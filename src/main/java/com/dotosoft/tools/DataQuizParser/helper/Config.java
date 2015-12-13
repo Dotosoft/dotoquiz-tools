@@ -1,4 +1,4 @@
-package com.dotosoft.tools.DataQuizParser;
+package com.dotosoft.tools.DataQuizParser.helper;
 
 public class Config {
 
