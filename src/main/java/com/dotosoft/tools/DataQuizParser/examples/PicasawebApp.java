@@ -1,4 +1,4 @@
-package com.dotosoft.tools.DataQuizParser.helper;
+package com.dotosoft.tools.DataQuizParser.examples;
 
 import java.net.URL;
 
