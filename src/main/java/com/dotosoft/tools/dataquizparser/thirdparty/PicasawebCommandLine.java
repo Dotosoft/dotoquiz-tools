@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-package com.dotosoft.tools.dataquizparser.picasa;
+package com.dotosoft.tools.dataquizparser.thirdparty;
 
 import com.google.gdata.client.photos.PicasawebService;
 import com.google.gdata.data.OtherContent;
