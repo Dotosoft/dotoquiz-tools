@@ -1,6 +1,6 @@
-package com.dotosoft.tools.DataQuizParser.representations;
+package com.dotosoft.tools.dataquizparser.representations;
 
-import com.dotosoft.tools.DataQuizParser.App.APPLICATION_TYPE;
+import com.dotosoft.tools.dataquizparser.App.APPLICATION_TYPE;
 
 public class ParserQuizObject {
 	protected APPLICATION_TYPE applicationType;

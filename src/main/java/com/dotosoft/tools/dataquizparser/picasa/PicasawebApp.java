@@ -1,4 +1,4 @@
-package com.dotosoft.tools.DataQuizParser.examples;
+package com.dotosoft.tools.dataquizparser.picasa;
 
 import java.net.URL;
 

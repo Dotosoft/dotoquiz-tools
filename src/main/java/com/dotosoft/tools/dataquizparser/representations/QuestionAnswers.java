@@ -1,9 +1,9 @@
-package com.dotosoft.tools.DataQuizParser.representations;
+package com.dotosoft.tools.dataquizparser.representations;
 
 import java.util.Arrays;
 import java.util.List;
 
-import com.dotosoft.tools.DataQuizParser.App.APPLICATION_TYPE;
+import com.dotosoft.tools.dataquizparser.App.APPLICATION_TYPE;
 
 public class QuestionAnswers extends ParserQuizObject {
 	private String id;

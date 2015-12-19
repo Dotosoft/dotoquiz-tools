@@ -1,11 +1,11 @@
-package com.dotosoft.tools.DataQuizParser.helper;
+package com.dotosoft.tools.dataquizparser.helper;
 
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 
-import com.dotosoft.tools.DataQuizParser.App.APPLICATION_TYPE;
-import com.dotosoft.tools.DataQuizParser.representations.QuestionAnswers;
-import com.dotosoft.tools.DataQuizParser.representations.Topics;
+import com.dotosoft.tools.dataquizparser.representations.QuestionAnswers;
+import com.dotosoft.tools.dataquizparser.representations.Topics;
+import com.dotosoft.tools.dataquizparser.App.APPLICATION_TYPE;
 
 public class DotoQuizStructure {
 	public static QuestionAnswers convertRowToQuestions(Row row, APPLICATION_TYPE type) {

@@ -1,4 +1,4 @@
-package com.dotosoft.tools.DataQuizParser;
+package com.dotosoft.tools.dataquizparser;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -12,9 +12,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Scanner;
 
-import com.dotosoft.tools.DataQuizParser.helper.DotoQuizStructure;
-import com.dotosoft.tools.DataQuizParser.representations.QuestionAnswers;
-import com.dotosoft.tools.DataQuizParser.representations.Topics;
+import com.dotosoft.tools.dataquizparser.helper.DotoQuizStructure;
+import com.dotosoft.tools.dataquizparser.representations.QuestionAnswers;
+import com.dotosoft.tools.dataquizparser.representations.Topics;
 import com.google.api.client.auth.oauth2.AuthorizationCodeFlow;
 import com.google.api.client.auth.oauth2.AuthorizationCodeRequestUrl;
 import com.google.api.client.auth.oauth2.AuthorizationCodeTokenRequest;
