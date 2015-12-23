@@ -40,7 +40,7 @@ import java.util.List;
  *
  * 
  */
-public class PicasawebClient {
+public class PicasawebClientAPI {
 
 	private static final String API_PREFIX = "https://picasaweb.google.com/data/feed/api/user/";
 
@@ -49,14 +49,14 @@ public class PicasawebClient {
 	/**
 	 * Constructs a new un-authenticated client.
 	 */
-	public PicasawebClient(PicasawebService service) {
+	public PicasawebClientAPI(PicasawebService service) {
 		this(service, null, null);
 	}
 
 	/**
 	 * Constructs a new client with the given username and password.
 	 */
-	public PicasawebClient(PicasawebService service, String uname, String passwd) {
+	public PicasawebClientAPI(PicasawebService service, String uname, String passwd) {
 		this.service = service;
 
 		if (uname != null && passwd != null) {

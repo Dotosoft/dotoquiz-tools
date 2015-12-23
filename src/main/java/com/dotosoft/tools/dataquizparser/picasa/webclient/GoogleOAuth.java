@@ -16,38 +16,39 @@ package com.dotosoft.tools.dataquizparser.picasa.webclient;
     limitations under the License.
 */
 
-import com.dotosoft.tools.dataquizparser.picasa.config.Settings;
-import com.dotosoft.tools.dataquizparser.picasa.syncutil.SyncState;
-import com.google.api.client.auth.oauth2.Credential;
-import com.google.api.client.googleapis.auth.oauth2.*;
-import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
-import com.google.api.client.http.HttpTransport;
-import com.google.api.client.json.jackson2.JacksonFactory;
-import com.sun.corba.se.impl.orbutil.concurrent.Sync;
-
-import javafx.application.Platform;
-import javafx.embed.swing.JFXPanel;
-import javafx.scene.Scene;
-import javafx.scene.web.WebEngine;
-import javafx.scene.web.WebView;
-
-import java.awt.*;
+import java.awt.Dimension;
+import java.awt.Toolkit;
 import java.io.IOException;
 import java.net.UnknownHostException;
 import java.security.GeneralSecurityException;
 import java.util.Collections;
 import java.util.prefs.Preferences;
 
-import javafx.scene.Group;
-
-import javax.swing.*;
-
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Worker;
 import javafx.concurrent.Worker.State;
+import javafx.embed.swing.JFXPanel;
+import javafx.scene.Group;
+import javafx.scene.Scene;
+import javafx.scene.web.WebEngine;
+import javafx.scene.web.WebView;
+
+import javax.swing.JFrame;
 
 import org.apache.log4j.Logger;
+
+import com.dotosoft.tools.dataquizparser.picasa.config.Settings;
+import com.dotosoft.tools.dataquizparser.picasa.syncutil.SyncState;
+import com.google.api.client.auth.oauth2.Credential;
+import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
+import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
+import com.google.api.client.googleapis.auth.oauth2.GoogleRefreshTokenRequest;
+import com.google.api.client.googleapis.auth.oauth2.GoogleTokenResponse;
+import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
+import com.google.api.client.http.HttpTransport;
+import com.google.api.client.json.jackson2.JacksonFactory;
 
 /**
  * Utility class to authenticate using Oauth 2.0.

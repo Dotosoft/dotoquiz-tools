@@ -40,7 +40,7 @@ import java.util.List;
  *
  * 
  */
-public class PicasawebCommandLine extends PicasawebClient {
+public class PicasawebCommandLine extends PicasawebClientAPI {
 
 	// Input stream for reading user input.
 	private static final BufferedReader IN = new BufferedReader(new InputStreamReader(System.in));

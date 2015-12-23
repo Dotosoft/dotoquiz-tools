@@ -1,4 +1,4 @@
-package com.dotosoft.tools.dataquizparser.thirdparty;
+package com.dotosoft.tools.dataquizparser;
 
 import java.io.File;
 import java.io.IOException;
