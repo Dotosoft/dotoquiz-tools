@@ -63,6 +63,7 @@ public class PicasawebClient {
 			try {
 				service.setUserCredentials(uname, passwd);
 			} catch (AuthenticationException e) {
+				e.printStackTrace();
 				throw new IllegalArgumentException("Illegal username/password combination.");
 			}
 		}

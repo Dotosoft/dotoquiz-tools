@@ -1,0 +1,36 @@
+deniss-MacBook-Pro:oauth2-cmdline-sample denis$ mvn -q exec:java
+2015-12-19 23:07:11.203:INFO::Logging to STDERR via org.mortbay.log.StdErrLog
+2015-12-19 23:07:11.204:INFO::jetty-6.1.26
+2015-12-19 23:07:11.223:INFO::Started SocketConnector@localhost:50666
+Please open the following address in your browser:
+  https://accounts.google.com/o/oauth2/auth?client_id=186396004448-81e3dlhmqctptjugdd1f68ekq5k353dh.apps.googleusercontent.com&redirect_uri=http://localhost:50666/Callback&response_type=code&scope=https://www.googleapis.com/auth/userinfo.profile%20https://www.googleapis.com/auth/userinfo.email
+Attempting to open that address in the default browser now...
+2015-12-19 23:07:41.604:INFO::Stopped SocketConnector@localhost:50666
+Dec 19, 2015 11:07:41 PM com.google.api.client.googleapis.services.AbstractGoogleClient <init>
+WARNING: Application name is not set. Call Builder#setApplicationName.
+
+================== Validating a token ==================
+
+{
+  "access_type" : "offline",
+  "audience" : "186396004448-81e3dlhmqctptjugdd1f68ekq5k353dh.apps.googleusercontent.com",
+  "email" : "dotosoft.images@gmail.com",
+  "expires_in" : 3599,
+  "issued_to" : "186396004448-81e3dlhmqctptjugdd1f68ekq5k353dh.apps.googleusercontent.com",
+  "scope" : "https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email",
+  "user_id" : "113922249877693412534",
+  "verified_email" : true
+}
+
+================== Obtaining User Profile Information ==================
+
+{
+  "email" : "dotosoft.images@gmail.com",
+  "family_name" : "Image",
+  "given_name" : "Dotosoft",
+  "id" : "113922249877693412534",
+  "locale" : "en",
+  "name" : "Dotosoft Image",
+  "picture" : "https://lh3.googleusercontent.com/-XdUIqdMkCWA/AAAAAAAAAAI/AAAAAAAAAAA/4252rscbv5M/photo.jpg",
+  "verified_email" : true
+}
