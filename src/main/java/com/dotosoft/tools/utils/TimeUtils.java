@@ -17,6 +17,7 @@
 package com.dotosoft.tools.utils;
 
 import com.google.gdata.data.photos.AlbumEntry;
+import com.google.gdata.data.photos.GphotoEntry;
 import com.google.gdata.data.photos.PhotoEntry;
 
 import java.io.File;
@@ -46,7 +47,18 @@ public class TimeUtils {
             }
         });
     }
-
+    
+    public static void sortGPhotoEntriesNewestFirst( List<GphotoEntry> photoEntry )
+    {
+    	Collections.sort(photoEntry, new Comparator<GphotoEntry>()
+        {
+            public int compare(GphotoEntry x, GphotoEntry y)
+            {
+                return y.getUpdated().compareTo(x.getUpdated());
+            }
+        });
+    }
+    
     public static void sortAlbumEntriesNewestFirst( List<AlbumEntry> albums )
     {
         Collections.sort(albums, new Comparator<AlbumEntry>() {
@@ -66,15 +78,4 @@ public class TimeUtils {
             }
         });
     }
-
-//    public static void sortSyncNewestFirst( List<AlbumSync> sync )
-//    {
-//        Collections.sort(sync, new Comparator<AlbumSync>()
-//        {
-//            public int compare(AlbumSync x, AlbumSync y)
-//            {
-//                return y.localChangeDate().compareTo( x.localChangeDate() );
-//            }
-//        });
-//    }
 }

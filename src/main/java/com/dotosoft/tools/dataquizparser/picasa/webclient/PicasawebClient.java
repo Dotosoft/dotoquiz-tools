@@ -24,6 +24,7 @@ import com.drew.metadata.Metadata;
 import com.drew.metadata.exif.ExifIFD0Directory;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.gdata.client.photos.PicasawebService;
+import com.google.gdata.data.Category;
 import com.google.gdata.data.DateTime;
 import com.google.gdata.data.Link;
 import com.google.gdata.data.PlainTextConstruct;
@@ -65,7 +66,7 @@ public class PicasawebClient {
     public static final String AUTO_UPLOAD_TYPE = "InstantUploadAuto";
     public static final String INSTANT_UPLOAD = "InstantUpload";
     private static final String ALBUM_TYPE_PATTERN = "<gphoto:albumType>%s</gphoto:albumType>";
-    private static final String SYNC_CLIENT_NAME = "com.otway.picasasync";
+    private static final String SYNC_CLIENT_NAME = "com.dotosoft.images";
     private static final int CONNECTION_TIMEOUT_SECS = 10;
 
     private static final String API_PREFIX
@@ -250,7 +251,7 @@ public class PicasawebClient {
     }
 
 
-    public void uploadImageToAlbum(File imageFile, PhotoEntry remotePhoto, AlbumEntry albumEntry, String localMd5CheckSum ) throws IOException, ServiceException {
+    public void uploadImageToAlbum(File imageFile, PhotoEntry remotePhoto, GphotoEntry albumEntry, String localMd5CheckSum ) throws IOException, ServiceException {
 
         boolean newPhoto = false;
         String albumName = albumEntry.getTitle().getPlainText();
@@ -335,8 +336,20 @@ public class PicasawebClient {
             }
         }
     }
+    
+    public PhotoEntry createPhotoEntry (String title, String description, File fileImage) {
+    	PhotoEntry myPhoto = new PhotoEntry();
+    	myPhoto.setTitle(new PlainTextConstruct(title));
+    	myPhoto.setDescription(new PlainTextConstruct(description));
+    	myPhoto.setClient(SYNC_CLIENT_NAME);
 
-    public void setUpdatedDate( AlbumEntry album, final PhotoEntry photoToChange, File localFile )
+    	MediaFileSource myMedia = new MediaFileSource(fileImage, "image/jpeg");
+    	myPhoto.setMediaSource(myMedia);
+    	
+    	return myPhoto;
+    }
+
+    public void setUpdatedDate( GphotoEntry album, final PhotoEntry photoToChange, File localFile )
     {
         try
         {
@@ -344,9 +357,9 @@ public class PicasawebClient {
 
             if( SETUPDATE_WORKS )
             {
-                List<PhotoEntry> photos = getPhotos(album);
+                List<GphotoEntry> photos = getPhotos(album);
 
-                for (PhotoEntry photo : photos)
+                for (GphotoEntry photo : photos)
                 {
                     if (photo.getGphotoId().equals(photoToChange.getGphotoId()))
                     {
@@ -399,42 +412,32 @@ public class PicasawebClient {
      * Retrieves the albums for the given user.
      * albumUrl = addParameter(albumUrl, "hidestreamid", "photos_from_posts" );
      */
-    public List<AlbumEntry> getAlbums(String username, boolean showall ) throws IOException,
-            ServiceException {
-    	
-//    	URL feedUrl = new URL("https://picasaweb.google.com/data/feed/api/user/default/albumid/6230417190229404673");
-//    	AlbumFeed feed = service.getFeed(feedUrl, AlbumFeed.class);
-//    	for(GphotoEntry photo : feed.getEntries()) {
-//    	    System.out.println(photo.getTitle().getPlainText());
-//    	}
-    	
-//    	URL feedUrl = new URL("https://picasaweb.google.com/data/feed/api/user/default?kind=photo");
-//    	AlbumFeed feed = service.getFeed(feedUrl, AlbumFeed.class);
-//    	for(GphotoEntry photo : feed.getEntries()) {
-//    	    System.out.println(photo.getTitle().getPlainText());
-//    	}
-
+    public List<GphotoEntry> getAlbums(String username, boolean showall ) throws IOException, ServiceException {
+        
         String albumUrl = API_PREFIX + username;
 
         if( showall )
             albumUrl = addParameter( albumUrl, "showall", null );
 
-        List<AlbumEntry> albums = new ArrayList<AlbumEntry>();
+        List<GphotoEntry> albums = new ArrayList<GphotoEntry>();
 
         while( true ) {
-            UserFeed userFeed = getFeed(albumUrl, UserFeed.class);
+        	UserFeed userFeed = getFeed(albumUrl, UserFeed.class);
 
             feeds.add( userFeed );
 
             List<GphotoEntry> entries = userFeed.getEntries();
 
             for (GphotoEntry entry : entries) {
-                GphotoEntry adapted = entry.getAdaptedEntry();
 
-                if (adapted instanceof AlbumEntry) {
-                    AlbumEntry album = (AlbumEntry)adapted;
-                    albums.add(album);
-                }
+//                GphotoEntry adapted = entry.getAdaptedEntry();
+//
+//                if (adapted instanceof AlbumEntry) {
+//                    AlbumEntry album = (AlbumEntry)adapted;
+//                    albums.add(album);
+//                }
+            	
+            	albums.add(entry);
             }
 
             Link nextLink = userFeed.getNextLink();
@@ -444,7 +447,7 @@ public class PicasawebClient {
             albumUrl = nextLink.getHref();
         }
 
-        TimeUtils.sortAlbumEntriesNewestFirst( albums );
+        TimeUtils.sortGPhotoEntriesNewestFirst( albums );
         return albums;
     }
 
@@ -452,7 +455,7 @@ public class PicasawebClient {
      * Retrieves the albums for the currently logged-in user.  This is equivalent
      * to calling {@link #getAlbums(String, boolean)} with "default" as the username.
      */
-    public List<AlbumEntry> getAlbums( boolean showall ) throws IOException, ServiceException {
+    public List<GphotoEntry> getAlbums( boolean showall ) throws IOException, ServiceException {
         return getAlbums("default", showall);
         // return getAlbums("113922249877693412534", showall);
     }
@@ -522,6 +525,48 @@ public class PicasawebClient {
         }
 
         TimeUtils.sortPhotoEntriesNewestFirst(photos);
+
+        return photos;
+    }
+    
+    /**
+     * Retrieves the photos for the given album.
+     */
+    public List<GphotoEntry> getPhotos(GphotoEntry photoEntry) throws IOException,
+            ServiceException {
+
+        List<GphotoEntry> photos = new ArrayList<GphotoEntry>();
+
+        // If it doesn't have an ID, it's an album we haven't created yet!
+        if( photoEntry.getLinks().size() != 0 ) {
+            String feedHref = getLinkByRel(photoEntry.getLinks(), Link.Rel.FEED);
+
+            feedHref = addParameter(feedHref, "imgmax", "d");
+            feedHref = addParameter(feedHref, "max-results", "1000");
+
+            while (feedHref != null) {
+                AlbumFeed albumFeed = getFeed(feedHref, AlbumFeed.class);
+
+                List<GphotoEntry> entries = albumFeed.getEntries();
+                for (GphotoEntry entry : entries) {
+//                    GphotoEntry adapted = entry.getAdaptedEntry();
+//                    if (adapted instanceof PhotoEntry) {
+//                        photos.add((PhotoEntry) adapted);
+//                    }
+                	
+                	photos.add(entry);
+                }
+
+                Link nextLink = albumFeed.getNextLink();
+                if (nextLink != null) {
+                    feedHref = nextLink.getHref();
+                } else {
+                    feedHref = null;
+                }
+            }
+        }
+
+        TimeUtils.sortGPhotoEntriesNewestFirst(photos);
 
         return photos;
     }

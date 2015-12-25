@@ -1,4 +1,4 @@
-package com.dotosoft.tools.DataQuizParser;
+package com.dotosoft.tools.dataquizparser;
 
 import junit.framework.Test;
 import junit.framework.TestCase;

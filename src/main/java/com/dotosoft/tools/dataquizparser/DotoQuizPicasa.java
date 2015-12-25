@@ -1,19 +1,24 @@
 package com.dotosoft.tools.dataquizparser;
 
-import java.io.File;
+import java.io.IOException;
+import java.util.List;
 
-import org.apache.log4j.*;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 
 import com.dotosoft.tools.dataquizparser.picasa.config.Settings;
 import com.dotosoft.tools.dataquizparser.picasa.syncutil.SyncState;
 import com.dotosoft.tools.dataquizparser.picasa.webclient.GoogleOAuth;
 import com.dotosoft.tools.dataquizparser.picasa.webclient.PicasawebClient;
-import com.dotosoft.tools.dataquizparser.picasa.webclient.RunRolledFileAppender;
+import com.google.gdata.data.Person;
+import com.google.gdata.data.photos.AlbumEntry;
+import com.google.gdata.data.photos.GphotoEntry;
+import com.google.gdata.util.ServiceException;
 
 
 public class DotoQuizPicasa {
 	
-	private static final Logger log = Logger.getLogger(DotoQuizPicasa.class);
+	private static final Logger log = LogManager.getLogger(DotoQuizPicasa.class.getName());
 	
 	private Settings settings;
 	private GoogleOAuth auth;
@@ -21,15 +26,12 @@ public class DotoQuizPicasa {
 	private PicasawebClient webClient;
 	
 	public DotoQuizPicasa() {
-		initLogging();
 		log.info("Starting and setup Doto Parser...");
 		settings = new Settings();
 		auth = new GoogleOAuth();
 		syncState = new SyncState();
-	}
-	
-	public void startParse() {		
-		if( settings.loadSettings() ) {
+		
+		if( settings.loadSettings(new String[]{}) ) {
 			log.info("Initialising Web client and authenticating...");
 	        if( webClient == null ) {
 	            try {
@@ -51,26 +53,22 @@ public class DotoQuizPicasa {
 		}
 	}
 	
-	private void initLogging() {
-
-        ConsoleAppender console = new ConsoleAppender(); //create appender
-        String PATTERN = "%d [%p|%c|%C{1}] %m%n";
-        console.setLayout(new PatternLayout(PATTERN));
-        console.setThreshold(Level.INFO);
-        console.activateOptions();
-        Logger.getRootLogger().addAppender(console);
-
-        RunRolledFileAppender fa = new RunRolledFileAppender();
-        fa.setName("FileLogger");
-        fa.setFile(new File(System.getProperty("user.home"), "DotoParseSync.log").toString() );
-        fa.setLayout(new PatternLayout("%d %-5p [%c{1}] %m%n"));
-        fa.setThreshold(Level.INFO);
-        fa.setAppend(true);
-        fa.activateOptions();
-        fa.setMaxBackupIndex( 1 );
-
-        Logger.getRootLogger().addAppender(fa);
-    }
+	public void startParse() {		
+		try {
+			List<GphotoEntry> albumEntries = webClient.getAlbums(true);
+			for(GphotoEntry album : albumEntries) {
+				System.out.println("album::: " + album);
+			} 
+			
+//			AlbumEntry myAlbum = new AlbumEntry();
+//			myAlbum.setTitle(new PlainTextConstruct("Trip to France"));
+//			myAlbum.setDescription(new PlainTextConstruct("My recent trip to France was delightful!"));
+//			webClient.insertAlbum(myAlbum);
+			
+		} catch (IOException | ServiceException e) {
+			e.printStackTrace();
+		}
+	}
 	
 	public void invalidateWebClient() {
         webClient = null;

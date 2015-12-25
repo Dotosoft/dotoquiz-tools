@@ -18,7 +18,10 @@ package com.dotosoft.tools.dataquizparser.picasa.config;
 
 import org.apache.log4j.Logger;
 
+import com.dotosoft.tools.dataquizparser.App.APPLICATION_TYPE;
+
 import javax.swing.*;
+
 import java.io.File;
 import java.util.prefs.Preferences;
 
@@ -30,13 +33,17 @@ public class Settings {
     private Preferences preferences;
 
     private static final String REFRESH_TOKEN = "RefreshToken";
-    private static final String SYNC_FOLDER = "SyncFolder";
+    private static final String APP_TYPE = "ApplicationType";
+    private static final String SYNC_FILE = "SyncFile";
 
-    private File photoRootFolder;
+    private String applicationType;
+    private File syncDataFile;
     private String refreshToken;
 
     public String getRefreshToken() { return refreshToken; }
-    public File getPhotoRootFolder() { return photoRootFolder; }
+    public String getApplicationType() { return applicationType; }
+    public File getSyncDataFile() { return syncDataFile; }
+    public String getSyncDataFolder() { return syncDataFile.getParent(); }
 
     public void setRefreshToken( String token ) { refreshToken = token; saveSettings(); }
 
@@ -44,51 +51,43 @@ public class Settings {
         preferences = Preferences.userNodeForPackage(Settings.class);
     }
 
-    public boolean loadSettings() {
+    public boolean loadSettings(String args[]) {
 
         boolean result = true;
-        photoRootFolder = null;
-
-        String prefsFolder = preferences.get( SYNC_FOLDER, null );
-        if( prefsFolder != null )
-            photoRootFolder = new File( prefsFolder );
-
-        if( photoRootFolder == null || ! photoRootFolder.exists() ) {
-            result = setPhotoRootFolder();
-        }
+        applicationType = null;
+        syncDataFile = null;
 
         refreshToken = preferences.get( REFRESH_TOKEN, null );
+        applicationType = preferences.get( APP_TYPE, null );
+        String prefsFolder = preferences.get( SYNC_FILE, null );
+        if( prefsFolder != null )
+        	syncDataFile = new File( prefsFolder );
+
+        if( syncDataFile == null || ! syncDataFile.exists() || applicationType == null) {
+        	if(args.length != 2) {
+				System.out.println("Error: Could not run DataQuizParser.");
+				System.out.println("Run: java -jar DataQuizParser.jar [GENERATE_SQL/BATCH_UPLOAD] [File Excel]");
+				result = false;
+			} else {
+				applicationType = args[0];
+				syncDataFile = new File(args[1]);
+				saveSettings();
+				result = true;
+			}
+        }
         
+        log.info( "Application Type : " + applicationType);
+        log.info( "Sync Data File : " + syncDataFile.getPath());
         log.info( "Settings loaded successfully.");
         return result;
     }
 
-    public boolean setPhotoRootFolder() {
-
-        // No folder, or the chosen folder isn't there. So prompt the user
-        JFileChooser chooser = new JFileChooser();
-        chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        chooser.setDialogTitle("Select Root Folder for Sync");
-
-        if( chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION )
-        {
-            photoRootFolder = chooser.getSelectedFile();
-
-            log.info( "Sync folder set to:" + photoRootFolder );
-            saveSettings();
-            return true;
-        }
-
-        return false;
-    }
-
     public void saveSettings() {
-        preferences.put( SYNC_FOLDER, getPhotoRootFolder().toString() );
+        preferences.put( SYNC_FILE, getSyncDataFile().toString() );
+        preferences.put( APP_TYPE, getApplicationType() );
         
-        if( getRefreshToken() != null )
-            preferences.put( REFRESH_TOKEN, getRefreshToken() );
-        else
-            preferences.remove( REFRESH_TOKEN );
+        if( getRefreshToken() != null ) preferences.put( REFRESH_TOKEN, getRefreshToken() );
+        else preferences.remove( REFRESH_TOKEN );
 
         log.info( "Settings saved successfully.");
     }
