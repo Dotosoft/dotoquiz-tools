@@ -53,33 +53,40 @@ public class Settings {
 
     public boolean loadSettings(String args[]) {
 
-        boolean result = true;
         applicationType = null;
         syncDataFile = null;
 
         refreshToken = preferences.get( REFRESH_TOKEN, null );
         applicationType = preferences.get( APP_TYPE, null );
         String prefsFolder = preferences.get( SYNC_FILE, null );
-        if( prefsFolder != null )
+        if( prefsFolder != null ) {
         	syncDataFile = new File( prefsFolder );
+        }
 
-        if( syncDataFile == null || ! syncDataFile.exists() || applicationType == null) {
-        	if(args.length != 2) {
+        if(args.length == 2) {
+        	try {
+	        	if(APPLICATION_TYPE.valueOf(args[0]) != null) {
+					applicationType = args[0];
+					syncDataFile = new File(args[1]);
+					saveSettings();
+	        	}
+        	} catch(IllegalArgumentException ex) {
+        		System.out.println("Error: Could not run DataQuizParser.");
+				System.out.println("Run: java -jar DataQuizParser.jar [GENERATE_SQL/BATCH_UPLOAD] [File Excel]");
+				System.exit(1);
+        	}
+        } else {
+        	if( syncDataFile == null || ! syncDataFile.exists() || applicationType == null) {
 				System.out.println("Error: Could not run DataQuizParser.");
 				System.out.println("Run: java -jar DataQuizParser.jar [GENERATE_SQL/BATCH_UPLOAD] [File Excel]");
-				result = false;
-			} else {
-				applicationType = args[0];
-				syncDataFile = new File(args[1]);
-				saveSettings();
-				result = true;
+				System.exit(1);
 			}
         }
         
         log.info( "Application Type : " + applicationType);
         log.info( "Sync Data File : " + syncDataFile.getPath());
         log.info( "Settings loaded successfully.");
-        return result;
+        return true;
     }
 
     public void saveSettings() {

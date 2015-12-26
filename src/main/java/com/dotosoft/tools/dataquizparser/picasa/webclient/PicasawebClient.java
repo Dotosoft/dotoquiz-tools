@@ -251,12 +251,12 @@ public class PicasawebClient {
     }
 
 
-    public void uploadImageToAlbum(File imageFile, PhotoEntry remotePhoto, GphotoEntry albumEntry, String localMd5CheckSum ) throws IOException, ServiceException {
+    public GphotoEntry uploadImageToAlbum(File imageFile, PhotoEntry remotePhoto, GphotoEntry albumEntry, String localMd5CheckSum ) throws IOException, ServiceException {
 
         boolean newPhoto = false;
         String albumName = albumEntry.getTitle().getPlainText();
         PhotoEntry myPhoto = remotePhoto;
-
+        
         if( myPhoto == null )
         {
             newPhoto = true;
@@ -275,6 +275,7 @@ public class PicasawebClient {
             MediaFileSource myMedia = new MediaFileSource(imageFile, "image/jpeg");
             myPhoto.setMediaSource(myMedia);
             myPhoto.setChecksum( localMd5CheckSum );
+            myPhoto.setAlbumAccess(GphotoAccess.Value.PUBLIC);
             myPhoto.setClient(SYNC_CLIENT_NAME);
 
             if( newPhoto)
@@ -291,6 +292,8 @@ public class PicasawebClient {
         }
 
         setUpdatedDate( albumEntry, myPhoto, imageFile );
+        
+        return myPhoto;
     }
 
     public void setAlbumDateFromFolder(File folder, AlbumEntry albumEntry)
@@ -660,7 +663,7 @@ public class PicasawebClient {
      */
     public <T extends GphotoFeed> T getFeed(String feedHref,
                                             Class<T> feedClass) throws IOException, ServiceException {
-        System.out.println("Get Feed URL: " + feedHref);
+        log.info("Get Feed URL: " + feedHref);
         return service.getFeed(new URL(feedHref), feedClass);
     }
 

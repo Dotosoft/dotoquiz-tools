@@ -68,9 +68,10 @@ public class Topics extends ParserQuizObject {
 	@Override
 	public String toString() {
 		if (applicationType == APPLICATION_TYPE.BATCH_UPLOAD) {
-			return "Topics [id=" + id + ", topicName=" + topicName
-					+ ", topicParentId=" + topicParentId
-					+ ", topicDescription=" + topicDescription + "]";
+			return "Topics [id=" + id + ", picasaId=" + picasaId
+				+ ", imagePicasaUrl=" + imagePicasaUrl + ", topicName="
+				+ topicName + ", topicDescription=" + topicDescription
+				+ ", topicParentId=" + topicParentId + "]";
 		} else {
 			return "insert into sos_topics(id, picasa_id, name, description, image_url, is_delete, created_dt, created_by, topicParent) "
 					+ "values ('" + id
@@ -84,4 +85,6 @@ public class Topics extends ParserQuizObject {
 					+ ", " + (topicParentId == null ? "null" : "'" + topicParentId + "'") + ");";
 		}
 	}
+	
+	
 }
