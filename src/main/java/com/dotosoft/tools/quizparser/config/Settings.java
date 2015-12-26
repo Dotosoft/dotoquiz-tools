@@ -23,6 +23,7 @@ import com.dotosoft.tools.quizparser.App.APPLICATION_TYPE;
 import javax.swing.*;
 
 import java.io.File;
+import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 /**
@@ -55,7 +56,6 @@ public class Settings {
 
         applicationType = null;
         syncDataFile = null;
-
         refreshToken = preferences.get( REFRESH_TOKEN, null );
         applicationType = preferences.get( APP_TYPE, null );
         String prefsFolder = preferences.get( SYNC_FILE, null );

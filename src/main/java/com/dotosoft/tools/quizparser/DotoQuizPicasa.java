@@ -2,6 +2,7 @@ package com.dotosoft.tools.quizparser;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.prefs.Preferences;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -73,7 +74,9 @@ public class DotoQuizPicasa {
     }
 	
 	public static void main(String args[]) {
-		DotoQuizPicasa doto = new DotoQuizPicasa();
-		doto.startParse();
+//		DotoQuizPicasa doto = new DotoQuizPicasa();
+//		doto.startParse();
+		
+		System.out.println(Preferences.userRoot().absolutePath());
 	}
 }

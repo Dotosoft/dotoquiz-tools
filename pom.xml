@@ -217,7 +217,7 @@
 					</execution>
 				</executions>
 				<configuration>
-					<mainClass>com.dotosoft.tools.dataquizparser.App</mainClass>
+					<mainClass>com.dotosoft.tools.quizparser.App</mainClass>
 					<systemProperties>
 						<systemProperty>
 							<key>java.util.logging.config.file</key>
