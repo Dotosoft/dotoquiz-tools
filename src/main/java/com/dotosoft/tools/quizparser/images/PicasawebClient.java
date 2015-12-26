@@ -68,7 +68,7 @@ public class PicasawebClient {
     public static final String AUTO_UPLOAD_TYPE = "InstantUploadAuto";
     public static final String INSTANT_UPLOAD = "InstantUpload";
     private static final String ALBUM_TYPE_PATTERN = "<gphoto:albumType>%s</gphoto:albumType>";
-    private static final String SYNC_CLIENT_NAME = "com.dotosoft.images";
+    private static final String SYNC_CLIENT_NAME = "com.dotosoft.quizparser";
     private static final int CONNECTION_TIMEOUT_SECS = 10;
 
     private static final String API_PREFIX = "https://picasaweb.google.com/data/feed/api/user/";
