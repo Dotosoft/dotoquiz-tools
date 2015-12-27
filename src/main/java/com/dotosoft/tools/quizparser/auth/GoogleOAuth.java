@@ -1,49 +1,16 @@
 package com.dotosoft.tools.quizparser.auth;
 
-/*
-    Copyright 2015 Mark Otway
-
-    Licensed under the Apache License, Version 2.0 (the "License");
-    you may not use this file except in compliance with the License.
-    You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-    Unless required by applicable law or agreed to in writing, software
-    distributed under the License is distributed on an "AS IS" BASIS,
-    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    See the License for the specific language governing permissions and
-    limitations under the License.
-*/
-
-import java.awt.Dimension;
-import java.awt.Toolkit;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.UnknownHostException;
 import java.security.GeneralSecurityException;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
-import java.util.prefs.Preferences;
-
-import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.concurrent.Worker;
-import javafx.concurrent.Worker.State;
-import javafx.embed.swing.JFXPanel;
-import javafx.scene.Group;
-import javafx.scene.Scene;
-import javafx.scene.web.WebEngine;
-import javafx.scene.web.WebView;
-
-import javax.swing.JFrame;
 
 import org.apache.log4j.Logger;
 
 import com.dotosoft.tools.quizparser.DotoQuizGoogle;
-import com.dotosoft.tools.quizparser.config.ClientSecretConsts;
+import com.dotosoft.tools.quizparser.config.QuizParserConstant;
 import com.dotosoft.tools.quizparser.config.Settings;
 import com.dotosoft.tools.quizparser.images.PicasawebClient;
 import com.dotosoft.tools.quizparser.images.syncutil.SyncState;
@@ -72,14 +39,6 @@ import com.google.api.client.util.store.FileDataStoreFactory;
 public class GoogleOAuth {
     private static final Logger log = Logger.getLogger(GoogleOAuth.class);
 
-    private static final String SUCCESS_CODE = "Success code=";
-    private static volatile String token;
-    private static final Object lock = new Object();
-    private static final String redirectUrl = "urn:ietf:wg:oauth:2.0:oob";
-    private static final String scope = "https://picasaweb.google.com/data/";
-    private static final JacksonFactory jsonFactory = JacksonFactory.getDefaultInstance();
-    private static final Preferences prefs = Preferences.userNodeForPackage(GoogleOAuth.class);
-    private static final Dimension frameSize = new Dimension( 650, 500 );
     private static GoogleClientSecrets clientSecrets;
     /** Global instance of the JSON factory. */
 	private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
@@ -99,8 +58,8 @@ public class GoogleOAuth {
 	
 	/** OAuth 2.0 scopes. */
 	private static final List<String> SCOPES = Arrays.asList(
-			"https://picasaweb.google.com/data/", 
-			"https://spreadsheets.google.com/feeds");
+			QuizParserConstant.SCOPE_PICASA, 
+			QuizParserConstant.SCOPE_GOOGLESHEET);
 
     public GoogleOAuth()
     {
@@ -116,7 +75,7 @@ public class GoogleOAuth {
 
 
     public PicasawebClient authenticatePicasa( Settings settings, boolean allowInteractive, SyncState state ) throws IOException, GeneralSecurityException {
-        final HttpTransport httpTransport = GoogleNetHttpTransport.newTrustedTransport();
+        // final HttpTransport httpTransport = GoogleNetHttpTransport.newTrustedTransport();
 
         log.info("Preparing to authenticate via OAuth...");
         Credential cred = null;
@@ -171,7 +130,7 @@ public class GoogleOAuth {
     }
 
     public Credential getRefreshedCredentials(String refreshCode) throws IOException, GeneralSecurityException {
-        HttpTransport httpTransport = GoogleNetHttpTransport.newTrustedTransport();
+        // HttpTransport httpTransport = GoogleNetHttpTransport.newTrustedTransport();
 
         log.info("Getting access token for refresh token..");
 
@@ -184,7 +143,7 @@ public class GoogleOAuth {
     		}
             
             GoogleTokenResponse response = new GoogleRefreshTokenRequest(
-                    httpTransport, jsonFactory, refreshCode, clientSecrets.getDetails().getClientId(), clientSecrets.getDetails().getClientId() )
+                    httpTransport, JSON_FACTORY, refreshCode, clientSecrets.getDetails().getClientId(), clientSecrets.getDetails().getClientSecret() )
                     .execute();
 
             return new GoogleCredential().setAccessToken(response.getAccessToken());
@@ -198,114 +157,5 @@ public class GoogleOAuth {
             log.error( "Exception getting refreshed auth: ", e );
         }
         return null;
-    }
-
-    private static String initAndShowGUI(final String url, final SyncState state ) {
-
-        log.info("Displaying OAuth Login frame...");
-
-        final JFrame frame = new JFrame("Authenticate Picasa");
-        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-
-        frame.getContentPane().setLayout(null); // do the layout manually
-
-        final JFXPanel fxPanel = new JFXPanel();
-
-        frame.add(fxPanel);
-        frame.setVisible(true);
-
-        fxPanel.setSize(frameSize);
-        fxPanel.setLocation(0,0);
-
-        frame.getContentPane().setPreferredSize(frameSize);
-
-        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        frame.setLocation(screenSize.width / 2 - fxPanel.getSize().width / 2, screenSize.height / 2 - fxPanel.getSize().height / 2);
-
-        frame.pack();
-        frame.setResizable(false);
-
-        String authToken = "";
-
-        try {
-            Platform.runLater(new Runnable() {
-                public void run() {
-                    log.info( "Initialising login frame on background thread.");
-                    synchronized ( lock ){
-                        initWebView(fxPanel, frame, url, state );
-                    }
-                }
-            });
-
-            synchronized ( lock ) {
-                lock.wait();
-
-                log.info( "User closed window.");
-
-                authToken = token;
-            }
-        }
-        catch( Exception ex ){
-            log.error("Unexpected exception opening interactive login screen.");
-        }
-
-        return authToken;
-    }
-
-    /* Creates a WebView and fires up google.com */
-    private static void initWebView(final JFXPanel fxPanel, final JFrame frame, String url, final SyncState state ) {
-        log.info( "Initialising WebView on GUI thread...");
-
-        Group group = new Group();
-        Scene scene = new Scene(group);
-        fxPanel.setScene(scene);
-
-        WebView webView = new WebView();
-
-        group.getChildren().add(webView);
-        webView.setMinSize(frameSize.width, frameSize.height);
-        webView.setMaxSize(frameSize.width, frameSize.height);
-        webView.setZoom( 0.80 );
-
-        // Obtain the webEngine to navigate
-        final WebEngine webEngine = webView.getEngine();
-
-        webEngine.getLoadWorker().stateProperty().addListener(
-                new ChangeListener<State>() {
-                    public void changed(ObservableValue ov, State oldState, State newState) {
-
-                        HandleWebTitleChange( webEngine, frame, newState, state );
-                    }
-                });
-
-        webEngine.load(url);
-    }
-
-    private static void HandleWebTitleChange( WebEngine webEngine, JFrame frame, State newState, SyncState state )
-    {
-        if (newState == Worker.State.SUCCEEDED) {
-            log.info("Page refreshed: " + webEngine.getTitle());
-
-            frame.setTitle(webEngine.getTitle());
-
-            if( webEngine.getTitle().startsWith( SUCCESS_CODE ) ) {
-
-                synchronized ( lock ) {
-                    token = webEngine.getTitle().substring( SUCCESS_CODE.length() );
-                    state.setStatus( "Login successful.");
-                    lock.notify();
-                }
-
-                log.info("Hiding login panel.");
-
-                frame.setVisible( false );
-            }
-        }
-        else if( newState == Worker.State.FAILED ) {
-            log.error("Error loading Google Auth Page!");
-            state.setStatus( "Unable to load Google Authentication page.");
-            state.cancel( true );
-            frame.setVisible(false);
-        }
     }
 }

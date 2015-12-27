@@ -131,60 +131,18 @@ public class DotoQuizGoogle {
 			// authorization
 			Credential credential = authorize();
 			
-//			GoogleCredential credential = new GoogleCredential.Builder()
-//	            .setTransport(httpTransport)
-//	            .setJsonFactory(JSON_FACTORY)
-//	            .setServiceAccountId("dotosoft-images@dotoquiz.iam.gserviceaccount.com")
-//	            .setServiceAccountPrivateKeyFromP12File(new File("/Users/denis/Documents/Dotosoft/SecretKey/DotoQuiz-1aa033e1165c.p12"))
-//	            .setServiceAccountScopes(Collections.singleton("https://picasaweb.google.com/data/"))
-//	            .build();
-//			credential.getRefreshToken();
-			
-			
-//			// set up global Oauth2 instance
-//			oauth2 = new Oauth2.Builder(httpTransport, JSON_FACTORY, credential).setApplicationName(APPLICATION_NAME).build();
-////			
-////			// run commands
-//			tokenInfo(credential.getAccessToken());
-//			userInfo(); 
-			
-			PicasawebService myService = new PicasawebService("exampleCo-exampleApp-1");
-			myService.setOAuth2Credentials( credential );
-			myService.setConnectTimeout( 1000 * CONNECTION_TIMEOUT_SECS );
-			myService.setReadTimeout(1000 * CONNECTION_TIMEOUT_SECS);
-			// myService.setAuthSubToken(credential.getAccessToken());
-			
-			
-			// String requestUrl = AuthSubUtil.getRequestUrl("http://dotosoft.com","https://picasaweb.google.com/data/",false,true);
-//			myService.setAuthSubToken(credential.getAccessToken());
-			
-			// String sessionToken = AuthSubUtil.exchangeForSessionToken(onetimeUseToken, null);
-			
-//			PicasawebClient client = new PicasawebClient(myService, "dotosoft.images@gmail.com", "user2010");
-//			for(AlbumEntry entry : client.getAlbums()) {
-//				System.out.println(":::: " + entry);
-//			}
-			
-			// myService.setUserToken(credential.getAccessToken());
-			// myService.setUserCredentials("dotosoft.images@gmail.com", "User2010");
-			
-//			myService.getAuthTokenFactory().
-			
-//			URL feedUrl = new URL("https://picasaweb.google.com/data/feed/api/user/default?kind=album");
+//			PicasawebService myService = new PicasawebService("exampleCo-exampleApp-1");
+//			myService.setOAuth2Credentials( credential );
+//			myService.setConnectTimeout( 1000 * CONNECTION_TIMEOUT_SECS );
+//			myService.setReadTimeout(1000 * CONNECTION_TIMEOUT_SECS);
+//			
+//			URL feedURL = new URL("https://picasaweb.google.com/data/feed/api/user/default");
+//			AlbumEntry myAlbum = new AlbumEntry();
 //
-//			UserFeed myUserFeed = myService.getFeed(feedUrl, UserFeed.class);
+//			myAlbum.setTitle(new PlainTextConstruct("Trip to France"));
+//			myAlbum.setDescription(new PlainTextConstruct("My recent trip to France was delightful!"));
 //
-//			for (AlbumEntry myAlbum : myUserFeed.getAlbumEntries()) {
-//			    System.out.println(myAlbum.getTitle().getPlainText());
-//			}
-			
-			URL feedURL = new URL("https://picasaweb.google.com/data/feed/api/user/default");
-			AlbumEntry myAlbum = new AlbumEntry();
-
-			myAlbum.setTitle(new PlainTextConstruct("Trip to France"));
-			myAlbum.setDescription(new PlainTextConstruct("My recent trip to France was delightful!"));
-
-			AlbumEntry insertedEntry = myService.insert(feedURL, myAlbum);
+//			AlbumEntry insertedEntry = myService.insert(feedURL, myAlbum);
 			
 			// success!
 			return;
