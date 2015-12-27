@@ -149,7 +149,7 @@ public class GoogleOAuth {
             cred = getRefreshedCredentials( refreshToken );
         }
 
-        if( cred == null && allowInteractive ) {
+        if( cred == null ) {
 
             // Either there was no valid refresh token, or the credentials could not
             // be created (they may have been revoked). So run the auth flow

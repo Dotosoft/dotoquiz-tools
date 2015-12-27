@@ -117,16 +117,32 @@ public class App {
 	}
 	
 	public void process() {
-		
-		// Init Picasa Data
-		if(IMAGE_HOSTING_TYPE.PICASA.toString().equals(settings.getImageHostingType())) {
-			refreshAllDataFromPicasa();
+		if(webClient != null) {
+			// Init Picasa Data
+			if(IMAGE_HOSTING_TYPE.PICASA.toString().equals(settings.getImageHostingType())) {
+				refreshAllDataFromPicasa();
+			}
+			
+			if(APPLICATION_TYPE.CLEAR.toString().equals(settings.getApplicationType())) {
+				ClearAllAlbums();
+			} else {
+				if(DATA_TYPE.EXCEL.toString().equals(settings.getDataType())) {
+					processExcel();
+				} else if(DATA_TYPE.GOOGLESHEET.toString().equals(settings.getDataType())) {
+					processGooglesheet();
+				}
+			}
 		}
-		
-		if(DATA_TYPE.EXCEL.toString().equals(settings.getDataType())) {
-			processExcel();
-		} else if(DATA_TYPE.GOOGLESHEET.toString().equals(settings.getDataType())) {
-			processGooglesheet();
+	}
+	
+	private void ClearAllAlbums() {
+		for(String key : albumMapByTitle.keySet()) {
+			try {
+				GphotoEntry albumEntry = albumMapByTitle.get(key);
+				albumEntry.delete();
+			} catch (IOException | ServiceException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 	
@@ -152,10 +168,10 @@ public class App {
 
 		        	if(type == APPLICATION_TYPE.GENERATE_SQL) {
 		    			System.out.println(topic);
-		    		} else if(type == APPLICATION_TYPE.BATCH_UPLOAD || type == APPLICATION_TYPE.ALL) {
-		    			if( !QuizParserConstant.YES.equals( topic.getIsProcessed()) ) {
-			    			topic = uploadTopicToPicasa(topic);
-			    			
+		    		} else if(type == APPLICATION_TYPE.BATCH_UPLOAD) {
+		    			topic = syncTopicToPicasa(topic);
+		    			
+		    			if(!QuizParserConstant.YES.equals(topic.getIsProcessed())) {
 			    			listEntry.getCustomElements().setValueLocal("albumidpicasa", topic.getPicasaId());
 			    			listEntry.getCustomElements().setValueLocal("imageurlpicasa", topic.getImagePicasaUrl());
 			    			listEntry.getCustomElements().setValueLocal("isprocessed", QuizParserConstant.YES);
@@ -180,10 +196,10 @@ public class App {
 		        	
 		        	if(type == APPLICATION_TYPE.GENERATE_SQL) {
 		    			System.out.println(questionAnswer + "\n");
-		    		} else if(type == APPLICATION_TYPE.BATCH_UPLOAD || type == APPLICATION_TYPE.ALL) {
-		    			if( !QuizParserConstant.YES.equals(questionAnswer.getIsProcessed()) ) {
-			    			questionAnswer = uploadQuestionAnswersToPicasa(questionAnswer);		    	
-			    			
+		    		} else if(type == APPLICATION_TYPE.BATCH_UPLOAD) {
+		    			questionAnswer = syncQuestionAnswersToPicasa(questionAnswer);		    	
+		    			
+		    			if(!QuizParserConstant.YES.equals(questionAnswer.getIsProcessed())) {
 			    			if("image".equals(questionAnswer.getQuestionType())) {
 				    			listEntry.getCustomElements().setValueLocal("photoidpicasa", questionAnswer.getPicasaId());
 				    			listEntry.getCustomElements().setValueLocal("imageurlpicasa_2", questionAnswer.getImagePicasaUrl());
@@ -232,10 +248,10 @@ public class App {
 		        if(topic != null) {
 		        	if(type == APPLICATION_TYPE.GENERATE_SQL) {
 		    			System.out.println(topic);
-		    		} else if(type == APPLICATION_TYPE.BATCH_UPLOAD || type == APPLICATION_TYPE.ALL) {
-		    			if( !QuizParserConstant.YES.equals( topic.getIsProcessed()) ) {
-			    			topic = uploadTopicToPicasa(topic);
-			    			
+		    		} else if(type == APPLICATION_TYPE.BATCH_UPLOAD) {
+		    			topic = syncTopicToPicasa(topic);
+		    			
+		    			if(!QuizParserConstant.YES.equals(topic.getIsProcessed())) {
 			    			row.getCell(1).setCellValue(topic.getPicasaId());
 			    			row.getCell(2).setCellValue(topic.getImagePicasaUrl());
 			    			row.getCell(7).setCellValue(QuizParserConstant.YES);
@@ -261,10 +277,10 @@ public class App {
 		        if(questionAnswer != null) {
 		        	if(type == APPLICATION_TYPE.GENERATE_SQL) {
 		    			System.out.println(questionAnswer + "\n");
-		    		} else if(type == APPLICATION_TYPE.BATCH_UPLOAD || type == APPLICATION_TYPE.ALL) {
-		    			if( !QuizParserConstant.YES.equals( questionAnswer.getIsProcessed()) ) {
-			    			questionAnswer = uploadQuestionAnswersToPicasa(questionAnswer);		    	
-			    			
+		    		} else if(type == APPLICATION_TYPE.BATCH_UPLOAD) {
+		    			questionAnswer = syncQuestionAnswersToPicasa(questionAnswer);		    	
+		    			
+		    			if(!QuizParserConstant.YES.equals(questionAnswer.getIsProcessed())) {
 			    			row.getCell(11).setCellValue(questionAnswer.getPicasaId());
 			    			row.getCell(12).setCellValue(questionAnswer.getImagePicasaUrl());
 			    			row.getCell(20).setCellValue(QuizParserConstant.YES);
@@ -317,8 +333,8 @@ public class App {
         webClient = null;
     }
 	
-	public Topics uploadTopicToPicasa(Topics topic) {
-		log.info("Upload Topics '" + topic.getTopicName() + "'");
+	public Topics syncTopicToPicasa(Topics topic) {
+		log.info("Sync Topics '" + topic.getTopicName() + "'");
 		try {
 			GphotoEntry albumEntry;
 			if(albumMapByTitle.containsKey(topic.getTopicName())) {
@@ -332,24 +348,26 @@ public class App {
 				albumEntry = webClient.insertAlbum(myAlbum);
 			}
 			
-			Map<String, GphotoEntry> photoEntryCollections = (Map<String, GphotoEntry>) photoMapByAlbumId.get(albumEntry.getId());
-			GphotoEntry photoEntry = photoEntryCollections != null ? photoEntryCollections.get(topic.getImageUrl()) : null;
-			if(photoEntryCollections == null) photoEntryCollections = new HashMap<String, GphotoEntry>();
-			if(photoEntry == null) {
-				// Upload album as topic
-				log.info("there is no image '"+ topic.getImageUrl() +"' at '" + topic.getTopicName() + "'. Wait for uploading...");
-				java.nio.file.Path topicImagePath = FileUtils.getPath(settings.getSyncDataFolder(), topic.getTopicName(), "topic.png");
-				if(!topicImagePath.toFile().exists()) {
-					log.error("File is not found at '" + topicImagePath.toString() + "'. Please put the file and start this app again.");
-					System.exit(1);
+			if(!QuizParserConstant.YES.equals(topic.getIsProcessed())) {
+				Map<String, GphotoEntry> photoEntryCollections = (Map<String, GphotoEntry>) photoMapByAlbumId.get(albumEntry.getId());
+				GphotoEntry photoEntry = photoEntryCollections != null ? photoEntryCollections.get(topic.getImageUrl()) : null;
+				if(photoEntryCollections == null) photoEntryCollections = new HashMap<String, GphotoEntry>();
+				if(photoEntry == null) {
+					// Upload album as topic
+					log.info("there is no image '"+ topic.getImageUrl() +"' at '" + topic.getTopicName() + "'. Wait for uploading...");
+					java.nio.file.Path topicImagePath = FileUtils.getPath(settings.getSyncDataFolder(), topic.getTopicName(), "topic.png");
+					if(!topicImagePath.toFile().exists()) {
+						log.error("File is not found at '" + topicImagePath.toString() + "'. Please put the file and start this app again.");
+						System.exit(1);
+					}
+					photoEntry = webClient.uploadImageToAlbum(topicImagePath.toFile(), null, albumEntry, MD5Checksum.getMD5Checksum(topicImagePath.toString()));
+					photoEntryCollections.put(((MediaContent)photoEntry.getContent()).getUri(), photoEntry);
+					photoMapByAlbumId.put(albumEntry.getId(), photoEntryCollections);
 				}
-				photoEntry = webClient.uploadImageToAlbum(topicImagePath.toFile(), null, albumEntry, MD5Checksum.getMD5Checksum(topicImagePath.toString()));
-				photoEntryCollections.put(((MediaContent)photoEntry.getContent()).getUri(), photoEntry);
-				photoMapByAlbumId.put(albumEntry.getId(), photoEntryCollections);
+				
+				topic.setImagePicasaUrl( ((MediaContent)photoEntry.getContent()).getUri() );
+				topic.setPicasaId(albumEntry.getGphotoId());
 			}
-			
-			topic.setImagePicasaUrl( ((MediaContent)photoEntry.getContent()).getUri() );
-			topic.setPicasaId(albumEntry.getGphotoId());
 			albumMapByTopicId.put(topic.getId(), albumEntry);
 		} catch (IOException | ServiceException e) {
 			e.printStackTrace();
@@ -357,40 +375,42 @@ public class App {
 		return topic;
 	}
 	
-	public QuestionAnswers uploadQuestionAnswersToPicasa(QuestionAnswers answer) {
-		log.info("Upload QuestionAnswers '" + answer.getQuestion() + "'");
+	public QuestionAnswers syncQuestionAnswersToPicasa(QuestionAnswers answer) {
+		log.info("Sync QuestionAnswers '" + answer.getQuestion() + "'");
 		
-		try {
-			if("image".equals(answer.getQuestionType()) && StringUtils.hasValue(answer.getAdditionalData())) {
-				GphotoEntry firstTopic = albumMapByTopicId.get(answer.getTopics()[0]);
-				// Check Topic is valid or not
-				if(firstTopic == null) {
-					log.error("Topic '"+ answer.getTopics()[0] +"' is not found!");
-					System.exit(1);
+		if(!QuizParserConstant.YES.equals(answer.getIsProcessed())) {
+			try {
+				if("image".equals(answer.getQuestionType()) && StringUtils.hasValue(answer.getAdditionalData())) {
+					GphotoEntry firstTopic = albumMapByTopicId.get(answer.getTopics()[0]);
+					// Check Topic is valid or not
+					if(firstTopic == null) {
+						log.error("Topic '"+ answer.getTopics()[0] +"' is not found!");
+						System.exit(1);
+					}
+					
+					// Check image file is valid or not
+					java.nio.file.Path questionAnswerImagePath = FileUtils.getPath(settings.getSyncDataFolder(), firstTopic.getTitle().getPlainText(), answer.getAdditionalData());
+					if(!questionAnswerImagePath.toFile().exists()) {
+						log.error("File is not found at '" + questionAnswerImagePath.toString() + "'. Please put the file and start this app again.");
+						System.exit(1);
+					}
+					
+					// Check image at picasa
+					Map<String, GphotoEntry> photoEntryCollections = photoMapByAlbumId.get(firstTopic.getId());
+					GphotoEntry photoEntry = photoEntryCollections != null ? photoEntryCollections.get(answer.getAdditionalData()) : null;
+					if(photoEntryCollections == null) photoEntryCollections = new HashMap<String, GphotoEntry>();
+					if(photoEntry == null) {
+						photoEntry = webClient.uploadImageToAlbum(questionAnswerImagePath.toFile(), null, firstTopic, MD5Checksum.getMD5Checksum(questionAnswerImagePath.toString()));
+						photoEntryCollections.put(((MediaContent)photoEntry.getContent()).getUri(), photoEntry);
+						photoMapByAlbumId.put(firstTopic.getId(), photoEntryCollections);
+					}
+					
+					answer.setImagePicasaUrl( ((MediaContent)photoEntry.getContent()).getUri() );
+					answer.setPicasaId( photoEntry.getGphotoId() );
 				}
-				
-				// Check image file is valid or not
-				java.nio.file.Path questionAnswerImagePath = FileUtils.getPath(settings.getSyncDataFolder(), firstTopic.getTitle().getPlainText(), answer.getAdditionalData());
-				if(!questionAnswerImagePath.toFile().exists()) {
-					log.error("File is not found at '" + questionAnswerImagePath.toString() + "'. Please put the file and start this app again.");
-					System.exit(1);
-				}
-				
-				// Check image at picasa
-				Map<String, GphotoEntry> photoEntryCollections = photoMapByAlbumId.get(firstTopic.getId());
-				GphotoEntry photoEntry = photoEntryCollections != null ? photoEntryCollections.get(answer.getAdditionalData()) : null;
-				if(photoEntryCollections == null) photoEntryCollections = new HashMap<String, GphotoEntry>();
-				if(photoEntry == null) {
-					photoEntry = webClient.uploadImageToAlbum(questionAnswerImagePath.toFile(), null, firstTopic, MD5Checksum.getMD5Checksum(questionAnswerImagePath.toString()));
-					photoEntryCollections.put(((MediaContent)photoEntry.getContent()).getUri(), photoEntry);
-					photoMapByAlbumId.put(firstTopic.getId(), photoEntryCollections);
-				}
-				
-				answer.setImagePicasaUrl( ((MediaContent)photoEntry.getContent()).getUri() );
-				answer.setPicasaId( photoEntry.getGphotoId() );
+			} catch (IOException | ServiceException e) {
+				e.printStackTrace();
 			}
-		} catch (IOException | ServiceException e) {
-			e.printStackTrace();
 		}
 		
 		return answer;

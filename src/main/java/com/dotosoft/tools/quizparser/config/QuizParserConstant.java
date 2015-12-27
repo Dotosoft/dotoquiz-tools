@@ -19,7 +19,7 @@ package com.dotosoft.tools.quizparser.config;
 public class QuizParserConstant {
 	// Application Type Definition
 	public enum APPLICATION_TYPE {
-		GENERATE_SQL, BATCH_UPLOAD, ALL
+		CLEAR, GENERATE_SQL, BATCH_UPLOAD
 	}
 	
 	public enum DATA_TYPE {
