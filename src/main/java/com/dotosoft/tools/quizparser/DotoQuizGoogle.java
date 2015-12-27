@@ -17,6 +17,7 @@
 package com.dotosoft.tools.quizparser;
 
 import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.util.List;
 
 import org.apache.log4j.LogManager;
@@ -40,7 +41,7 @@ private static final Logger log = LogManager.getLogger(App.class.getName());
 	
 	private static boolean isError = false;
 	
-	public static void main(String[] args) throws IOException, ServiceException {
+	public static void main(String[] args) throws IOException, ServiceException, GeneralSecurityException {
 		
 		settings = new Settings();
 		auth = new GoogleOAuth();
@@ -51,7 +52,7 @@ private static final Logger log = LogManager.getLogger(App.class.getName());
 			log.info("Initialising Web client and authenticating...");
 	        if( webClient == null ) {
 	            try {
-	                webClient = auth.authenticateGooglesheet(settings, false, syncState );
+	                webClient = auth.authenticateGooglesheet("Pertanyaan", settings, false, syncState );
 	            }
 	            catch( Exception _ex ) {
 	            	isError = true;

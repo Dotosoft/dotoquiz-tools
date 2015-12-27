@@ -22,6 +22,14 @@ public class QuizParserConstant {
 		GENERATE_SQL, BATCH_UPLOAD, ALL
 	}
 	
+	public enum DATA_TYPE {
+		EXCEL, GOOGLESHEET
+	}
+	
+	public enum IMAGE_HOSTING_TYPE {
+		PICASA
+	}
+	
 	public static final String SCOPE_PICASA = "https://picasaweb.google.com/data/";
 	public static final String SCOPE_GOOGLESHEET = "https://spreadsheets.google.com/feeds";
 	
@@ -37,4 +45,9 @@ public class QuizParserConstant {
 	public static final String REFRESH_TOKEN = "RefreshToken";
 	public static final String APP_TYPE = "ApplicationType";
 	public static final String SYNC_FILE = "SyncFile";
+	public static final String DATA_TYPE = "DataType";
+	public static final String IMAGE_HOSTING_TYPE = "ImageHostingType";
+	
+	public static final String YES = "Y";
+	public static final String NO = "N";
 }

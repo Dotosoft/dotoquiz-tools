@@ -12,7 +12,7 @@
 	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 	See the License for the specific language governing permissions and
 	limitations under the License.
-*/
+ */
 
 package com.dotosoft.tools.quizparser.representations;
 
@@ -21,44 +21,37 @@ import java.util.Arrays;
 import com.dotosoft.tools.quizparser.config.QuizParserConstant.APPLICATION_TYPE;
 
 public class QuestionAnswers extends ParserQuizObject {
-	private String id;
-	private String picasaId;
-	private String[] topics;
-	private String pertanyaan;
-	private String imageUrl;
-	private String correctAnswer;
-	private String wrongAnswer1;
-	private String wrongAnswer2;
-	private String wrongAnswer3;
 
-	public QuestionAnswers(String id, String[] topics, String pertanyaan,
-			String imageUrl, String correctAnswer, String wrongAnswer1,
-			String wrongAnswer2, String wrongAnswer3) {
+	public QuestionAnswers(String id, String[] topics, String picasaId,
+			String imagePicasaUrl, String question, String questionType,
+			String additionalData, String correctAnswer, String wrongAnswer1,
+			String wrongAnswer2, String wrongAnswer3, String isProcessed) {
 		this.id = id;
 		this.topics = topics;
-		this.pertanyaan = pertanyaan;
-		this.imageUrl = imageUrl;
+		this.picasaId = picasaId;
+		this.imagePicasaUrl = imagePicasaUrl;
+		this.question = question;
+		this.questionType = questionType;
+		this.additionalData = additionalData;
 		this.correctAnswer = correctAnswer;
 		this.wrongAnswer1 = wrongAnswer1;
 		this.wrongAnswer2 = wrongAnswer2;
 		this.wrongAnswer3 = wrongAnswer3;
+		this.isProcessed = isProcessed;
 	}
 
-	public String getPicasaId() {
-		return picasaId;
-	}
-
-	public void setPicasaId(String picasaId) {
-		this.picasaId = picasaId;
-	}
-
-	public String QuestionType() {
-		if (imageUrl != null && !imageUrl.equals("")) {
-			return "Text/HTML";
-		} else {
-			return "Plain Text";
-		}
-	}
+	private String id;
+	private String[] topics;
+	private String picasaId;
+	private String imagePicasaUrl;
+	private String question;
+	private String questionType;
+	private String additionalData;
+	private String correctAnswer;
+	private String wrongAnswer1;
+	private String wrongAnswer2;
+	private String wrongAnswer3;
+	private String isProcessed;
 
 	public String getId() {
 		return id;
@@ -76,20 +69,44 @@ public class QuestionAnswers extends ParserQuizObject {
 		this.topics = topics;
 	}
 
-	public String getPertanyaan() {
-		return pertanyaan;
+	public String getPicasaId() {
+		return picasaId;
 	}
 
-	public void setPertanyaan(String pertanyaan) {
-		this.pertanyaan = pertanyaan;
+	public void setPicasaId(String picasaId) {
+		this.picasaId = picasaId;
 	}
 
-	public String getImageUrl() {
-		return imageUrl;
+	public String getImagePicasaUrl() {
+		return imagePicasaUrl;
 	}
 
-	public void setImageUrl(String imageUrl) {
-		this.imageUrl = imageUrl;
+	public void setImagePicasaUrl(String imagePicasaUrl) {
+		this.imagePicasaUrl = imagePicasaUrl;
+	}
+
+	public String getQuestion() {
+		return question;
+	}
+
+	public void setQuestion(String question) {
+		this.question = question;
+	}
+
+	public String getQuestionType() {
+		return questionType;
+	}
+
+	public void setQuestionType(String questionType) {
+		this.questionType = questionType;
+	}
+
+	public String getAdditionalData() {
+		return additionalData;
+	}
+
+	public void setAdditionalData(String additionalData) {
+		this.additionalData = additionalData;
 	}
 
 	public String getCorrectAnswer() {
@@ -124,29 +141,46 @@ public class QuestionAnswers extends ParserQuizObject {
 		this.wrongAnswer3 = wrongAnswer3;
 	}
 
+	public String getIsProcessed() {
+		return isProcessed;
+	}
+
+	public void setIsProcessed(String isProcessed) {
+		this.isProcessed = isProcessed;
+	}
+
 	@Override
 	public String toString() {
 		if (applicationType == APPLICATION_TYPE.BATCH_UPLOAD) {
-			return "QuestionAnswers [id=" + id + ", picasaId=" + picasaId
-					+ ", topics=" + Arrays.toString(topics) + ", pertanyaan="
-					+ pertanyaan + ", imageUrl=" + imageUrl + ", correctAnswer="
+			return "QuestionAnswers [id=" + id + ", topics="
+					+ Arrays.toString(topics) + ", picasaId=" + picasaId
+					+ ", imagePicasaUrl=" + imagePicasaUrl + ", question="
+					+ question + ", questionType=" + questionType
+					+ ", additionalData=" + additionalData + ", correctAnswer="
 					+ correctAnswer + ", wrongAnswer1=" + wrongAnswer1
 					+ ", wrongAnswer2=" + wrongAnswer2 + ", wrongAnswer3="
-					+ wrongAnswer3 + "]";
+					+ wrongAnswer3 + ", isProcessed=" + isProcessed + "]";
 		} else {
 			return "insert into dat_questions(id, picasaId, question, questionImage, question_type, is_delete, correct_answer, wrong_answer1, wrong_answer2, wrong_answer3, created_by, created_dt) "
-				+ "values(" + "uuid()"
-				+ ", '" + picasaId
-				+ "', '" + pertanyaan
-				+ "', '" + imageUrl
-				+ "', '" + QuestionType()
-				+ "', 'N'"
-				+ ", '" + correctAnswer 
-				+ "', '" + wrongAnswer1
-				+ "', '" + wrongAnswer2
-				+ "', '"+ wrongAnswer3
-				+ "', 'system'"
-				+ ", current_time" + ");";
+					+ "values("
+					+ "uuid()"
+					+ ", '"
+					+ picasaId
+					+ "', '"
+					+ question
+					+ "', '"
+					+ imagePicasaUrl
+					+ "', '"
+					+ questionType
+					+ "', 'N'"
+					+ ", '"
+					+ correctAnswer
+					+ "', '"
+					+ wrongAnswer1
+					+ "', '"
+					+ wrongAnswer2
+					+ "', '"
+					+ wrongAnswer3 + "', 'system'" + ", current_time" + ");";
 		}
 	}
 }

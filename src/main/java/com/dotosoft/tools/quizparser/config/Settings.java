@@ -22,6 +22,8 @@ import java.util.prefs.Preferences;
 import org.apache.log4j.Logger;
 
 import com.dotosoft.tools.quizparser.config.QuizParserConstant.APPLICATION_TYPE;
+import com.dotosoft.tools.quizparser.config.QuizParserConstant.DATA_TYPE;
+import com.dotosoft.tools.quizparser.config.QuizParserConstant.IMAGE_HOSTING_TYPE;
 
 /**
  * General settings class for loading/saving prefs
@@ -32,9 +34,13 @@ public class Settings {
     private Preferences preferences;
 
     private String applicationType;
-    private File syncDataFile;
+    private String dataType;
+    private String imageHostingType;
     private String refreshToken;
+    private File syncDataFile;
 
+    public String getDataType() { return dataType; }
+    public String getImageHostingType() { return imageHostingType; }
     public String getRefreshToken() { return refreshToken; }
     public String getApplicationType() { return applicationType; }
     public File getSyncDataFile() { return syncDataFile; }
@@ -52,40 +58,64 @@ public class Settings {
         syncDataFile = null;
         refreshToken = preferences.get( QuizParserConstant.REFRESH_TOKEN, null );
         applicationType = preferences.get( QuizParserConstant.APP_TYPE, null );
+        dataType = preferences.get( QuizParserConstant.DATA_TYPE, null );
+        imageHostingType = preferences.get( QuizParserConstant.IMAGE_HOSTING_TYPE, null );
+        
         String prefsFolder = preferences.get( QuizParserConstant.SYNC_FILE, null );
         if( prefsFolder != null ) {
         	syncDataFile = new File( prefsFolder );
         }
 
-        if(args.length == 2) {
+        // if data type is excel, it must add 4 argument, need file excel
+        // else if data type is googlesheet, it must add 3 argument
+        if(args.length >= 3 &&  args.length <= 4) {
         	try {
-	        	if(APPLICATION_TYPE.valueOf(args[0]) != null) {
-					applicationType = args[0];
-					syncDataFile = new File(args[1]);
-					saveSettings();
+	        	if(DATA_TYPE.valueOf(args[0]) != null) {
+					dataType = args[0];
+					
+					if(DATA_TYPE.EXCEL.equals(dataType)) {
+						syncDataFile = new File(args[3]);
+					}
 	        	}
+	        	
+	        	if(IMAGE_HOSTING_TYPE.valueOf(args[1]) != null) {
+					imageHostingType = args[1];
+	        	}
+	        	
+	        	if(APPLICATION_TYPE.valueOf(args[2]) != null) {
+					applicationType = args[2];
+	        	}
+	        	
+				saveSettings();
+				
         	} catch(IllegalArgumentException ex) {
-        		System.out.println("Error: Could not run DataQuizParser.");
-				System.out.println("Run: java -jar DataQuizParser.jar [GENERATE_SQL/BATCH_UPLOAD] [File Excel]");
-				System.exit(1);
+        		ShowError();
         	}
         } else {
-        	if( syncDataFile == null || ! syncDataFile.exists() || applicationType == null) {
-				System.out.println("Error: Could not run DataQuizParser.");
-				System.out.println("Run: java -jar DataQuizParser.jar [GENERATE_SQL/BATCH_UPLOAD] [File Excel]");
-				System.exit(1);
+        	if( syncDataFile == null || ! syncDataFile.exists() || applicationType == null || dataType == null || imageHostingType == null ) {
+				ShowError();
 			}
         }
         
+        log.info( "Data Type : " + dataType);
+        log.info( "Image Hosting Type : " + imageHostingType);
         log.info( "Application Type : " + applicationType);
         log.info( "Sync Data File : " + syncDataFile.getPath());
         log.info( "Settings loaded successfully.");
         return true;
     }
+    
+    void ShowError() {
+    	System.out.println("Error: Could not run DataQuizParser.");
+		System.out.println("Run: java -jar DataQuizParser.jar [EXCEL|GOOGLESHEET] [PICASA] [GENERATE_SQL|BATCH_UPLOAD|ALL] [File Excel]");
+		System.exit(1);
+    }
 
     public void saveSettings() {
         preferences.put( QuizParserConstant.SYNC_FILE, getSyncDataFile().toString() );
         preferences.put( QuizParserConstant.APP_TYPE, getApplicationType() );
+        preferences.put( QuizParserConstant.DATA_TYPE, getDataType() );
+        preferences.put( QuizParserConstant.IMAGE_HOSTING_TYPE, getImageHostingType() );
         
         if( getRefreshToken() != null ) preferences.put( QuizParserConstant.REFRESH_TOKEN, getRefreshToken() );
         else preferences.remove( QuizParserConstant.REFRESH_TOKEN );

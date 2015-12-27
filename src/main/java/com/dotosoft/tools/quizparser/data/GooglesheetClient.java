@@ -110,18 +110,6 @@ public class GooglesheetClient {
 		// Fetch the list feed of the worksheet.
 	    URL listFeedUrl = worksheet.getListFeedUrl();
 	    ListFeed listFeed = service.getFeed(listFeedUrl, ListFeed.class);
-
-	    // Iterate through each row, printing its cell values.
-	    for (ListEntry row : listFeed.getEntries()) {
-	    	// Print the first column's cell value
-	    	System.out.print(row.getTitle().getPlainText() + "\t");
-	    	// Iterate over the remaining columns, and print each cell value
-	    	for (String tag : row.getCustomElements().getTags()) {
-	    		System.out.print(row.getCustomElements().getValue(tag) + "\t");
-	    	}
-	    	System.out.println();
-	    }
-	    
 	    return listFeed.getEntries();
 	}
 	

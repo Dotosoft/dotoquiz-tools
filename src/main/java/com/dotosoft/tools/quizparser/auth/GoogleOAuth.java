@@ -124,7 +124,7 @@ public class GoogleOAuth {
         return null;
     }
     
-    public GooglesheetClient authenticateGooglesheet( Settings settings, boolean allowInteractive, SyncState state ) throws IOException, GeneralSecurityException, IOException, ServiceException  {
+    public GooglesheetClient authenticateGooglesheet(String googlesheetFileName, Settings settings, boolean allowInteractive, SyncState state) throws IOException, GeneralSecurityException, IOException, ServiceException  {
     	Credential cred = authenticateOauth(settings, allowInteractive, state);
 
         if( cred != null ){
@@ -132,7 +132,7 @@ public class GoogleOAuth {
             log.info("Building Googlesheet Client...");
 
             // Build a web client using the credentials we created
-            return new GooglesheetClient( cred , "Pertanyaan");
+            return new GooglesheetClient( cred , googlesheetFileName);
         }
 
         return null;
