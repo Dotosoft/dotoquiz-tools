@@ -1,58 +1,65 @@
 /*
-    Copyright 2015 Mark Otway
-
-    Licensed under the Apache License, Version 2.0 (the "License");
-    you may not use this file except in compliance with the License.
-    You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-    Unless required by applicable law or agreed to in writing, software
-    distributed under the License is distributed on an "AS IS" BASIS,
-    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    See the License for the specific language governing permissions and
-    limitations under the License.
+	Copyright 2015 Denis Prasetio
+	
+	Licensed under the Apache License, Version 2.0 (the "License");
+	you may not use this file except in compliance with the License.
+	You may obtain a copy of the License at
+	
+	http://www.apache.org/licenses/LICENSE-2.0
+	
+	Unless required by applicable law or agreed to in writing, software
+	distributed under the License is distributed on an "AS IS" BASIS,
+	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+	See the License for the specific language governing permissions and
+	limitations under the License.
 */
 
 package com.dotosoft.tools.quizparser.images;
 
-import com.dotosoft.tools.quizparser.helper.TimeUtils;
-import com.dotosoft.tools.quizparser.images.metadata.ImageInformation;
-import com.drew.imaging.ImageMetadataReader;
-import com.drew.metadata.Directory;
-import com.drew.metadata.Metadata;
-import com.drew.metadata.exif.ExifIFD0Directory;
-import com.google.api.client.auth.oauth2.Credential;
-import com.google.gdata.client.Query;
-import com.google.gdata.client.photos.PicasawebService;
-import com.google.gdata.data.Category;
-import com.google.gdata.data.DateTime;
-import com.google.gdata.data.Link;
-import com.google.gdata.data.PlainTextConstruct;
-import com.google.gdata.data.media.MediaFileSource;
-import com.google.gdata.data.media.mediarss.MediaContent;
-import com.google.gdata.data.photos.*;
-import com.google.gdata.util.AuthenticationException;
-import com.google.gdata.util.ParseException;
-import com.google.gdata.util.ServiceException;
-import com.google.gdata.util.XmlBlob;
+import static com.dotosoft.tools.quizparser.images.metadata.ImageInformation.safeReadImageInformation;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.log4j.Logger;
-
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.ConnectException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
-import static com.dotosoft.tools.quizparser.images.metadata.ImageInformation.readImageInformation;
-import static com.dotosoft.tools.quizparser.images.metadata.ImageInformation.safeReadImageInformation;
+import org.apache.commons.io.FileUtils;
+import org.apache.log4j.Logger;
+
+import com.dotosoft.tools.quizparser.config.QuizParserConstant;
+import com.dotosoft.tools.quizparser.helper.TimeUtils;
+import com.dotosoft.tools.quizparser.images.metadata.ImageInformation;
+import com.google.api.client.auth.oauth2.Credential;
+import com.google.gdata.client.photos.PicasawebService;
+import com.google.gdata.data.DateTime;
+import com.google.gdata.data.Link;
+import com.google.gdata.data.PlainTextConstruct;
+import com.google.gdata.data.media.MediaFileSource;
+import com.google.gdata.data.media.mediarss.MediaContent;
+import com.google.gdata.data.photos.AlbumEntry;
+import com.google.gdata.data.photos.AlbumFeed;
+import com.google.gdata.data.photos.CommentEntry;
+import com.google.gdata.data.photos.ExifTags;
+import com.google.gdata.data.photos.GphotoAccess;
+import com.google.gdata.data.photos.GphotoEntry;
+import com.google.gdata.data.photos.GphotoFeed;
+import com.google.gdata.data.photos.PhotoEntry;
+import com.google.gdata.data.photos.TagEntry;
+import com.google.gdata.data.photos.UserFeed;
+import com.google.gdata.util.AuthenticationException;
+import com.google.gdata.util.ParseException;
+import com.google.gdata.util.ServiceException;
+import com.google.gdata.util.XmlBlob;
 
 /**
  * This is a simple client that provides high-level operations on the Picasa Web
@@ -68,20 +75,18 @@ public class PicasawebClient {
     public static final String AUTO_UPLOAD_TYPE = "InstantUploadAuto";
     public static final String INSTANT_UPLOAD = "InstantUpload";
     private static final String ALBUM_TYPE_PATTERN = "<gphoto:albumType>%s</gphoto:albumType>";
-    private static final String SYNC_CLIENT_NAME = "com.dotosoft.quizparser";
-    private static final int CONNECTION_TIMEOUT_SECS = 10;
 
     private static final String API_PREFIX = "https://picasaweb.google.com/data/feed/api/user/";
 
-    private final PicasawebService service = new PicasawebService(SYNC_CLIENT_NAME);;
+    private final PicasawebService service = new PicasawebService(QuizParserConstant.SYNC_CLIENT_NAME);
 
     /**
      * Constructs a new un-authenticated client.
      */
     public PicasawebClient(Credential credential ) {
         service.setOAuth2Credentials( credential );
-        service.setConnectTimeout( 1000 * CONNECTION_TIMEOUT_SECS );
-        service.setReadTimeout(1000 * CONNECTION_TIMEOUT_SECS);
+        service.setConnectTimeout( 1000 * QuizParserConstant.CONNECTION_TIMEOUT_SECS );
+        service.setReadTimeout(1000 * QuizParserConstant.CONNECTION_TIMEOUT_SECS);
     }
 
     /**
@@ -276,7 +281,7 @@ public class PicasawebClient {
             myPhoto.setMediaSource(myMedia);
             myPhoto.setChecksum( localMd5CheckSum );
             myPhoto.setAlbumAccess(GphotoAccess.Value.PUBLIC);
-            myPhoto.setClient(SYNC_CLIENT_NAME);
+            myPhoto.setClient(QuizParserConstant.SYNC_CLIENT_NAME);
 
             if( newPhoto)
             {
@@ -344,7 +349,7 @@ public class PicasawebClient {
     	PhotoEntry myPhoto = new PhotoEntry();
     	myPhoto.setTitle(new PlainTextConstruct(title));
     	myPhoto.setDescription(new PlainTextConstruct(description));
-    	myPhoto.setClient(SYNC_CLIENT_NAME);
+    	myPhoto.setClient(QuizParserConstant.SYNC_CLIENT_NAME);
 
     	MediaFileSource myMedia = new MediaFileSource(fileImage, "image/jpeg");
     	myPhoto.setMediaSource(myMedia);

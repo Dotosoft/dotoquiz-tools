@@ -1,22 +1,21 @@
 /*
-    Copyright 2015 Mark Otway
-
-    Licensed under the Apache License, Version 2.0 (the "License");
-    you may not use this file except in compliance with the License.
-    You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-    Unless required by applicable law or agreed to in writing, software
-    distributed under the License is distributed on an "AS IS" BASIS,
-    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    See the License for the specific language governing permissions and
-    limitations under the License.
+	Copyright 2015 Denis Prasetio
+	
+	Licensed under the Apache License, Version 2.0 (the "License");
+	you may not use this file except in compliance with the License.
+	You may obtain a copy of the License at
+	
+	http://www.apache.org/licenses/LICENSE-2.0
+	
+	Unless required by applicable law or agreed to in writing, software
+	distributed under the License is distributed on an "AS IS" BASIS,
+	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+	See the License for the specific language governing permissions and
+	limitations under the License.
 */
 
 package com.dotosoft.tools.quizparser.images.syncutil;
 
-//import com.otway.picasasync.ui.SyncTrayIcon;
 import javax.swing.*;
 
 /**
@@ -30,13 +29,8 @@ public class SyncState {
     private boolean cancelled;
     private String lastStatus;
     private boolean syncInProgress;
-//    private SyncTrayIcon trayIcon;
     private int totalDownloaded;
     private int totalUploaded;
-
-//    public void setTrayIcon( SyncTrayIcon trayIcon ){
-//        this.trayIcon = trayIcon;
-//    }
 
     public boolean getIsInProgress() {
         synchronized ( lock ){
@@ -61,8 +55,6 @@ public class SyncState {
         synchronized ( lock ){
             lastStatus = msg;
         }
-
-//        updateGUIStatus( false );
     }
 
     public void start() {
@@ -72,8 +64,6 @@ public class SyncState {
             cancelled = false;
             syncInProgress = true;
         }
-
-//        updateGUIStatus( false );
     }
 
     public void cancel( boolean withError ){
@@ -81,29 +71,5 @@ public class SyncState {
             cancelled = true;
             syncInProgress = false;
         }
-
-//        updateGUIStatus( withError );
     }
-
-//    private void updateGUIStatus( final boolean errorState ){
-//
-//        if( trayIcon != null ) {
-//
-//            final String msg;
-//            final String stats;
-//            final boolean inProgress;
-//
-//            synchronized (lock) {
-//                msg = this.lastStatus;
-//                inProgress = this.syncInProgress;
-//                stats = String.format( "%d downloaded, %d uploaded", this.totalDownloaded, this.totalUploaded);
-//            }
-//
-//            SwingUtilities.invokeLater(new Runnable() {
-//                public void run() {
-//                    trayIcon.setStatus(msg, stats, inProgress, errorState);
-//                }
-//            });
-//        }
-//    }
 }
