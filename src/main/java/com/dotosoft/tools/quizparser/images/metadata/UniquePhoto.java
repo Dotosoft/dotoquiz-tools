@@ -28,9 +28,6 @@ import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Date;
 
-/**
- * Created by markotway on 28/04/15.
- */
 public class UniquePhoto
 {
     public UniquePhoto( File localFile ) throws IOException

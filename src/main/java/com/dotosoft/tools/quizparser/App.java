@@ -32,6 +32,7 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import com.dotosoft.tools.quizparser.auth.GoogleOAuth;
+import com.dotosoft.tools.quizparser.config.QuizParserConstant.APPLICATION_TYPE;
 import com.dotosoft.tools.quizparser.config.Settings;
 import com.dotosoft.tools.quizparser.helper.DotoQuizStructure;
 import com.dotosoft.tools.quizparser.helper.FileUtils;
@@ -63,12 +64,13 @@ public class App {
 	
 	private boolean isError = false;
 	
-	public enum APPLICATION_TYPE {
-		GENERATE_SQL, BATCH_UPLOAD, ALL
+	public static void main(String[] args) {
+		new App(args).processExcel();
 	}
 	
 	public App(String args[]) {
 		log.info("Starting and setup Doto Parser...");
+		
 		photoMapByAlbumId = new HashMap<String, Map<String, GphotoEntry>>();
 		albumMapByTopicId = new HashMap<String, GphotoEntry>();
 		albumMapByTitle = new HashMap<String, GphotoEntry>();
@@ -106,36 +108,11 @@ public class App {
 		}
 	}
 	
-	private void refreshAllData() {
-		log.info("Load all data from picasa");
-		try {
-			List<GphotoEntry> albumEntries = webClient.getAlbums(true);
-			for(GphotoEntry albumEntry : albumEntries) {
-				// System.out.println("album::: " + album);
-				albumMapByTitle.put(albumEntry.getTitle().getPlainText(), albumEntry);
-				// Sync picture topic.png
-				List<GphotoEntry> photoEntries = webClient.getPhotos(albumEntry);
-				Map<String, GphotoEntry> photoEntriesCollections;
-				if(photoMapByAlbumId.containsKey(albumEntry.getId())) {
-					photoEntriesCollections = (Map<String, GphotoEntry>) photoMapByAlbumId.get(albumEntry.getId());  
-				} else {
-					photoEntriesCollections = new HashMap<String, GphotoEntry>();
-				}
-				for(GphotoEntry photoEntry : photoEntries) {
-					photoEntriesCollections.put(photoEntry.getTitle().getPlainText(), photoEntry);
-				}
-				photoMapByAlbumId.put(albumEntry.getId(), photoEntriesCollections);
-			}
-		} catch (IOException | ServiceException e) {
-			e.printStackTrace();
-		}
+	public void processGooglesheet() {
+		
 	}
 	
-	public void invalidateWebClient() {
-        webClient = null;
-    }
-	
-	public void process() {
+	public void processExcel() {
 		if(isError) return;
 		try {
 			APPLICATION_TYPE type = APPLICATION_TYPE.valueOf(settings.getApplicationType());
@@ -187,6 +164,35 @@ public class App {
 		    e.printStackTrace();
 		}
 	}
+	
+	private void refreshAllData() {
+		log.info("Load all data from picasa");
+		try {
+			List<GphotoEntry> albumEntries = webClient.getAlbums(true);
+			for(GphotoEntry albumEntry : albumEntries) {
+				// System.out.println("album::: " + album);
+				albumMapByTitle.put(albumEntry.getTitle().getPlainText(), albumEntry);
+				// Sync picture topic.png
+				List<GphotoEntry> photoEntries = webClient.getPhotos(albumEntry);
+				Map<String, GphotoEntry> photoEntriesCollections;
+				if(photoMapByAlbumId.containsKey(albumEntry.getId())) {
+					photoEntriesCollections = (Map<String, GphotoEntry>) photoMapByAlbumId.get(albumEntry.getId());  
+				} else {
+					photoEntriesCollections = new HashMap<String, GphotoEntry>();
+				}
+				for(GphotoEntry photoEntry : photoEntries) {
+					photoEntriesCollections.put(photoEntry.getTitle().getPlainText(), photoEntry);
+				}
+				photoMapByAlbumId.put(albumEntry.getId(), photoEntriesCollections);
+			}
+		} catch (IOException | ServiceException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void invalidateWebClient() {
+        webClient = null;
+    }
 	
 	public Topics uploadTopicToPicasa(Topics topic) {
 		log.info("Upload Topics '" + topic.getTopicName() + "'");
@@ -265,9 +271,5 @@ public class App {
 		}
 		
 		return answer;
-	}
-	
-	public static void main(String[] args) {
-		new App(args).process();
 	}
 }

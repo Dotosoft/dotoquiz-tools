@@ -17,9 +17,8 @@
 package com.dotosoft.tools.quizparser.representations;
 
 import java.util.Arrays;
-import java.util.List;
 
-import com.dotosoft.tools.quizparser.App.APPLICATION_TYPE;
+import com.dotosoft.tools.quizparser.config.QuizParserConstant.APPLICATION_TYPE;
 
 public class QuestionAnswers extends ParserQuizObject {
 	private String id;

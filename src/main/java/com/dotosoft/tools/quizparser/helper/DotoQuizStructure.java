@@ -19,7 +19,7 @@ package com.dotosoft.tools.quizparser.helper;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 
-import com.dotosoft.tools.quizparser.App.APPLICATION_TYPE;
+import com.dotosoft.tools.quizparser.config.QuizParserConstant.APPLICATION_TYPE;
 import com.dotosoft.tools.quizparser.representations.QuestionAnswers;
 import com.dotosoft.tools.quizparser.representations.Topics;
 

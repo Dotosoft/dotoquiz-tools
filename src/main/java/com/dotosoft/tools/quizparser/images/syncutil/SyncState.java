@@ -16,7 +16,6 @@
 
 package com.dotosoft.tools.quizparser.images.syncutil;
 
-import javax.swing.*;
 
 /**
  * Synchronised object used to marshal updates and status

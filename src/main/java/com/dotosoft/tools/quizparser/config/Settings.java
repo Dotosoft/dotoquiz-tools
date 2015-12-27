@@ -16,26 +16,20 @@
 
 package com.dotosoft.tools.quizparser.config;
 
+import java.io.File;
+import java.util.prefs.Preferences;
+
 import org.apache.log4j.Logger;
 
-import com.dotosoft.tools.quizparser.App.APPLICATION_TYPE;
-
-import javax.swing.*;
-
-import java.io.File;
-import java.util.prefs.BackingStoreException;
-import java.util.prefs.Preferences;
+import com.dotosoft.tools.quizparser.config.QuizParserConstant.APPLICATION_TYPE;
 
 /**
  * General settings class for loading/saving prefs
  */
 public class Settings {
     private static final Logger log = Logger.getLogger(Settings.class);
+    
     private Preferences preferences;
-
-    private static final String REFRESH_TOKEN = "RefreshToken";
-    private static final String APP_TYPE = "ApplicationType";
-    private static final String SYNC_FILE = "SyncFile";
 
     private String applicationType;
     private File syncDataFile;
@@ -56,9 +50,9 @@ public class Settings {
 
         applicationType = null;
         syncDataFile = null;
-        refreshToken = preferences.get( REFRESH_TOKEN, null );
-        applicationType = preferences.get( APP_TYPE, null );
-        String prefsFolder = preferences.get( SYNC_FILE, null );
+        refreshToken = preferences.get( QuizParserConstant.REFRESH_TOKEN, null );
+        applicationType = preferences.get( QuizParserConstant.APP_TYPE, null );
+        String prefsFolder = preferences.get( QuizParserConstant.SYNC_FILE, null );
         if( prefsFolder != null ) {
         	syncDataFile = new File( prefsFolder );
         }
@@ -90,11 +84,11 @@ public class Settings {
     }
 
     public void saveSettings() {
-        preferences.put( SYNC_FILE, getSyncDataFile().toString() );
-        preferences.put( APP_TYPE, getApplicationType() );
+        preferences.put( QuizParserConstant.SYNC_FILE, getSyncDataFile().toString() );
+        preferences.put( QuizParserConstant.APP_TYPE, getApplicationType() );
         
-        if( getRefreshToken() != null ) preferences.put( REFRESH_TOKEN, getRefreshToken() );
-        else preferences.remove( REFRESH_TOKEN );
+        if( getRefreshToken() != null ) preferences.put( QuizParserConstant.REFRESH_TOKEN, getRefreshToken() );
+        else preferences.remove( QuizParserConstant.REFRESH_TOKEN );
 
         log.info( "Settings saved successfully.");
     }

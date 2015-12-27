@@ -16,7 +16,7 @@
 
 package com.dotosoft.tools.quizparser.representations;
 
-import com.dotosoft.tools.quizparser.App.APPLICATION_TYPE;
+import com.dotosoft.tools.quizparser.config.QuizParserConstant.APPLICATION_TYPE;
 
 public class ParserQuizObject {
 	protected APPLICATION_TYPE applicationType;
