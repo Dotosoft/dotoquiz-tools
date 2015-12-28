@@ -45,7 +45,7 @@ import com.dotosoft.tools.quizparser.helper.FileUtils;
 import com.dotosoft.tools.quizparser.helper.MD5Checksum;
 import com.dotosoft.tools.quizparser.helper.StringUtils;
 import com.dotosoft.tools.quizparser.images.PicasawebClient;
-import com.dotosoft.tools.quizparser.images.syncutil.SyncState;
+import com.dotosoft.tools.quizparser.images.utils.SyncState;
 import com.dotosoft.tools.quizparser.representations.QuestionAnswers;
 import com.dotosoft.tools.quizparser.representations.Topics;
 import com.google.gdata.data.MediaContent;

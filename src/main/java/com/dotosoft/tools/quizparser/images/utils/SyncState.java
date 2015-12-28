@@ -14,7 +14,7 @@
 	limitations under the License.
 */
 
-package com.dotosoft.tools.quizparser.images.syncutil;
+package com.dotosoft.tools.quizparser.images.utils;
 
 
 /**

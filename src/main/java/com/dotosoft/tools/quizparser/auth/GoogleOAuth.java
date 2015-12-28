@@ -45,7 +45,7 @@ import com.dotosoft.tools.quizparser.config.QuizParserConstant;
 import com.dotosoft.tools.quizparser.config.Settings;
 import com.dotosoft.tools.quizparser.data.GooglesheetClient;
 import com.dotosoft.tools.quizparser.images.PicasawebClient;
-import com.dotosoft.tools.quizparser.images.syncutil.SyncState;
+import com.dotosoft.tools.quizparser.images.utils.SyncState;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
 import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;

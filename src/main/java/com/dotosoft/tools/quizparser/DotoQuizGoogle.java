@@ -26,7 +26,7 @@ import org.apache.log4j.Logger;
 import com.dotosoft.tools.quizparser.auth.GoogleOAuth;
 import com.dotosoft.tools.quizparser.config.Settings;
 import com.dotosoft.tools.quizparser.data.GooglesheetClient;
-import com.dotosoft.tools.quizparser.images.syncutil.SyncState;
+import com.dotosoft.tools.quizparser.images.utils.SyncState;
 import com.google.gdata.data.spreadsheet.WorksheetEntry;
 import com.google.gdata.util.ServiceException;
 
