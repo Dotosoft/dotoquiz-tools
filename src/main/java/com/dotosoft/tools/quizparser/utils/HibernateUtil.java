@@ -1,4 +1,4 @@
-package com.dotosoft.tools.quizparser.images.utils;
+package com.dotosoft.tools.quizparser.utils;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;

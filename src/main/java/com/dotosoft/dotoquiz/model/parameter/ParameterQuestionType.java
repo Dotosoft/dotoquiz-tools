@@ -10,25 +10,25 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(name="mt_question_type", catalog="dotoquiz")
+@Table(name = "mt_question_type", catalog = "dotoquiz")
 public class ParameterQuestionType implements java.io.Serializable {
 
 	@Id
 	private String id;
-	
-	@Column(name="name", length=45)
+
+	@Column(name = "name", length = 45)
 	private String name;
-	
-	@Column(name="description")
+
+	@Column(name = "description")
 	private String description;
-	
-	@Column(name="is_delete", length=1)
+
+	@Column(name = "is_delete", length = 1)
 	private String isDelete;
-	
-	@Column(name="created_dt", length=19)
+
+	@Column(name = "created_dt", length = 19)
 	private Date createdDt;
-	
-	@Column(name="created_by", length=50)
+
+	@Column(name = "created_by", length = 50)
 	private String createdBy;
 
 	public ParameterQuestionType() {
@@ -94,6 +94,13 @@ public class ParameterQuestionType implements java.io.Serializable {
 
 	public void setCreatedBy(String createdBy) {
 		this.createdBy = createdBy;
+	}
+
+	@Override
+	public String toString() {
+		return "ParameterQuestionType [id=" + id + ", name=" + name
+				+ ", description=" + description + ", isDelete=" + isDelete
+				+ ", createdDt=" + createdDt + ", createdBy=" + createdBy + "]";
 	}
 
 }
