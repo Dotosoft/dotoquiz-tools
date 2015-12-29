@@ -18,7 +18,6 @@ package com.dotosoft.dotoquiz.tools.quizparser;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
-import java.util.List;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;

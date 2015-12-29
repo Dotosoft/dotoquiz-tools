@@ -61,13 +61,6 @@ import com.google.gdata.util.ParseException;
 import com.google.gdata.util.ServiceException;
 import com.google.gdata.util.XmlBlob;
 
-/**
- * This is a simple client that provides high-level operations on the Picasa Web
- * Albums GData API. It can also be used as a command-line application to test
- * out some of the features of the API.
- *
- *
- */
 public class PicasawebClient {
     Logger log = Logger.getLogger(PicasawebClient.class);
     

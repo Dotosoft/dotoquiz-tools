@@ -17,7 +17,6 @@
 package com.dotosoft.dotoquiz.tools.quizparser.config;
 
 import java.io.File;
-import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 import org.apache.log4j.Logger;

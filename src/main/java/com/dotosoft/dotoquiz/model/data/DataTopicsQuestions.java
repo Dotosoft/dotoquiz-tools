@@ -8,39 +8,12 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import com.dotosoft.dotoquiz.model.social.SocialTopics;
-
 @Entity
-@Table(name="dat_topics_questions", catalog="dotoquiz")
+@Table(name = "dat_topics_questions", catalog = "dotoquiz")
 public class DataTopicsQuestions implements java.io.Serializable {
 
-	@Id
-	private String id;
-	
-	@ManyToOne
-	private DataQuestions datQuestions;
-	
-	@ManyToOne
-	private SocialTopics sosTopics;
-	
-	@Column(name="is_delete")
-	private String isDelete;
-	
-	@Column(name="created_dt")
-	private Date createdDt;
-	
-	@Column(name="created_by")
-	private String createdBy;
-
-	public DataTopicsQuestions() {
-	}
-
-	public DataTopicsQuestions(String id) {
-		this.id = id;
-	}
-
 	public DataTopicsQuestions(String id, DataQuestions datQuestions,
-			SocialTopics sosTopics, String isDelete, Date createdDt,
+			DataTopics sosTopics, String isDelete, Date createdDt,
 			String createdBy) {
 		this.id = id;
 		this.datQuestions = datQuestions;
@@ -48,6 +21,31 @@ public class DataTopicsQuestions implements java.io.Serializable {
 		this.isDelete = isDelete;
 		this.createdDt = createdDt;
 		this.createdBy = createdBy;
+	}
+
+	@Id
+	private String id;
+
+	@ManyToOne
+	private DataQuestions datQuestions;
+
+	@ManyToOne
+	private DataTopics sosTopics;
+
+	@Column(name = "is_delete")
+	private String isDelete;
+
+	@Column(name = "created_dt")
+	private Date createdDt;
+
+	@Column(name = "created_by")
+	private String createdBy;
+
+	public DataTopicsQuestions() {
+	}
+
+	public DataTopicsQuestions(String id) {
+		this.id = id;
 	}
 
 	public String getId() {
@@ -66,11 +64,11 @@ public class DataTopicsQuestions implements java.io.Serializable {
 		this.datQuestions = datQuestions;
 	}
 
-	public SocialTopics getSosTopics() {
+	public DataTopics getSosTopics() {
 		return this.sosTopics;
 	}
 
-	public void setSosTopics(SocialTopics sosTopics) {
+	public void setSosTopics(DataTopics sosTopics) {
 		this.sosTopics = sosTopics;
 	}
 

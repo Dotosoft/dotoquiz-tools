@@ -16,10 +16,6 @@
 
 package com.dotosoft.dotoquiz.tools.quizparser.helper;
 
-import com.google.gdata.data.photos.AlbumEntry;
-import com.google.gdata.data.photos.GphotoEntry;
-import com.google.gdata.data.photos.PhotoEntry;
-
 import java.io.File;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -27,6 +23,10 @@ import java.time.ZoneId;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+
+import com.google.gdata.data.photos.AlbumEntry;
+import com.google.gdata.data.photos.GphotoEntry;
+import com.google.gdata.data.photos.PhotoEntry;
 
 /**
  * Wrapper for useful time utilities...

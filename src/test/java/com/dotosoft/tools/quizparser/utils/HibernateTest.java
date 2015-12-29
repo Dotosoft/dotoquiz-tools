@@ -1,6 +1,5 @@
 package com.dotosoft.tools.quizparser.utils;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import junit.framework.Test;
@@ -11,9 +10,7 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 
 import com.dotosoft.dotoquiz.model.parameter.ParameterQuestionType;
-import com.dotosoft.dotoquiz.tools.quizparser.helper.MD5Checksum;
 import com.dotosoft.dotoquiz.tools.quizparser.utils.HibernateUtil;
-import com.dotosoft.tools.dataquizparser.helper.MD5ChecksumTest;
 
 public class HibernateTest extends TestCase {
 

@@ -1,28 +1,59 @@
 package com.dotosoft.dotoquiz.model.data;
 
+import java.util.Arrays;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import com.dotosoft.dotoquiz.model.parameter.ParameterQuestionType;
+import com.dotosoft.dotoquiz.tools.quizparser.config.QuizParserConstant.APPLICATION_TYPE;
 
 @Entity
 @Table(name = "dat_questions", catalog = "dotoquiz")
 public class DataQuestions implements java.io.Serializable {
+
+	public DataQuestions(String id, ParameterQuestionType mtQuestionType,
+			String picasaId, String imagePicasaUrl, String additionalData,
+			String question, String isDelete, String correctAnswer,
+			String wrongAnswer1, String wrongAnswer2, String wrongAnswer3,
+			Date createdDt, String createdBy, String[] topics,
+			String isProcessed, APPLICATION_TYPE applicationType) {
+		this.id = id;
+		this.mtQuestionType = mtQuestionType;
+		this.picasaId = picasaId;
+		this.imagePicasaUrl = imagePicasaUrl;
+		this.additionalData = additionalData;
+		this.question = question;
+		this.isDelete = isDelete;
+		this.correctAnswer = correctAnswer;
+		this.wrongAnswer1 = wrongAnswer1;
+		this.wrongAnswer2 = wrongAnswer2;
+		this.wrongAnswer3 = wrongAnswer3;
+		this.createdDt = createdDt;
+		this.createdBy = createdBy;
+		this.topics = topics;
+		this.isProcessed = isProcessed;
+		this.applicationType = applicationType;
+	}
 
 	@Id
 	private String id;
 
 	@ManyToOne
 	private ParameterQuestionType mtQuestionType;
+
+	@Column(name = "picasaId", length = 100)
+	private String picasaId;
+
+	@Column(name = "imagePicasaUrl", length = 1000)
+	private String imagePicasaUrl;
+
+	@Column(name = "additionalData", length = 1000)
+	private String additionalData;
 
 	@Column(name = "question")
 	private String question;
@@ -48,6 +79,11 @@ public class DataQuestions implements java.io.Serializable {
 	@Column(name = "created_by")
 	private String createdBy;
 
+	// only need for batch
+	private String[] topics;
+	private String isProcessed;
+	private APPLICATION_TYPE applicationType;
+
 	public DataQuestions() {
 	}
 
@@ -55,21 +91,52 @@ public class DataQuestions implements java.io.Serializable {
 		this.id = id;
 	}
 
-	public DataQuestions(String id, ParameterQuestionType mtQuestionType,
-			String question, String isDelete, String correctAnswer,
-			String wrongAnswer1, String wrongAnswer2, String wrongAnswer3,
-			Date createdDt, String createdBy) {
-		super();
-		this.id = id;
-		this.mtQuestionType = mtQuestionType;
-		this.question = question;
-		this.isDelete = isDelete;
-		this.correctAnswer = correctAnswer;
-		this.wrongAnswer1 = wrongAnswer1;
-		this.wrongAnswer2 = wrongAnswer2;
-		this.wrongAnswer3 = wrongAnswer3;
-		this.createdDt = createdDt;
-		this.createdBy = createdBy;
+	public String getPicasaId() {
+		return picasaId;
+	}
+
+	public void setPicasaId(String picasaId) {
+		this.picasaId = picasaId;
+	}
+
+	public String getImagePicasaUrl() {
+		return imagePicasaUrl;
+	}
+
+	public void setImagePicasaUrl(String imagePicasaUrl) {
+		this.imagePicasaUrl = imagePicasaUrl;
+	}
+
+	public String getAdditionalData() {
+		return additionalData;
+	}
+
+	public void setAdditionalData(String additionalData) {
+		this.additionalData = additionalData;
+	}
+
+	public String[] getTopics() {
+		return topics;
+	}
+
+	public void setTopics(String[] topics) {
+		this.topics = topics;
+	}
+
+	public String getIsProcessed() {
+		return isProcessed;
+	}
+
+	public void setIsProcessed(String isProcessed) {
+		this.isProcessed = isProcessed;
+	}
+
+	public APPLICATION_TYPE getApplicationType() {
+		return applicationType;
+	}
+
+	public void setApplicationType(APPLICATION_TYPE applicationType) {
+		this.applicationType = applicationType;
 	}
 
 	public String getCorrectAnswer() {
@@ -150,6 +217,20 @@ public class DataQuestions implements java.io.Serializable {
 
 	public void setCreatedBy(String createdBy) {
 		this.createdBy = createdBy;
+	}
+
+	@Override
+	public String toString() {
+		return "DataQuestions [id=" + id + ", mtQuestionType=" + mtQuestionType
+				+ ", picasaId=" + picasaId + ", imagePicasaUrl="
+				+ imagePicasaUrl + ", additionalData=" + additionalData
+				+ ", question=" + question + ", isDelete=" + isDelete
+				+ ", correctAnswer=" + correctAnswer + ", wrongAnswer1="
+				+ wrongAnswer1 + ", wrongAnswer2=" + wrongAnswer2
+				+ ", wrongAnswer3=" + wrongAnswer3 + ", createdDt=" + createdDt
+				+ ", createdBy=" + createdBy + ", topics="
+				+ Arrays.toString(topics) + ", isProcessed=" + isProcessed
+				+ ", applicationType=" + applicationType + "]";
 	}
 
 }

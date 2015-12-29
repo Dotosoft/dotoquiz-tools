@@ -16,7 +16,8 @@
 
 package com.dotosoft.dotoquiz.tools.quizparser.helper;
 
-import java.io.*;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.security.MessageDigest;
 
 public class MD5Checksum {

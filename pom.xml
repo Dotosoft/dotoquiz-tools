@@ -246,7 +246,7 @@
 									implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
 								<transformer
 									implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-									<mainClass>com.dotosoft.tools.quizparser.App</mainClass>
+									<mainClass>com.dotosoft.dotoquiz.tools.quizparser.App</mainClass>
 								</transformer>
 							</transformers>
 						</configuration>

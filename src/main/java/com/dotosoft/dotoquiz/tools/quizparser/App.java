@@ -33,20 +33,20 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
+import com.dotosoft.dotoquiz.model.data.DataQuestions;
+import com.dotosoft.dotoquiz.model.data.DataTopics;
 import com.dotosoft.dotoquiz.tools.quizparser.auth.GoogleOAuth;
 import com.dotosoft.dotoquiz.tools.quizparser.config.QuizParserConstant;
-import com.dotosoft.dotoquiz.tools.quizparser.config.Settings;
 import com.dotosoft.dotoquiz.tools.quizparser.config.QuizParserConstant.APPLICATION_TYPE;
 import com.dotosoft.dotoquiz.tools.quizparser.config.QuizParserConstant.DATA_TYPE;
 import com.dotosoft.dotoquiz.tools.quizparser.config.QuizParserConstant.IMAGE_HOSTING_TYPE;
+import com.dotosoft.dotoquiz.tools.quizparser.config.Settings;
 import com.dotosoft.dotoquiz.tools.quizparser.data.GooglesheetClient;
 import com.dotosoft.dotoquiz.tools.quizparser.helper.DotoQuizStructure;
 import com.dotosoft.dotoquiz.tools.quizparser.helper.FileUtils;
 import com.dotosoft.dotoquiz.tools.quizparser.helper.MD5Checksum;
 import com.dotosoft.dotoquiz.tools.quizparser.helper.StringUtils;
 import com.dotosoft.dotoquiz.tools.quizparser.images.PicasawebClient;
-import com.dotosoft.dotoquiz.tools.quizparser.representations.QuestionAnswers;
-import com.dotosoft.dotoquiz.tools.quizparser.representations.Topics;
 import com.dotosoft.dotoquiz.tools.quizparser.utils.SyncState;
 import com.google.gdata.data.MediaContent;
 import com.google.gdata.data.PlainTextConstruct;
@@ -152,9 +152,6 @@ public class App {
 		try {
 			APPLICATION_TYPE type = APPLICATION_TYPE.valueOf(settings.getApplicationType());
 			GooglesheetClient googlesheetClient = auth.authenticateGooglesheet("Pertanyaan", settings, false, syncState );
-			
-		    List<Topics> topicCollections = new ArrayList<Topics>();
-		    List<QuestionAnswers> questionAnswersCollections = new ArrayList<QuestionAnswers>();
 		    
 		    WorksheetEntry fullSheet = googlesheetClient.getWorksheet(0);
 		    List<ListEntry> listEntries = googlesheetClient.getListRows(fullSheet);
@@ -162,45 +159,35 @@ public class App {
 		    // Extract Topic
 		    int index = 0;
 		    for(ListEntry listEntry : listEntries) {
-		    	Topics topic = DotoQuizStructure.convertRowGooglesheetExcelToTopics(listEntry, type);
-		        
+		    	DataTopics topic = DotoQuizStructure.convertRowGooglesheetExcelToTopics(listEntry, type);
 		        if(topic != null) {
-
 		        	if(type == APPLICATION_TYPE.GENERATE_SQL) {
 		    			System.out.println(topic);
 		    		} else if(type == APPLICATION_TYPE.BATCH_UPLOAD) {
 		    			topic = syncTopicToPicasa(topic);
-		    			
 		    			if(!QuizParserConstant.YES.equals(topic.getIsProcessed())) {
 			    			listEntry.getCustomElements().setValueLocal("albumidpicasa", topic.getPicasaId());
 			    			listEntry.getCustomElements().setValueLocal("imageurlpicasa", topic.getImagePicasaUrl());
 			    			listEntry.getCustomElements().setValueLocal("isprocessed", QuizParserConstant.YES);
-			    			
 			    			listEntry.update();
 		    			}
 		    		}
-		        	
-		        	topicCollections.add(topic);
 		        }
 		    }
 		    
-		    fullSheet = googlesheetClient.getWorksheet(0);
-		    listEntries = googlesheetClient.getListRows(fullSheet);
-		    
 		    // Extract QuestionAnswers
 		    index = 0;
+		    fullSheet = googlesheetClient.getWorksheet(0);
+		    listEntries = googlesheetClient.getListRows(fullSheet);
 		    for(ListEntry listEntry : listEntries) {
-		    	QuestionAnswers questionAnswer = DotoQuizStructure.convertRowGooglesheetToQuestions(listEntry, type);
-		        
+		    	DataQuestions questionAnswer = DotoQuizStructure.convertRowGooglesheetToQuestions(listEntry, type);
     			if(questionAnswer != null) {
-		        	
 		        	if(type == APPLICATION_TYPE.GENERATE_SQL) {
 		    			System.out.println(questionAnswer + "\n");
 		    		} else if(type == APPLICATION_TYPE.BATCH_UPLOAD) {
 		    			questionAnswer = syncQuestionAnswersToPicasa(questionAnswer);		    	
-		    			
 		    			if(!QuizParserConstant.YES.equals(questionAnswer.getIsProcessed())) {
-			    			if("image".equals(questionAnswer.getQuestionType())) {
+			    			if("image".equalsIgnoreCase(questionAnswer.getMtQuestionType().getName())) {
 				    			listEntry.getCustomElements().setValueLocal("photoidpicasa", questionAnswer.getPicasaId());
 				    			listEntry.getCustomElements().setValueLocal("imageurlpicasa_2", questionAnswer.getImagePicasaUrl());
 			    			}
@@ -208,8 +195,6 @@ public class App {
 			    			listEntry.update();
 		    			}
 		    		}
-		        	
-		        	questionAnswersCollections.add(questionAnswer);
 		        }
 		    }
 		    
@@ -230,8 +215,8 @@ public class App {
 		 
 		    //Get first sheet from the workbook
 		    XSSFSheet sheet = workbook.getSheetAt(0);
-		    List<Topics> topicCollections = new ArrayList<Topics>();
-		    List<QuestionAnswers> questionAnswersCollections = new ArrayList<QuestionAnswers>();
+		    List<DataTopics> topicCollections = new ArrayList<DataTopics>();
+		    List<DataQuestions> questionAnswersCollections = new ArrayList<DataQuestions>();
 		    
 		    // Extract Topic
 		    Iterator<Row> rowIterator = sheet.iterator();
@@ -243,7 +228,7 @@ public class App {
 		    	}
 		    	
 		        Row row = rowIterator.next();
-		        Topics topic = DotoQuizStructure.convertRowExcelToTopics(row, type);
+		        DataTopics topic = DotoQuizStructure.convertRowExcelToTopics(row, type);
 		        
 		        if(topic != null) {
 		        	if(type == APPLICATION_TYPE.GENERATE_SQL) {
@@ -272,7 +257,7 @@ public class App {
 		    	}
 		    	
 		        Row row = rowIterator.next();
-		        QuestionAnswers questionAnswer = DotoQuizStructure.convertRowExcelToQuestions(row, type);
+		        DataQuestions questionAnswer = DotoQuizStructure.convertRowExcelToQuestions(row, type);
 		        
 		        if(questionAnswer != null) {
 		        	if(type == APPLICATION_TYPE.GENERATE_SQL) {
@@ -333,18 +318,18 @@ public class App {
         webClient = null;
     }
 	
-	public Topics syncTopicToPicasa(Topics topic) {
-		log.info("Sync Topics '" + topic.getTopicName() + "'");
+	public DataTopics syncTopicToPicasa(DataTopics topic) {
+		log.info("Sync Topics '" + topic.getName() + "'");
 		try {
 			GphotoEntry albumEntry;
-			if(albumMapByTitle.containsKey(topic.getTopicName())) {
-				albumEntry = albumMapByTitle.get(topic.getTopicName());
+			if(albumMapByTitle.containsKey(topic.getName())) {
+				albumEntry = albumMapByTitle.get(topic.getName());
 			} else {
 				// Upload photo as QuestionAnswer
 				AlbumEntry myAlbum = new AlbumEntry();
 				myAlbum.setAccess(GphotoAccess.Value.PUBLIC);
-				myAlbum.setTitle(new PlainTextConstruct(topic.getTopicName()));
-				myAlbum.setDescription(new PlainTextConstruct(topic.getTopicDescription()));
+				myAlbum.setTitle(new PlainTextConstruct(topic.getName()));
+				myAlbum.setDescription(new PlainTextConstruct(topic.getDescription()));
 				albumEntry = webClient.insertAlbum(myAlbum);
 			}
 			
@@ -354,8 +339,8 @@ public class App {
 				if(photoEntryCollections == null) photoEntryCollections = new HashMap<String, GphotoEntry>();
 				if(photoEntry == null) {
 					// Upload album as topic
-					log.info("there is no image '"+ topic.getImageUrl() +"' at '" + topic.getTopicName() + "'. Wait for uploading...");
-					java.nio.file.Path topicImagePath = FileUtils.getPath(settings.getSyncDataFolder(), topic.getTopicName(), "topic.png");
+					log.info("there is no image '"+ topic.getImageUrl() +"' at '" + topic.getName() + "'. Wait for uploading...");
+					java.nio.file.Path topicImagePath = FileUtils.getPath(settings.getSyncDataFolder(), topic.getName(), "topic.png");
 					if(!topicImagePath.toFile().exists()) {
 						log.error("File is not found at '" + topicImagePath.toString() + "'. Please put the file and start this app again.");
 						System.exit(1);
@@ -375,12 +360,12 @@ public class App {
 		return topic;
 	}
 	
-	public QuestionAnswers syncQuestionAnswersToPicasa(QuestionAnswers answer) {
+	public DataQuestions syncQuestionAnswersToPicasa(DataQuestions answer) {
 		log.info("Sync QuestionAnswers '" + answer.getQuestion() + "'");
 		
 		if(!QuizParserConstant.YES.equals(answer.getIsProcessed())) {
 			try {
-				if("image".equals(answer.getQuestionType()) && StringUtils.hasValue(answer.getAdditionalData())) {
+				if("image".equalsIgnoreCase(answer.getMtQuestionType().getName()) && StringUtils.hasValue(answer.getAdditionalData())) {
 					GphotoEntry firstTopic = albumMapByTopicId.get(answer.getTopics()[0]);
 					// Check Topic is valid or not
 					if(firstTopic == null) {
