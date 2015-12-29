@@ -14,7 +14,7 @@
 	limitations under the License.
 */
 
-package com.dotosoft.tools.quizparser.images.metadata;
+package com.dotosoft.dotoquiz.tools.quizparser.images.metadata;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;

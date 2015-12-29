@@ -11,9 +11,9 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 
 import com.dotosoft.dotoquiz.model.parameter.ParameterQuestionType;
+import com.dotosoft.dotoquiz.tools.quizparser.helper.MD5Checksum;
+import com.dotosoft.dotoquiz.tools.quizparser.utils.HibernateUtil;
 import com.dotosoft.tools.dataquizparser.helper.MD5ChecksumTest;
-import com.dotosoft.tools.quizparser.helper.MD5Checksum;
-import com.dotosoft.tools.quizparser.utils.HibernateUtil;
 
 public class HibernateTest extends TestCase {
 
@@ -36,21 +36,5 @@ public class HibernateTest extends TestCase {
 		for(ParameterQuestionType parameter : test) {
 			System.out.println(parameter);
 		}
-
-//		Department department = new Department("java");
-//		session.save(department);
-//
-//		session.save(new Employee("Jakab Gipsz", department));
-//		session.save(new Employee("Captain Nemo", department));
-//
-//		session.getTransaction().commit();
-//
-//		Query q = session.createQuery("From Employee ");
-//
-//		List<Employee> resultList = q.list();
-//		System.out.println("num of employess:" + resultList.size());
-//		for (Employee next : resultList) {
-//			System.out.println("next employee: " + next);
-//		}
 	}
 }

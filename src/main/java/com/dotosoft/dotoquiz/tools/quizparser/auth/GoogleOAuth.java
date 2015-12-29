@@ -14,7 +14,7 @@
 	limitations under the License.
 */
 
-package com.dotosoft.tools.quizparser.auth;
+package com.dotosoft.dotoquiz.tools.quizparser.auth;
 
 import java.awt.Dimension;
 import java.awt.Toolkit;
@@ -40,12 +40,12 @@ import javax.swing.JFrame;
 
 import org.apache.log4j.Logger;
 
-import com.dotosoft.tools.quizparser.DotoQuizGoogle;
-import com.dotosoft.tools.quizparser.config.QuizParserConstant;
-import com.dotosoft.tools.quizparser.config.Settings;
-import com.dotosoft.tools.quizparser.data.GooglesheetClient;
-import com.dotosoft.tools.quizparser.images.PicasawebClient;
-import com.dotosoft.tools.quizparser.utils.SyncState;
+import com.dotosoft.dotoquiz.tools.quizparser.DotoQuizGoogle;
+import com.dotosoft.dotoquiz.tools.quizparser.config.QuizParserConstant;
+import com.dotosoft.dotoquiz.tools.quizparser.config.Settings;
+import com.dotosoft.dotoquiz.tools.quizparser.data.GooglesheetClient;
+import com.dotosoft.dotoquiz.tools.quizparser.images.PicasawebClient;
+import com.dotosoft.dotoquiz.tools.quizparser.utils.SyncState;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
 import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;

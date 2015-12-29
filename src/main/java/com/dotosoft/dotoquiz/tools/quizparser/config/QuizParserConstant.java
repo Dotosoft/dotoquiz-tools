@@ -14,7 +14,7 @@
 	limitations under the License.
 */
 
-package com.dotosoft.tools.quizparser.config;
+package com.dotosoft.dotoquiz.tools.quizparser.config;
 
 public class QuizParserConstant {
 	// Application Type Definition

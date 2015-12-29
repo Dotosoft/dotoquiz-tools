@@ -14,14 +14,14 @@
 	limitations under the License.
 */
 
-package com.dotosoft.tools.quizparser.helper;
+package com.dotosoft.dotoquiz.tools.quizparser.helper;
 
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 
-import com.dotosoft.tools.quizparser.config.QuizParserConstant.APPLICATION_TYPE;
-import com.dotosoft.tools.quizparser.representations.QuestionAnswers;
-import com.dotosoft.tools.quizparser.representations.Topics;
+import com.dotosoft.dotoquiz.tools.quizparser.config.QuizParserConstant.APPLICATION_TYPE;
+import com.dotosoft.dotoquiz.tools.quizparser.representations.QuestionAnswers;
+import com.dotosoft.dotoquiz.tools.quizparser.representations.Topics;
 import com.google.gdata.data.spreadsheet.ListEntry;
 
 public class DotoQuizStructure {

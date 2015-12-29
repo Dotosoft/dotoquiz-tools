@@ -14,25 +14,14 @@
 	limitations under the License.
 */
 
-package com.dotosoft.tools.quizparser.helper;
+package com.dotosoft.dotoquiz.tools.quizparser.helper;
 
-import org.apache.log4j.RollingFileAppender;
-
-/**
- This appender rolls over at program start.
- This is for creating a clean boundary between log data of different runs.
- */
-public class RunRolledFileAppender extends RollingFileAppender
-{
-    public RunRolledFileAppender() { }
-
-    @Override
-    public void activateOptions() {
-        super.activateOptions();
-        super.rollOver();
-    }
-
-    @Override
-    public void rollOver() { }
-
+public class StringUtils {
+	public static boolean hasValue(String value) {
+		if(value != null && !value.equals("")) {
+			return true;
+		}
+		
+		return false;
+	}
 }

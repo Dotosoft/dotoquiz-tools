@@ -14,7 +14,7 @@
     limitations under the License.
 */
 
-package com.dotosoft.tools.quizparser.config;
+package com.dotosoft.dotoquiz.tools.quizparser.config;
 
 import java.io.File;
 import java.util.prefs.BackingStoreException;
@@ -22,9 +22,9 @@ import java.util.prefs.Preferences;
 
 import org.apache.log4j.Logger;
 
-import com.dotosoft.tools.quizparser.config.QuizParserConstant.APPLICATION_TYPE;
-import com.dotosoft.tools.quizparser.config.QuizParserConstant.DATA_TYPE;
-import com.dotosoft.tools.quizparser.config.QuizParserConstant.IMAGE_HOSTING_TYPE;
+import com.dotosoft.dotoquiz.tools.quizparser.config.QuizParserConstant.APPLICATION_TYPE;
+import com.dotosoft.dotoquiz.tools.quizparser.config.QuizParserConstant.DATA_TYPE;
+import com.dotosoft.dotoquiz.tools.quizparser.config.QuizParserConstant.IMAGE_HOSTING_TYPE;
 
 /**
  * General settings class for loading/saving prefs

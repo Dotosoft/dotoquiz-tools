@@ -14,9 +14,9 @@
 	limitations under the License.
  */
 
-package com.dotosoft.tools.quizparser.representations;
+package com.dotosoft.dotoquiz.tools.quizparser.representations;
 
-import com.dotosoft.tools.quizparser.config.QuizParserConstant.APPLICATION_TYPE;
+import com.dotosoft.dotoquiz.tools.quizparser.config.QuizParserConstant.APPLICATION_TYPE;
 
 public class Topics extends ParserQuizObject {
 

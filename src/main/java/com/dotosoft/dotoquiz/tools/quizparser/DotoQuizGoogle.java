@@ -14,7 +14,7 @@
 	limitations under the License.
 */
 
-package com.dotosoft.tools.quizparser;
+package com.dotosoft.dotoquiz.tools.quizparser;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -23,10 +23,10 @@ import java.util.List;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
-import com.dotosoft.tools.quizparser.auth.GoogleOAuth;
-import com.dotosoft.tools.quizparser.config.Settings;
-import com.dotosoft.tools.quizparser.data.GooglesheetClient;
-import com.dotosoft.tools.quizparser.utils.SyncState;
+import com.dotosoft.dotoquiz.tools.quizparser.auth.GoogleOAuth;
+import com.dotosoft.dotoquiz.tools.quizparser.config.Settings;
+import com.dotosoft.dotoquiz.tools.quizparser.data.GooglesheetClient;
+import com.dotosoft.dotoquiz.tools.quizparser.utils.SyncState;
 import com.google.gdata.data.spreadsheet.WorksheetEntry;
 import com.google.gdata.util.ServiceException;
 

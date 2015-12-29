@@ -14,7 +14,7 @@
 	limitations under the License.
 */
 
-package com.dotosoft.tools.quizparser.data;
+package com.dotosoft.dotoquiz.tools.quizparser.data;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -24,7 +24,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.dotosoft.tools.quizparser.config.QuizParserConstant;
+import com.dotosoft.dotoquiz.tools.quizparser.config.QuizParserConstant;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.gdata.client.spreadsheet.SpreadsheetService;
 import com.google.gdata.data.PlainTextConstruct;

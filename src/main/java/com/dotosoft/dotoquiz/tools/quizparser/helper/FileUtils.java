@@ -14,7 +14,7 @@
 	limitations under the License.
 */
 
-package com.dotosoft.tools.quizparser.helper;
+package com.dotosoft.dotoquiz.tools.quizparser.helper;
 
 import java.io.File;
 import java.io.IOException;

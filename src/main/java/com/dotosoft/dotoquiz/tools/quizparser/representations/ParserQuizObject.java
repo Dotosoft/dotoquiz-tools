@@ -14,14 +14,18 @@
 	limitations under the License.
 */
 
-package com.dotosoft.tools.quizparser.helper;
+package com.dotosoft.dotoquiz.tools.quizparser.representations;
 
-public class StringUtils {
-	public static boolean hasValue(String value) {
-		if(value != null && !value.equals("")) {
-			return true;
-		}
-		
-		return false;
+import com.dotosoft.dotoquiz.tools.quizparser.config.QuizParserConstant.APPLICATION_TYPE;
+
+public class ParserQuizObject {
+	protected APPLICATION_TYPE applicationType;
+
+	public APPLICATION_TYPE getApplicationType() {
+		return applicationType;
+	}
+
+	public void setApplicationType(APPLICATION_TYPE applicationType) {
+		this.applicationType = applicationType;
 	}
 }

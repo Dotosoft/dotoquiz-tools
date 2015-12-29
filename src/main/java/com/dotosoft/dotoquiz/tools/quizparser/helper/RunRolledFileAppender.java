@@ -14,18 +14,25 @@
 	limitations under the License.
 */
 
-package com.dotosoft.tools.quizparser.representations;
+package com.dotosoft.dotoquiz.tools.quizparser.helper;
 
-import com.dotosoft.tools.quizparser.config.QuizParserConstant.APPLICATION_TYPE;
+import org.apache.log4j.RollingFileAppender;
 
-public class ParserQuizObject {
-	protected APPLICATION_TYPE applicationType;
+/**
+ This appender rolls over at program start.
+ This is for creating a clean boundary between log data of different runs.
+ */
+public class RunRolledFileAppender extends RollingFileAppender
+{
+    public RunRolledFileAppender() { }
 
-	public APPLICATION_TYPE getApplicationType() {
-		return applicationType;
-	}
+    @Override
+    public void activateOptions() {
+        super.activateOptions();
+        super.rollOver();
+    }
 
-	public void setApplicationType(APPLICATION_TYPE applicationType) {
-		this.applicationType = applicationType;
-	}
+    @Override
+    public void rollOver() { }
+
 }

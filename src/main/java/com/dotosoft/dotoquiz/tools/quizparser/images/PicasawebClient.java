@@ -14,9 +14,9 @@
 	limitations under the License.
 */
 
-package com.dotosoft.tools.quizparser.images;
+package com.dotosoft.dotoquiz.tools.quizparser.images;
 
-import static com.dotosoft.tools.quizparser.images.metadata.ImageInformation.safeReadImageInformation;
+import static com.dotosoft.dotoquiz.tools.quizparser.images.metadata.ImageInformation.safeReadImageInformation;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -36,9 +36,9 @@ import java.util.List;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 
-import com.dotosoft.tools.quizparser.config.QuizParserConstant;
-import com.dotosoft.tools.quizparser.helper.TimeUtils;
-import com.dotosoft.tools.quizparser.images.metadata.ImageInformation;
+import com.dotosoft.dotoquiz.tools.quizparser.config.QuizParserConstant;
+import com.dotosoft.dotoquiz.tools.quizparser.helper.TimeUtils;
+import com.dotosoft.dotoquiz.tools.quizparser.images.metadata.ImageInformation;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.gdata.client.photos.PicasawebService;
 import com.google.gdata.data.DateTime;

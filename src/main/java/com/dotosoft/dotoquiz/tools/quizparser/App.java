@@ -14,7 +14,7 @@
 	limitations under the License.
 */
 
-package com.dotosoft.tools.quizparser;
+package com.dotosoft.dotoquiz.tools.quizparser;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -33,21 +33,21 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import com.dotosoft.tools.quizparser.auth.GoogleOAuth;
-import com.dotosoft.tools.quizparser.config.QuizParserConstant;
-import com.dotosoft.tools.quizparser.config.QuizParserConstant.APPLICATION_TYPE;
-import com.dotosoft.tools.quizparser.config.QuizParserConstant.DATA_TYPE;
-import com.dotosoft.tools.quizparser.config.QuizParserConstant.IMAGE_HOSTING_TYPE;
-import com.dotosoft.tools.quizparser.config.Settings;
-import com.dotosoft.tools.quizparser.data.GooglesheetClient;
-import com.dotosoft.tools.quizparser.helper.DotoQuizStructure;
-import com.dotosoft.tools.quizparser.helper.FileUtils;
-import com.dotosoft.tools.quizparser.helper.MD5Checksum;
-import com.dotosoft.tools.quizparser.helper.StringUtils;
-import com.dotosoft.tools.quizparser.images.PicasawebClient;
-import com.dotosoft.tools.quizparser.representations.QuestionAnswers;
-import com.dotosoft.tools.quizparser.representations.Topics;
-import com.dotosoft.tools.quizparser.utils.SyncState;
+import com.dotosoft.dotoquiz.tools.quizparser.auth.GoogleOAuth;
+import com.dotosoft.dotoquiz.tools.quizparser.config.QuizParserConstant;
+import com.dotosoft.dotoquiz.tools.quizparser.config.Settings;
+import com.dotosoft.dotoquiz.tools.quizparser.config.QuizParserConstant.APPLICATION_TYPE;
+import com.dotosoft.dotoquiz.tools.quizparser.config.QuizParserConstant.DATA_TYPE;
+import com.dotosoft.dotoquiz.tools.quizparser.config.QuizParserConstant.IMAGE_HOSTING_TYPE;
+import com.dotosoft.dotoquiz.tools.quizparser.data.GooglesheetClient;
+import com.dotosoft.dotoquiz.tools.quizparser.helper.DotoQuizStructure;
+import com.dotosoft.dotoquiz.tools.quizparser.helper.FileUtils;
+import com.dotosoft.dotoquiz.tools.quizparser.helper.MD5Checksum;
+import com.dotosoft.dotoquiz.tools.quizparser.helper.StringUtils;
+import com.dotosoft.dotoquiz.tools.quizparser.images.PicasawebClient;
+import com.dotosoft.dotoquiz.tools.quizparser.representations.QuestionAnswers;
+import com.dotosoft.dotoquiz.tools.quizparser.representations.Topics;
+import com.dotosoft.dotoquiz.tools.quizparser.utils.SyncState;
 import com.google.gdata.data.MediaContent;
 import com.google.gdata.data.PlainTextConstruct;
 import com.google.gdata.data.photos.AlbumEntry;
