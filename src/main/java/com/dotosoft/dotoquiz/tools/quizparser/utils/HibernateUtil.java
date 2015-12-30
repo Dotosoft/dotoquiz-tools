@@ -1,7 +1,20 @@
 package com.dotosoft.dotoquiz.tools.quizparser.utils;
 
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
+
+import org.hibernate.Query;
+import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.id.UUIDGenerator;
+
+import com.dotosoft.dotoquiz.model.data.DataQuestions;
+import com.dotosoft.dotoquiz.model.data.DataTopics;
+import com.dotosoft.dotoquiz.model.data.DataTopicsQuestions;
+import com.dotosoft.dotoquiz.model.parameter.ParameterQuestionType;
+import com.dotosoft.dotoquiz.tools.quizparser.config.QuizParserConstant;
   
 public class HibernateUtil {
   
@@ -27,4 +40,25 @@ public class HibernateUtil {
         getSessionFactory().close();
     }
   
+    public static void SaveOrUpdateTopicQuestionData(Session session, DataTopics topic, DataQuestions questionAnswer) {
+    	Query q = session.createQuery("From DataTopicsQuestions tq where tq.datQuestions.id = :questionId and tq.sosTopics.id = :topicId");
+    	q.setString("questionId", questionAnswer.getId());
+    	q.setString("topicId", topic.getId());
+		List<DataTopicsQuestions> dataTopicQuestions = q.list();
+		if(!dataTopicQuestions.isEmpty()) {
+			for(DataTopicsQuestions topicQuestion : dataTopicQuestions) {
+				topicQuestion.setDatQuestions(questionAnswer);
+				topicQuestion.setSosTopics(topic);
+				session.update(topicQuestion);
+			}
+		} else {
+			DataTopicsQuestions topicQuestion = new DataTopicsQuestions();
+			topicQuestion.setId(UUID.randomUUID().toString());
+			topicQuestion.setDatQuestions(questionAnswer);
+			topicQuestion.setSosTopics(topic);
+			topicQuestion.setCreatedBy(QuizParserConstant.SYSTEM_USER);
+			topicQuestion.setCreatedDt(new Date());
+			session.save(topicQuestion);
+		}
+    }
 }

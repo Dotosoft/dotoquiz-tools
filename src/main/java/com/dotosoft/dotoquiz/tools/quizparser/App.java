@@ -17,13 +17,10 @@
 package com.dotosoft.dotoquiz.tools.quizparser;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -32,6 +29,8 @@ import org.apache.log4j.Logger;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
 
 import com.dotosoft.dotoquiz.model.data.DataQuestions;
 import com.dotosoft.dotoquiz.model.data.DataTopics;
@@ -47,6 +46,7 @@ import com.dotosoft.dotoquiz.tools.quizparser.helper.FileUtils;
 import com.dotosoft.dotoquiz.tools.quizparser.helper.MD5Checksum;
 import com.dotosoft.dotoquiz.tools.quizparser.helper.StringUtils;
 import com.dotosoft.dotoquiz.tools.quizparser.images.PicasawebClient;
+import com.dotosoft.dotoquiz.tools.quizparser.utils.HibernateUtil;
 import com.dotosoft.dotoquiz.tools.quizparser.utils.SyncState;
 import com.google.api.client.util.Lists;
 import com.google.gdata.data.MediaContent;
@@ -70,6 +70,7 @@ public class App {
 	private Map<String, Map<String, GphotoEntry>> photoMapByAlbumId;
 	private Map<String, GphotoEntry> albumMapByTopicId;
 	private Map<String, GphotoEntry> albumMapByTitle;
+	private Map<String, DataTopics> topicMapByTopicId;
 	
 	public static void main(String[] args) {
 		new App(args).process();
@@ -81,6 +82,7 @@ public class App {
 		photoMapByAlbumId = new HashMap<String, Map<String, GphotoEntry>>();
 		albumMapByTopicId = new HashMap<String, GphotoEntry>();
 		albumMapByTitle = new HashMap<String, GphotoEntry>();
+		topicMapByTopicId = new HashMap<String, DataTopics>();
 		
 		settings = new Settings();
 		auth = new GoogleOAuth();
@@ -147,16 +149,26 @@ public class App {
 			log.info("process data from googlesheet!");
 		}
 		
-		// blueprint for googlesheet
+		// variable for googlesheet
 		GooglesheetClient googlesheetClient = null;
 		WorksheetEntry fullSheet = null;
-		// blueprint for excel
+		
+		// variable for excel
 		FileInputStream file = null;
 		XSSFWorkbook workbook = null;
 		XSSFSheet sheet = null;
+		
+		// variable for DB
+		Session session = null;
+		Transaction trx = null;
 
 		try {
 			APPLICATION_TYPE type = APPLICATION_TYPE.valueOf(settings.getApplicationType());
+			
+			if(APPLICATION_TYPE.DB.toString().equals(settings.getApplicationType())) {
+				session = HibernateUtil.getSessionFactory().openSession();
+	    		trx = session.beginTransaction();
+			}
 			
 			List rows = null;
 			if(DATA_TYPE.EXCEL.toString().equals(settings.getDataType())) {
@@ -182,9 +194,12 @@ public class App {
 		    	
 		        if(topic != null) {
 		        	if(type == APPLICATION_TYPE.DB) {
-		    			System.out.println(topic);
+		    			log.info("Save or update topic: " + topic);
+		        		session.saveOrUpdate(topic);
 		    		} else if(type == APPLICATION_TYPE.SYNC) {
 		    			topic = syncTopicToPicasa(topic);
+		    			topicMapByTopicId.put(topic.getId(), topic);
+		    			
 		    			if(!QuizParserConstant.YES.equals(topic.getIsProcessed())) {
 		    				if(DATA_TYPE.EXCEL.toString().equals(settings.getDataType())) {
 		    					Row rowData = (Row) row;
@@ -222,7 +237,12 @@ public class App {
 		    	
     			if(questionAnswer != null) {
 		        	if(type == APPLICATION_TYPE.DB) {
-		    			System.out.println(questionAnswer + "\n");
+		        		log.info("Save or update QuestionAnswers: " + questionAnswer);
+		        		session.saveOrUpdate(questionAnswer);
+		        		for(String topicId : questionAnswer.getTopics()) {
+		        			DataTopics datTopic = topicMapByTopicId.get(topicId);
+		        			HibernateUtil.SaveOrUpdateTopicQuestionData(session, datTopic, questionAnswer);
+		        		}
 		    		} else if(type == APPLICATION_TYPE.SYNC) {
 		    			questionAnswer = syncQuestionAnswersToPicasa(questionAnswer);		    	
 		    			if(!QuizParserConstant.YES.equals(questionAnswer.getIsProcessed())) {
@@ -256,9 +276,18 @@ public class App {
 			    fos.close();
 		    }
 		    
+		    
+		    if(APPLICATION_TYPE.DB.toString().equals(settings.getApplicationType())) {
+		    	trx.commit();
+				session.close();
+			}
+		    
 		    log.info("Done");
 		} catch (ServiceException | IOException | GeneralSecurityException e) {
-		    e.printStackTrace();
+		    trx.rollback();
+			session.close();
+			
+			e.printStackTrace();
 		}
 	}
 	
