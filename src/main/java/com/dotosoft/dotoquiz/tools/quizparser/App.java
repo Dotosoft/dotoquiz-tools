@@ -48,6 +48,7 @@ import com.dotosoft.dotoquiz.tools.quizparser.helper.MD5Checksum;
 import com.dotosoft.dotoquiz.tools.quizparser.helper.StringUtils;
 import com.dotosoft.dotoquiz.tools.quizparser.images.PicasawebClient;
 import com.dotosoft.dotoquiz.tools.quizparser.utils.SyncState;
+import com.google.api.client.util.Lists;
 import com.google.gdata.data.MediaContent;
 import com.google.gdata.data.PlainTextConstruct;
 import com.google.gdata.data.photos.AlbumEntry;
@@ -69,8 +70,6 @@ public class App {
 	private Map<String, Map<String, GphotoEntry>> photoMapByAlbumId;
 	private Map<String, GphotoEntry> albumMapByTopicId;
 	private Map<String, GphotoEntry> albumMapByTitle;
-	
-	private boolean isError = false;
 	
 	public static void main(String[] args) {
 		new App(args).process();
@@ -95,7 +94,7 @@ public class App {
 	                webClient = auth.authenticatePicasa(settings, false, syncState );
 	            }
 	            catch( Exception _ex ) {
-	            	isError = true;
+	            	settings.showError();
 	                log.error( "Exception while authenticating.", _ex );
 	                invalidateWebClient();
 	            }
@@ -106,13 +105,11 @@ public class App {
 	            }
 	            else{
 	                log.warn("Unable to re-authenticate. User will need to auth interactively.");
-	                isError = true;
+	                settings.showError();
 	            }
 	        }
 		} else {
-			isError = true;
-			log.error( "Error: Could not run DataQuizParser.");
-			System.out.println("Run: java -jar DataQuizParser.jar [GENERATE_SQL/BATCH_UPLOAD] [File Excel]");
+			settings.showError();
 		}
 	}
 	
@@ -120,22 +117,19 @@ public class App {
 		if(webClient != null) {
 			// Init Picasa Data
 			if(IMAGE_HOSTING_TYPE.PICASA.toString().equals(settings.getImageHostingType())) {
-				refreshAllDataFromPicasa();
-			}
-			
-			if(APPLICATION_TYPE.CLEAR.toString().equals(settings.getApplicationType())) {
-				ClearAllAlbums();
-			} else {
-				if(DATA_TYPE.EXCEL.toString().equals(settings.getDataType())) {
-					processExcel();
-				} else if(DATA_TYPE.GOOGLESHEET.toString().equals(settings.getDataType())) {
-					processGooglesheet();
+				refreshDataFromPicasa();
+				
+				if(APPLICATION_TYPE.CLEAR.toString().equals(settings.getApplicationType())) {
+					clearPicasa();
+				} else if(APPLICATION_TYPE.SYNC.toString().equals(settings.getApplicationType())
+						|| APPLICATION_TYPE.DB.toString().equals(settings.getApplicationType())) {
+					processPicasa();
 				}
 			}
 		}
 	}
 	
-	private void ClearAllAlbums() {
+	private void clearPicasa() {
 		for(String key : albumMapByTitle.keySet()) {
 			try {
 				GphotoEntry albumEntry = albumMapByTitle.get(key);
@@ -146,56 +140,120 @@ public class App {
 		}
 	}
 	
-	private void processGooglesheet() {
-		log.info("process data from googlesheet!");
-		if(isError) return;
+	private void processPicasa() {
+		if(DATA_TYPE.EXCEL.toString().equals(settings.getDataType())) {
+			log.info("process data from excel!");
+		} else if(DATA_TYPE.GOOGLESHEET.toString().equals(settings.getDataType())) {
+			log.info("process data from googlesheet!");
+		}
+		
+		// blueprint for googlesheet
+		GooglesheetClient googlesheetClient = null;
+		WorksheetEntry fullSheet = null;
+		// blueprint for excel
+		FileInputStream file = null;
+		XSSFWorkbook workbook = null;
+		XSSFSheet sheet = null;
+
 		try {
 			APPLICATION_TYPE type = APPLICATION_TYPE.valueOf(settings.getApplicationType());
-			GooglesheetClient googlesheetClient = auth.authenticateGooglesheet("Pertanyaan", settings, false, syncState );
-		    
-		    WorksheetEntry fullSheet = googlesheetClient.getWorksheet(0);
-		    List<ListEntry> listEntries = googlesheetClient.getListRows(fullSheet);
+			
+			List rows = null;
+			if(DATA_TYPE.EXCEL.toString().equals(settings.getDataType())) {
+			    file = new FileInputStream(settings.getSyncDataFile());
+			    workbook = new XSSFWorkbook(file);			 
+			    sheet = workbook.getSheetAt(0);
+			    rows = Lists.newArrayList(sheet.iterator());
+			} else if(DATA_TYPE.GOOGLESHEET.toString().equals(settings.getDataType())) {
+				googlesheetClient = auth.authenticateGooglesheet("Pertanyaan", settings, false, syncState );
+			    fullSheet = googlesheetClient.getWorksheet(0);
+			    rows = googlesheetClient.getListRows(fullSheet);
+			}
 		    
 		    // Extract Topic
 		    int index = 0;
-		    for(ListEntry listEntry : listEntries) {
-		    	DataTopics topic = DotoQuizStructure.convertRowGooglesheetExcelToTopics(listEntry, type);
+		    for(Object row : rows) {
+		    	DataTopics topic = null;
+		    	if(DATA_TYPE.EXCEL.toString().equals(settings.getDataType())) {
+		    		topic = DotoQuizStructure.convertRowExcelToTopics((Row) row, type);
+				} else if(DATA_TYPE.GOOGLESHEET.toString().equals(settings.getDataType())) {
+					topic = DotoQuizStructure.convertRowGooglesheetExcelToTopics((ListEntry) row, type);
+				}
+		    	
 		        if(topic != null) {
-		        	if(type == APPLICATION_TYPE.GENERATE_SQL) {
+		        	if(type == APPLICATION_TYPE.DB) {
 		    			System.out.println(topic);
-		    		} else if(type == APPLICATION_TYPE.BATCH_UPLOAD) {
+		    		} else if(type == APPLICATION_TYPE.SYNC) {
 		    			topic = syncTopicToPicasa(topic);
 		    			if(!QuizParserConstant.YES.equals(topic.getIsProcessed())) {
-			    			listEntry.getCustomElements().setValueLocal("albumidpicasa", topic.getPicasaId());
-			    			listEntry.getCustomElements().setValueLocal("imageurlpicasa", topic.getImagePicasaUrl());
-			    			listEntry.getCustomElements().setValueLocal("isprocessed", QuizParserConstant.YES);
-			    			listEntry.update();
+		    				if(DATA_TYPE.EXCEL.toString().equals(settings.getDataType())) {
+		    					Row rowData = (Row) row;
+		    					rowData.getCell(1).setCellValue(topic.getPicasaId());
+		    					rowData.getCell(2).setCellValue(topic.getImagePicasaUrl());
+		    					rowData.getCell(7).setCellValue(QuizParserConstant.YES);
+		    				} else if(DATA_TYPE.GOOGLESHEET.toString().equals(settings.getDataType())) {
+		    					ListEntry listEntry = (ListEntry) row;
+		    					listEntry.getCustomElements().setValueLocal("albumidpicasa", topic.getPicasaId());
+				    			listEntry.getCustomElements().setValueLocal("imageurlpicasa", topic.getImagePicasaUrl());
+				    			listEntry.getCustomElements().setValueLocal("isprocessed", QuizParserConstant.YES);
+				    			listEntry.update();
+		    				}
 		    			}
 		    		}
 		        }
 		    }
 		    
 		    // Extract QuestionAnswers
+		    if(DATA_TYPE.EXCEL.toString().equals(settings.getDataType())) {			 
+			    rows = Lists.newArrayList(sheet.iterator());
+			} else if(DATA_TYPE.GOOGLESHEET.toString().equals(settings.getDataType())) {
+			    rows = googlesheetClient.getListRows(fullSheet);
+			}
+		    
 		    index = 0;
-		    fullSheet = googlesheetClient.getWorksheet(0);
-		    listEntries = googlesheetClient.getListRows(fullSheet);
-		    for(ListEntry listEntry : listEntries) {
-		    	DataQuestions questionAnswer = DotoQuizStructure.convertRowGooglesheetToQuestions(listEntry, type);
+		    for(Object row : rows) {
+		    	DataQuestions questionAnswer = null;
+		    	
+		    	if(DATA_TYPE.EXCEL.toString().equals(settings.getDataType())) {
+		    		questionAnswer = DotoQuizStructure.convertRowExcelToQuestions((Row) row, type);
+				} else if(DATA_TYPE.GOOGLESHEET.toString().equals(settings.getDataType())) {
+					questionAnswer = DotoQuizStructure.convertRowGooglesheetToQuestions((ListEntry) row, type);
+				}
+		    	
     			if(questionAnswer != null) {
-		        	if(type == APPLICATION_TYPE.GENERATE_SQL) {
+		        	if(type == APPLICATION_TYPE.DB) {
 		    			System.out.println(questionAnswer + "\n");
-		    		} else if(type == APPLICATION_TYPE.BATCH_UPLOAD) {
+		    		} else if(type == APPLICATION_TYPE.SYNC) {
 		    			questionAnswer = syncQuestionAnswersToPicasa(questionAnswer);		    	
 		    			if(!QuizParserConstant.YES.equals(questionAnswer.getIsProcessed())) {
-			    			if("image".equalsIgnoreCase(questionAnswer.getMtQuestionType().getName())) {
-				    			listEntry.getCustomElements().setValueLocal("photoidpicasa", questionAnswer.getPicasaId());
-				    			listEntry.getCustomElements().setValueLocal("imageurlpicasa_2", questionAnswer.getImagePicasaUrl());
-			    			}
-			    			listEntry.getCustomElements().setValueLocal("isprocessed_2", QuizParserConstant.YES);
-			    			listEntry.update();
+		    				if(DATA_TYPE.EXCEL.toString().equals(settings.getDataType())) {
+		    					Row rowData = (Row) row;
+				    			if("image".equalsIgnoreCase(questionAnswer.getMtQuestionType().getName())) {
+				    				rowData.getCell(11).setCellValue(questionAnswer.getPicasaId());
+				    				rowData.getCell(12).setCellValue(questionAnswer.getImagePicasaUrl());
+				    			}
+				    			rowData.getCell(20).setCellValue(QuizParserConstant.YES);
+		    				} else if(DATA_TYPE.GOOGLESHEET.toString().equals(settings.getDataType())) {
+		    					ListEntry listEntry = (ListEntry) row;
+		    					if("image".equalsIgnoreCase(questionAnswer.getMtQuestionType().getName())) {
+					    			listEntry.getCustomElements().setValueLocal("photoidpicasa", questionAnswer.getPicasaId());
+					    			listEntry.getCustomElements().setValueLocal("imageurlpicasa_2", questionAnswer.getImagePicasaUrl());
+				    			}
+				    			listEntry.getCustomElements().setValueLocal("isprocessed_2", QuizParserConstant.YES);
+				    			listEntry.update();
+		    				}
 		    			}
 		    		}
 		        }
+		    }
+		    
+		    if(DATA_TYPE.EXCEL.toString().equals(settings.getDataType())) {
+		    	file.close();
+		    	
+			    log.info("Save data to file...");
+			    FileOutputStream fos = new FileOutputStream(settings.getSyncDataFile());
+			    workbook.write(fos);
+			    fos.close();
 		    }
 		    
 		    log.info("Done");
@@ -204,92 +262,8 @@ public class App {
 		}
 	}
 	
-	private void processExcel() {
-		log.info("process data from excel!");
-		if(isError) return;
-		try {
-			
-			APPLICATION_TYPE type = APPLICATION_TYPE.valueOf(settings.getApplicationType());
-		    FileInputStream file = new FileInputStream(settings.getSyncDataFile());
-		    XSSFWorkbook workbook = new XSSFWorkbook(file);
-		 
-		    //Get first sheet from the workbook
-		    XSSFSheet sheet = workbook.getSheetAt(0);
-		    List<DataTopics> topicCollections = new ArrayList<DataTopics>();
-		    List<DataQuestions> questionAnswersCollections = new ArrayList<DataQuestions>();
-		    
-		    // Extract Topic
-		    Iterator<Row> rowIterator = sheet.iterator();
-		    int index = 0;
-		    while(rowIterator.hasNext()) {
-		    	if(index++ == 0) {
-		    		rowIterator.next();
-		    		continue;
-		    	}
-		    	
-		        Row row = rowIterator.next();
-		        DataTopics topic = DotoQuizStructure.convertRowExcelToTopics(row, type);
-		        
-		        if(topic != null) {
-		        	if(type == APPLICATION_TYPE.GENERATE_SQL) {
-		    			System.out.println(topic);
-		    		} else if(type == APPLICATION_TYPE.BATCH_UPLOAD) {
-		    			topic = syncTopicToPicasa(topic);
-		    			
-		    			if(!QuizParserConstant.YES.equals(topic.getIsProcessed())) {
-			    			row.getCell(1).setCellValue(topic.getPicasaId());
-			    			row.getCell(2).setCellValue(topic.getImagePicasaUrl());
-			    			row.getCell(7).setCellValue(QuizParserConstant.YES);
-		    			}
-		    		}
-		        	
-		        	topicCollections.add(topic);
-		        }
-		    }
-		    
-		    // Extract QuestionAnswers
-		    rowIterator = sheet.iterator();
-		    index = 0;
-		    while(rowIterator.hasNext()) {
-		    	if(index++ == 0) {
-		    		rowIterator.next();
-		    		continue;
-		    	}
-		    	
-		        Row row = rowIterator.next();
-		        DataQuestions questionAnswer = DotoQuizStructure.convertRowExcelToQuestions(row, type);
-		        
-		        if(questionAnswer != null) {
-		        	if(type == APPLICATION_TYPE.GENERATE_SQL) {
-		    			System.out.println(questionAnswer + "\n");
-		    		} else if(type == APPLICATION_TYPE.BATCH_UPLOAD) {
-		    			questionAnswer = syncQuestionAnswersToPicasa(questionAnswer);		    	
-		    			
-		    			if(!QuizParserConstant.YES.equals(questionAnswer.getIsProcessed())) {
-			    			row.getCell(11).setCellValue(questionAnswer.getPicasaId());
-			    			row.getCell(12).setCellValue(questionAnswer.getImagePicasaUrl());
-			    			row.getCell(20).setCellValue(QuizParserConstant.YES);
-		    			}
-		    		}
-		        	questionAnswersCollections.add(questionAnswer);
-		        }
-		    }
-		    
-		    file.close();
-		    
-		    log.info("Save data to file...");
-		    FileOutputStream fos =new FileOutputStream(settings.getSyncDataFile());
-		    workbook.write(fos);
-		    fos.close();
-		    log.info("Done");
-		} catch (FileNotFoundException e) {
-		    e.printStackTrace();
-		} catch (IOException e) {
-		    e.printStackTrace();
-		}
-	}
 	
-	private void refreshAllDataFromPicasa() {
+	private void refreshDataFromPicasa() {
 		log.info("Load all data from picasa");
 		try {
 			List<GphotoEntry> albumEntries = webClient.getAlbums(true);
@@ -319,7 +293,7 @@ public class App {
     }
 	
 	public DataTopics syncTopicToPicasa(DataTopics topic) {
-		log.info("Sync Topics '" + topic.getName() + "'");
+		log.info("Sync Topics '" + topic.getId() + "'");
 		try {
 			GphotoEntry albumEntry;
 			if(albumMapByTitle.containsKey(topic.getName())) {
@@ -361,7 +335,7 @@ public class App {
 	}
 	
 	public DataQuestions syncQuestionAnswersToPicasa(DataQuestions answer) {
-		log.info("Sync QuestionAnswers '" + answer.getQuestion() + "'");
+		log.info("Sync QuestionAnswers '" + answer.getId() + "'");
 		
 		if(!QuizParserConstant.YES.equals(answer.getIsProcessed())) {
 			try {

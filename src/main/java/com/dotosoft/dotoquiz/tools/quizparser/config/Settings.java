@@ -17,6 +17,7 @@
 package com.dotosoft.dotoquiz.tools.quizparser.config;
 
 import java.io.File;
+import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 import org.apache.log4j.Logger;
@@ -55,16 +56,18 @@ public class Settings {
 
     public Settings() {
         preferences = Preferences.userNodeForPackage(Settings.class);
-//        try {
-//			preferences.clear();
-//		} catch (BackingStoreException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
+    }
+    
+    private void ClearPreferences() {
+    	try {
+			preferences.clear();
+		} catch (BackingStoreException e) {
+			e.printStackTrace();
+		}
     }
 
     public boolean loadSettings(String args[]) {
-
+    	
         applicationType = null;
         syncDataFile = null;
         refreshToken = preferences.get( QuizParserConstant.REFRESH_TOKEN, null );
@@ -81,13 +84,13 @@ public class Settings {
         	if(APPLICATION_TYPE.CLEAR.toString().equals(args[0])) {
 				applicationType = args[0];
         	} else {
-        		ShowError();
+        		showError();
         	}
         	
         	if(IMAGE_HOSTING_TYPE.valueOf(args[1]) != null) {
 				imageHostingType = args[1];
         	} else {
-        		ShowError();
+        		showError();
         	}
         	
         	saveSettings();
@@ -97,19 +100,19 @@ public class Settings {
         else if(args.length >= 3 &&  args.length <= 4) {
         	try {
         		if(APPLICATION_TYPE.CLEAR.toString().equals(args[0])) {
-        			ShowError();
+        			showError();
         		}
         		
         		if(APPLICATION_TYPE.valueOf(args[0]) != null) {
 					applicationType = args[0];
 	        	} else {
-	        		ShowError();
+	        		showError();
 	        	}
         		
         		if(IMAGE_HOSTING_TYPE.valueOf(args[1]) != null) {
 					imageHostingType = args[1];
 	        	} else {
-	        		ShowError();
+	        		showError();
 	        	}
         		
 	        	if(DATA_TYPE.valueOf(args[2]) != null) {
@@ -119,17 +122,17 @@ public class Settings {
 						syncDataFile = new File(args[3]);
 					}
 	        	} else {
-	        		ShowError();
+	        		showError();
 	        	}
 	        	
 				saveSettings();
 				
         	} catch(IllegalArgumentException ex) {
-        		ShowError();
+        		showError();
         	}
         } else {
         	if( syncDataFile == null || ! syncDataFile.exists() || applicationType == null || dataType == null || imageHostingType == null ) {
-				ShowError();
+				showError();
 			}
         }
         
@@ -141,9 +144,9 @@ public class Settings {
         return true;
     }
     
-    void ShowError() {
-    	System.out.println("Error: Could not run DataQuizParser.");
-		System.out.println("Run: java -jar DataQuizParser.jar [GENERATE_SQL|BATCH_UPLOAD|CLEAR] [EXCEL|GOOGLESHEET] [PICASA] [File Excel]");
+    public void showError() {
+    	log.error( "Error: Could not run DataQuizParser.");
+    	log.info("Run: java -jar DataQuizParser.jar [CLEAR|DB|SYNC] [PICASA] [GOOGLESHEET|EXCEL] [File Excel]");
 		System.exit(1);
     }
 
