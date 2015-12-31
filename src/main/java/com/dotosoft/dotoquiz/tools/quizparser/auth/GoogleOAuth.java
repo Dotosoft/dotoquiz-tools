@@ -40,8 +40,8 @@ import javax.swing.JFrame;
 
 import org.apache.log4j.Logger;
 
+import com.dotosoft.dotoquiz.common.DotoQuizConstant;
 import com.dotosoft.dotoquiz.tools.quizparser.DotoQuizGoogle;
-import com.dotosoft.dotoquiz.tools.quizparser.config.QuizParserConstant;
 import com.dotosoft.dotoquiz.tools.quizparser.config.Settings;
 import com.dotosoft.dotoquiz.tools.quizparser.data.GooglesheetClient;
 import com.dotosoft.dotoquiz.tools.quizparser.images.PicasawebClient;
@@ -95,8 +95,8 @@ public class GoogleOAuth {
 	
 	/** OAuth 2.0 scopes. */
 	private static final List<String> SCOPES = Arrays.asList(
-			QuizParserConstant.SCOPE_PICASA, 
-			QuizParserConstant.SCOPE_GOOGLESHEET);
+			DotoQuizConstant.SCOPE_PICASA, 
+			DotoQuizConstant.SCOPE_GOOGLESHEET);
 
     public GoogleOAuth()
     {

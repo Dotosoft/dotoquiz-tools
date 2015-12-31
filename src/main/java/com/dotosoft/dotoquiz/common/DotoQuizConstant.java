@@ -14,9 +14,9 @@
 	limitations under the License.
 */
 
-package com.dotosoft.dotoquiz.tools.quizparser.config;
+package com.dotosoft.dotoquiz.common;
 
-public class QuizParserConstant {
+public class DotoQuizConstant {
 	// Application Type Definition
 	public enum APPLICATION_TYPE {
 		CLEAR, DB, SYNC

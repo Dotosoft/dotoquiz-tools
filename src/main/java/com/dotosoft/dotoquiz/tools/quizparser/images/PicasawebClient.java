@@ -36,7 +36,7 @@ import java.util.List;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 
-import com.dotosoft.dotoquiz.tools.quizparser.config.QuizParserConstant;
+import com.dotosoft.dotoquiz.common.DotoQuizConstant;
 import com.dotosoft.dotoquiz.tools.quizparser.helper.TimeUtils;
 import com.dotosoft.dotoquiz.tools.quizparser.images.metadata.ImageInformation;
 import com.google.api.client.auth.oauth2.Credential;
@@ -71,15 +71,15 @@ public class PicasawebClient {
 
     private static final String API_PREFIX = "https://picasaweb.google.com/data/feed/api/user/";
 
-    private final PicasawebService service = new PicasawebService(QuizParserConstant.SYNC_CLIENT_NAME);
+    private final PicasawebService service = new PicasawebService(DotoQuizConstant.SYNC_CLIENT_NAME);
 
     /**
      * Constructs a new un-authenticated client.
      */
     public PicasawebClient(Credential credential ) {
         service.setOAuth2Credentials( credential );
-        service.setConnectTimeout( 1000 * QuizParserConstant.CONNECTION_TIMEOUT_SECS );
-        service.setReadTimeout(1000 * QuizParserConstant.CONNECTION_TIMEOUT_SECS);
+        service.setConnectTimeout( 1000 * DotoQuizConstant.CONNECTION_TIMEOUT_SECS );
+        service.setReadTimeout(1000 * DotoQuizConstant.CONNECTION_TIMEOUT_SECS);
     }
 
     /**
@@ -274,7 +274,7 @@ public class PicasawebClient {
             myPhoto.setMediaSource(myMedia);
             myPhoto.setChecksum( localMd5CheckSum );
             myPhoto.setAlbumAccess(GphotoAccess.Value.PUBLIC);
-            myPhoto.setClient(QuizParserConstant.SYNC_CLIENT_NAME);
+            myPhoto.setClient(DotoQuizConstant.SYNC_CLIENT_NAME);
 
             if( newPhoto)
             {
@@ -342,7 +342,7 @@ public class PicasawebClient {
     	PhotoEntry myPhoto = new PhotoEntry();
     	myPhoto.setTitle(new PlainTextConstruct(title));
     	myPhoto.setDescription(new PlainTextConstruct(description));
-    	myPhoto.setClient(QuizParserConstant.SYNC_CLIENT_NAME);
+    	myPhoto.setClient(DotoQuizConstant.SYNC_CLIENT_NAME);
 
     	MediaFileSource myMedia = new MediaFileSource(fileImage, "image/jpeg");
     	myPhoto.setMediaSource(myMedia);

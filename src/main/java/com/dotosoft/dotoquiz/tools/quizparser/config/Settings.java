@@ -22,9 +22,10 @@ import java.util.prefs.Preferences;
 
 import org.apache.log4j.Logger;
 
-import com.dotosoft.dotoquiz.tools.quizparser.config.QuizParserConstant.APPLICATION_TYPE;
-import com.dotosoft.dotoquiz.tools.quizparser.config.QuizParserConstant.DATA_TYPE;
-import com.dotosoft.dotoquiz.tools.quizparser.config.QuizParserConstant.IMAGE_HOSTING_TYPE;
+import com.dotosoft.dotoquiz.common.DotoQuizConstant;
+import com.dotosoft.dotoquiz.common.DotoQuizConstant.APPLICATION_TYPE;
+import com.dotosoft.dotoquiz.common.DotoQuizConstant.DATA_TYPE;
+import com.dotosoft.dotoquiz.common.DotoQuizConstant.IMAGE_HOSTING_TYPE;
 
 /**
  * General settings class for loading/saving prefs
@@ -70,12 +71,12 @@ public class Settings {
     	
         applicationType = null;
         syncDataFile = null;
-        refreshToken = preferences.get( QuizParserConstant.REFRESH_TOKEN, null );
-        applicationType = preferences.get( QuizParserConstant.APP_TYPE, null );
-        dataType = preferences.get( QuizParserConstant.DATA_TYPE, null );
-        imageHostingType = preferences.get( QuizParserConstant.IMAGE_HOSTING_TYPE, null );
+        refreshToken = preferences.get( DotoQuizConstant.REFRESH_TOKEN, null );
+        applicationType = preferences.get( DotoQuizConstant.APP_TYPE, null );
+        dataType = preferences.get( DotoQuizConstant.DATA_TYPE, null );
+        imageHostingType = preferences.get( DotoQuizConstant.IMAGE_HOSTING_TYPE, null );
         
-        String prefsFolder = preferences.get( QuizParserConstant.SYNC_FILE, null );
+        String prefsFolder = preferences.get( DotoQuizConstant.SYNC_FILE, null );
         if( prefsFolder != null ) {
         	syncDataFile = new File( prefsFolder );
         }
@@ -151,13 +152,13 @@ public class Settings {
     }
 
     public void saveSettings() {
-        preferences.put( QuizParserConstant.SYNC_FILE, String.valueOf(getSyncDataFile()) );
-        preferences.put( QuizParserConstant.APP_TYPE, getApplicationType() );
-        preferences.put( QuizParserConstant.IMAGE_HOSTING_TYPE, getImageHostingType() );
-        if(getDataType() != null) preferences.put( QuizParserConstant.DATA_TYPE, getDataType() );
+        preferences.put( DotoQuizConstant.SYNC_FILE, String.valueOf(getSyncDataFile()) );
+        preferences.put( DotoQuizConstant.APP_TYPE, getApplicationType() );
+        preferences.put( DotoQuizConstant.IMAGE_HOSTING_TYPE, getImageHostingType() );
+        if(getDataType() != null) preferences.put( DotoQuizConstant.DATA_TYPE, getDataType() );
         
-        if( getRefreshToken() != null ) preferences.put( QuizParserConstant.REFRESH_TOKEN, getRefreshToken() );
-        else preferences.remove( QuizParserConstant.REFRESH_TOKEN );
+        if( getRefreshToken() != null ) preferences.put( DotoQuizConstant.REFRESH_TOKEN, getRefreshToken() );
+        else preferences.remove( DotoQuizConstant.REFRESH_TOKEN );
 
         log.info( "Settings saved successfully.");
     }

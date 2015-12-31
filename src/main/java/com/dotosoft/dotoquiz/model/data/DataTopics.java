@@ -9,7 +9,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
-import com.dotosoft.dotoquiz.tools.quizparser.config.QuizParserConstant.APPLICATION_TYPE;
+import com.dotosoft.dotoquiz.common.DotoQuizConstant.APPLICATION_TYPE;
 
 @Entity
 @Table(name = "dat_topics", catalog = "dotoquiz")
