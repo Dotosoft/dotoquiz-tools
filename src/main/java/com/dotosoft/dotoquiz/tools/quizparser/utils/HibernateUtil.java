@@ -39,23 +39,33 @@ public class HibernateUtil {
         // Close caches and connection pools
         getSessionFactory().close();
     }
+    
+    public static ParameterQuestionType getQuestionTypeByName(Session session, String name) {
+    	Query q = session.createQuery("From ParameterQuestionType qt where qt.name = :questionTypeId");
+    	q.setString("questionTypeId", name);
+    	
+    	ParameterQuestionType parameterQuestionType = (ParameterQuestionType) q.uniqueResult();
+    	return parameterQuestionType;
+    }
   
     public static void SaveOrUpdateTopicQuestionData(Session session, DataTopics topic, DataQuestions questionAnswer) {
-    	Query q = session.createQuery("From DataTopicsQuestions tq where tq.datQuestions.id = :questionId and tq.sosTopics.id = :topicId");
+    	Query q = session.createQuery("From DataTopicsQuestions tq where tq.datQuestions.id = :questionId and tq.datTopics.id = :topicId");
     	q.setString("questionId", questionAnswer.getId());
     	q.setString("topicId", topic.getId());
 		List<DataTopicsQuestions> dataTopicQuestions = q.list();
 		if(!dataTopicQuestions.isEmpty()) {
 			for(DataTopicsQuestions topicQuestion : dataTopicQuestions) {
 				topicQuestion.setDatQuestions(questionAnswer);
-				topicQuestion.setSosTopics(topic);
+				topicQuestion.setDatTopics(topic);
+				topicQuestion.setIsDelete(QuizParserConstant.NO);
 				session.update(topicQuestion);
 			}
 		} else {
 			DataTopicsQuestions topicQuestion = new DataTopicsQuestions();
 			topicQuestion.setId(UUID.randomUUID().toString());
 			topicQuestion.setDatQuestions(questionAnswer);
-			topicQuestion.setSosTopics(topic);
+			topicQuestion.setDatTopics(topic);
+			topicQuestion.setIsDelete(QuizParserConstant.NO);
 			topicQuestion.setCreatedBy(QuizParserConstant.SYSTEM_USER);
 			topicQuestion.setCreatedDt(new Date());
 			session.save(topicQuestion);

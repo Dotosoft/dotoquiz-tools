@@ -46,7 +46,7 @@ public class DotoQuizStructure {
 		String wrongAnswer3 = ReadCellAsString(row.getCell(19), "");
 		String isProcessed = ReadCellAsString(row.getCell(20), "");
 		
-		DataQuestions qa = new DataQuestions(pertanyaanId, new ParameterQuestionType(questionType), picasaId, imagePicasaURL, additionalData, questionType, QuizParserConstant.NO, correctAnswer, wrongAnswer1, wrongAnswer2, wrongAnswer3, new java.util.Date(), "system", topics, isProcessed, type);
+		DataQuestions qa = new DataQuestions(pertanyaanId, questionType, picasaId, imagePicasaURL, additionalData, questionType, QuizParserConstant.NO, correctAnswer, wrongAnswer1, wrongAnswer2, wrongAnswer3, new java.util.Date(), "system", topics, isProcessed, type);
 		qa.setApplicationType(type);
 		
 		return qa;
@@ -66,7 +66,7 @@ public class DotoQuizStructure {
 		String isProcessed = ReadCellAsString(row.getCell(7), "");
 		
 		// DataTopics topic = new DataTopics(topicId, picasaId, imagePicasaURL, imageURL, topicName, topicDescription, topicParent, isProcessed);
-		DataTopics topic = new DataTopics(topicId, picasaId, imagePicasaURL, new DataTopics(topicParent), topicName, topicDescription, imageURL, QuizParserConstant.NO, new java.util.Date(), QuizParserConstant.SYSTEM_USER, isProcessed, type);
+		DataTopics topic = new DataTopics(topicId, picasaId, imagePicasaURL, topicParent, topicName, topicDescription, imageURL, QuizParserConstant.NO, new java.util.Date(), QuizParserConstant.SYSTEM_USER, isProcessed, type);
 		topic.setApplicationType(type);
 		
 		return topic;
@@ -93,7 +93,7 @@ public class DotoQuizStructure {
 		String wrongAnswer3 = row.getCustomElements().getValue("jawabansalah3");
 		String isProcessed = row.getCustomElements().getValue("isprocessed_2");
 		
-		DataQuestions qa = new DataQuestions(pertanyaanId, new ParameterQuestionType(questionType), picasaId, imagePicasaURL, additionalData, questionType, QuizParserConstant.NO, correctAnswer, wrongAnswer1, wrongAnswer2, wrongAnswer3, new java.util.Date(), "system", topics, isProcessed, type);
+		DataQuestions qa = new DataQuestions(pertanyaanId, questionType, picasaId, imagePicasaURL, additionalData, questionType, QuizParserConstant.NO, correctAnswer, wrongAnswer1, wrongAnswer2, wrongAnswer3, new java.util.Date(), "system", topics, isProcessed, type);
 		qa.setApplicationType(type);
 		
 		return qa;
@@ -112,7 +112,7 @@ public class DotoQuizStructure {
 		String topicParent = row.getCustomElements().getValue("topicparent");
 		String isProcessed = row.getCustomElements().getValue("isprocessed");
 		
-		DataTopics topic = new DataTopics(topicId, picasaId, imagePicasaURL, new DataTopics(topicParent), topicName, topicDescription, imageURL, QuizParserConstant.NO, new java.util.Date(), QuizParserConstant.SYSTEM_USER, isProcessed, type);
+		DataTopics topic = new DataTopics(topicId, picasaId, imagePicasaURL, topicParent, topicName, topicDescription, imageURL, QuizParserConstant.NO, new java.util.Date(), QuizParserConstant.SYSTEM_USER, isProcessed, type);
 		topic.setApplicationType(type);
 		
 		return topic;

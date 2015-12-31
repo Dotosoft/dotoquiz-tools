@@ -8,6 +8,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import com.dotosoft.dotoquiz.model.parameter.ParameterQuestionType;
 import com.dotosoft.dotoquiz.tools.quizparser.config.QuizParserConstant.APPLICATION_TYPE;
@@ -16,14 +17,14 @@ import com.dotosoft.dotoquiz.tools.quizparser.config.QuizParserConstant.APPLICAT
 @Table(name = "dat_questions", catalog = "dotoquiz")
 public class DataQuestions implements java.io.Serializable {
 
-	public DataQuestions(String id, ParameterQuestionType mtQuestionType,
+	public DataQuestions(String id, String mtQuestionType,
 			String picasaId, String imagePicasaUrl, String additionalData,
 			String question, String isDelete, String correctAnswer,
 			String wrongAnswer1, String wrongAnswer2, String wrongAnswer3,
 			Date createdDt, String createdBy, String[] topics,
 			String isProcessed, APPLICATION_TYPE applicationType) {
 		this.id = id;
-		this.mtQuestionType = mtQuestionType;
+		this.questionTypeData = mtQuestionType;
 		this.picasaId = picasaId;
 		this.imagePicasaUrl = imagePicasaUrl;
 		this.additionalData = additionalData;
@@ -80,9 +81,15 @@ public class DataQuestions implements java.io.Serializable {
 	private String createdBy;
 
 	// only need for batch
+	@Transient
 	private String[] topics;
+	@Transient
 	private String isProcessed;
+	@Transient
 	private APPLICATION_TYPE applicationType;
+	
+	@Transient
+	private String questionTypeData;
 
 	public DataQuestions() {
 	}
@@ -109,6 +116,14 @@ public class DataQuestions implements java.io.Serializable {
 
 	public String getAdditionalData() {
 		return additionalData;
+	}
+
+	public String getQuestionTypeData() {
+		return questionTypeData;
+	}
+
+	public void setQuestionTypeData(String questionTypeData) {
+		this.questionTypeData = questionTypeData;
 	}
 
 	public void setAdditionalData(String additionalData) {

@@ -5,6 +5,7 @@ import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
@@ -13,11 +14,11 @@ import javax.persistence.Table;
 public class DataTopicsQuestions implements java.io.Serializable {
 
 	public DataTopicsQuestions(String id, DataQuestions datQuestions,
-			DataTopics sosTopics, String isDelete, Date createdDt,
+			DataTopics datTopics, String isDelete, Date createdDt,
 			String createdBy) {
 		this.id = id;
 		this.datQuestions = datQuestions;
-		this.sosTopics = sosTopics;
+		this.datTopics = datTopics;
 		this.isDelete = isDelete;
 		this.createdDt = createdDt;
 		this.createdBy = createdBy;
@@ -30,7 +31,7 @@ public class DataTopicsQuestions implements java.io.Serializable {
 	private DataQuestions datQuestions;
 
 	@ManyToOne
-	private DataTopics sosTopics;
+	private DataTopics datTopics;
 
 	@Column(name = "is_delete")
 	private String isDelete;
@@ -64,12 +65,12 @@ public class DataTopicsQuestions implements java.io.Serializable {
 		this.datQuestions = datQuestions;
 	}
 
-	public DataTopics getSosTopics() {
-		return this.sosTopics;
+	public DataTopics getDatTopics() {
+		return this.datTopics;
 	}
 
-	public void setSosTopics(DataTopics sosTopics) {
-		this.sosTopics = sosTopics;
+	public void setDatTopics(DataTopics datTopics) {
+		this.datTopics = datTopics;
 	}
 
 	public String getIsDelete() {

@@ -7,6 +7,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import com.dotosoft.dotoquiz.tools.quizparser.config.QuizParserConstant.APPLICATION_TYPE;
 
@@ -14,14 +15,14 @@ import com.dotosoft.dotoquiz.tools.quizparser.config.QuizParserConstant.APPLICAT
 @Table(name = "dat_topics", catalog = "dotoquiz")
 public class DataTopics implements java.io.Serializable {
 	public DataTopics(String id, String picasaId, String imagePicasaUrl,
-			DataTopics datTopics, String name, String description,
+			String topicParentId, String name, String description,
 			String imageUrl, String isDelete, Date createdDt, String createdBy,
 			String isProcessed, APPLICATION_TYPE applicationType) {
 		this.id = id;
 		this.picasaId = picasaId;
 		this.imagePicasaUrl = imagePicasaUrl;
-		this.datTopics = datTopics;
 		this.name = name;
+		this.topicParentId = topicParentId;
 		this.description = description;
 		this.imageUrl = imageUrl;
 		this.isDelete = isDelete;
@@ -62,8 +63,20 @@ public class DataTopics implements java.io.Serializable {
 	private String createdBy;
 
 	// only need for batch
+	@Transient
 	private String isProcessed;
+	@Transient
 	private APPLICATION_TYPE applicationType;
+	@Transient
+	private String topicParentId;
+
+	public String getTopicParentId() {
+		return topicParentId;
+	}
+
+	public void setTopicParentId(String topicParentId) {
+		this.topicParentId = topicParentId;
+	}
 
 	public DataTopics() {
 	}

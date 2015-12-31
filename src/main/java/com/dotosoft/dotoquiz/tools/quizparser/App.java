@@ -194,11 +194,13 @@ public class App {
 		    	
 		        if(topic != null) {
 		        	if(type == APPLICATION_TYPE.DB) {
+		        		if(StringUtils.hasValue(topic.getTopicParentId())) {
+		        			topic.setDatTopics(topicMapByTopicId.get(topic.getTopicParentId()));
+		        		}
 		    			log.info("Save or update topic: " + topic);
 		        		session.saveOrUpdate(topic);
 		    		} else if(type == APPLICATION_TYPE.SYNC) {
 		    			topic = syncTopicToPicasa(topic);
-		    			topicMapByTopicId.put(topic.getId(), topic);
 		    			
 		    			if(!QuizParserConstant.YES.equals(topic.getIsProcessed())) {
 		    				if(DATA_TYPE.EXCEL.toString().equals(settings.getDataType())) {
@@ -215,6 +217,8 @@ public class App {
 		    				}
 		    			}
 		    		}
+		        	
+		        	topicMapByTopicId.put(topic.getId(), topic);
 		        }
 		    }
 		    
@@ -237,12 +241,13 @@ public class App {
 		    	
     			if(questionAnswer != null) {
 		        	if(type == APPLICATION_TYPE.DB) {
-		        		log.info("Save or update QuestionAnswers: " + questionAnswer);
+		        		questionAnswer.setMtQuestionType(HibernateUtil.getQuestionTypeByName(session, questionAnswer.getQuestionTypeData()));
 		        		session.saveOrUpdate(questionAnswer);
 		        		for(String topicId : questionAnswer.getTopics()) {
 		        			DataTopics datTopic = topicMapByTopicId.get(topicId);
 		        			HibernateUtil.SaveOrUpdateTopicQuestionData(session, datTopic, questionAnswer);
 		        		}
+		        		log.info("Save or update QuestionAnswers: " + questionAnswer);
 		    		} else if(type == APPLICATION_TYPE.SYNC) {
 		    			questionAnswer = syncQuestionAnswersToPicasa(questionAnswer);		    	
 		    			if(!QuizParserConstant.YES.equals(questionAnswer.getIsProcessed())) {
@@ -283,12 +288,14 @@ public class App {
 			}
 		    
 		    log.info("Done");
-		} catch (ServiceException | IOException | GeneralSecurityException e) {
+		} catch (Exception e) {
 		    trx.rollback();
 			session.close();
 			
 			e.printStackTrace();
 		}
+		
+		System.exit(0);
 	}
 	
 	
