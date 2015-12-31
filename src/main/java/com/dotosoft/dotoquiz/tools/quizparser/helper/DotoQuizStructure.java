@@ -20,15 +20,14 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 
 import com.dotosoft.dotoquiz.common.DotoQuizConstant;
-import com.dotosoft.dotoquiz.common.DotoQuizConstant.APPLICATION_TYPE;
-import com.dotosoft.dotoquiz.model.data.DataQuestions;
-import com.dotosoft.dotoquiz.model.data.DataTopics;
-import com.dotosoft.dotoquiz.model.parameter.ParameterQuestionType;
+import com.dotosoft.dotoquiz.common.QuizParserConstant.APPLICATION_TYPE;
+import com.dotosoft.dotoquiz.model.data.custom.DataQuestionsParser;
+import com.dotosoft.dotoquiz.model.data.custom.DataTopicsParser;
 import com.google.gdata.data.spreadsheet.ListEntry;
 
 public class DotoQuizStructure {
 	// Excel Data Converter
-	public static DataQuestions convertRowExcelToQuestions(Row row, APPLICATION_TYPE type) {
+	public static DataQuestionsParser convertRowExcelToQuestions(Row row, APPLICATION_TYPE type) {
 		String pertanyaanId = ReadCellAsString(row.getCell(9), "");
 		if(pertanyaanId.equals("")) return null;
 		
@@ -46,13 +45,13 @@ public class DotoQuizStructure {
 		String wrongAnswer3 = ReadCellAsString(row.getCell(19), "");
 		String isProcessed = ReadCellAsString(row.getCell(20), "");
 		
-		DataQuestions qa = new DataQuestions(pertanyaanId, questionType, picasaId, imagePicasaURL, additionalData, questionType, DotoQuizConstant.NO, correctAnswer, wrongAnswer1, wrongAnswer2, wrongAnswer3, new java.util.Date(), "system", topics, isProcessed, type);
+		DataQuestionsParser qa = new DataQuestionsParser(pertanyaanId, questionType, picasaId, imagePicasaURL, additionalData, questionType, DotoQuizConstant.NO, correctAnswer, wrongAnswer1, wrongAnswer2, wrongAnswer3, new java.util.Date(), "system", topics, isProcessed, type);
 		qa.setApplicationType(type);
 		
 		return qa;
 	}
 
-	public static DataTopics convertRowExcelToTopics(Row row, APPLICATION_TYPE type) {
+	public static DataTopicsParser convertRowExcelToTopics(Row row, APPLICATION_TYPE type) {
 		String topicId = ReadCellAsString(row.getCell(0), "");
 		if(topicId.equals("")) return null;
 		
@@ -66,14 +65,14 @@ public class DotoQuizStructure {
 		String isProcessed = ReadCellAsString(row.getCell(7), "");
 		
 		// DataTopics topic = new DataTopics(topicId, picasaId, imagePicasaURL, imageURL, topicName, topicDescription, topicParent, isProcessed);
-		DataTopics topic = new DataTopics(topicId, picasaId, imagePicasaURL, topicParent, topicName, topicDescription, imageURL, DotoQuizConstant.NO, new java.util.Date(), DotoQuizConstant.SYSTEM_USER, isProcessed, type);
+		DataTopicsParser topic = new DataTopicsParser(topicId, picasaId, imagePicasaURL, topicParent, topicName, topicDescription, imageURL, DotoQuizConstant.NO, new java.util.Date(), DotoQuizConstant.SYSTEM_USER, isProcessed, type);
 		topic.setApplicationType(type);
 		
 		return topic;
 	}
 	
 	// Googlesheet Data Converter
-	public static DataQuestions convertRowGooglesheetToQuestions(ListEntry row, APPLICATION_TYPE type) {
+	public static DataQuestionsParser convertRowGooglesheetToQuestions(ListEntry row, APPLICATION_TYPE type) {
 		// for(String tag : row.getCustomElements().getTags())
 		
 		String pertanyaanId = row.getCustomElements().getValue("pertanyaanId");
@@ -93,13 +92,13 @@ public class DotoQuizStructure {
 		String wrongAnswer3 = row.getCustomElements().getValue("jawabansalah3");
 		String isProcessed = row.getCustomElements().getValue("isprocessed_2");
 		
-		DataQuestions qa = new DataQuestions(pertanyaanId, questionType, picasaId, imagePicasaURL, additionalData, questionType, DotoQuizConstant.NO, correctAnswer, wrongAnswer1, wrongAnswer2, wrongAnswer3, new java.util.Date(), "system", topics, isProcessed, type);
+		DataQuestionsParser qa = new DataQuestionsParser(pertanyaanId, questionType, picasaId, imagePicasaURL, additionalData, questionType, DotoQuizConstant.NO, correctAnswer, wrongAnswer1, wrongAnswer2, wrongAnswer3, new java.util.Date(), "system", topics, isProcessed, type);
 		qa.setApplicationType(type);
 		
 		return qa;
 	}
 
-	public static DataTopics convertRowGooglesheetExcelToTopics(ListEntry row, APPLICATION_TYPE type) {
+	public static DataTopicsParser convertRowGooglesheetExcelToTopics(ListEntry row, APPLICATION_TYPE type) {
 		String topicId = row.getCustomElements().getValue("topikid");
 		if(!StringUtils.hasValue(topicId)) return null;
 		
@@ -112,7 +111,7 @@ public class DotoQuizStructure {
 		String topicParent = row.getCustomElements().getValue("topicparent");
 		String isProcessed = row.getCustomElements().getValue("isprocessed");
 		
-		DataTopics topic = new DataTopics(topicId, picasaId, imagePicasaURL, topicParent, topicName, topicDescription, imageURL, DotoQuizConstant.NO, new java.util.Date(), DotoQuizConstant.SYSTEM_USER, isProcessed, type);
+		DataTopicsParser topic = new DataTopicsParser(topicId, picasaId, imagePicasaURL, topicParent, topicName, topicDescription, imageURL, DotoQuizConstant.NO, new java.util.Date(), DotoQuizConstant.SYSTEM_USER, isProcessed, type);
 		topic.setApplicationType(type);
 		
 		return topic;

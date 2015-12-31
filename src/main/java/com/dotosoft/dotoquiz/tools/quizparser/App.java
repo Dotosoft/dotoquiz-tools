@@ -33,11 +33,12 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 
 import com.dotosoft.dotoquiz.common.DotoQuizConstant;
-import com.dotosoft.dotoquiz.common.DotoQuizConstant.APPLICATION_TYPE;
-import com.dotosoft.dotoquiz.common.DotoQuizConstant.DATA_TYPE;
-import com.dotosoft.dotoquiz.common.DotoQuizConstant.IMAGE_HOSTING_TYPE;
-import com.dotosoft.dotoquiz.model.data.DataQuestions;
+import com.dotosoft.dotoquiz.common.QuizParserConstant.APPLICATION_TYPE;
+import com.dotosoft.dotoquiz.common.QuizParserConstant.DATA_TYPE;
+import com.dotosoft.dotoquiz.common.QuizParserConstant.IMAGE_HOSTING_TYPE;
 import com.dotosoft.dotoquiz.model.data.DataTopics;
+import com.dotosoft.dotoquiz.model.data.custom.DataQuestionsParser;
+import com.dotosoft.dotoquiz.model.data.custom.DataTopicsParser;
 import com.dotosoft.dotoquiz.tools.quizparser.auth.GoogleOAuth;
 import com.dotosoft.dotoquiz.tools.quizparser.config.Settings;
 import com.dotosoft.dotoquiz.tools.quizparser.data.GooglesheetClient;
@@ -70,7 +71,7 @@ public class App {
 	private Map<String, Map<String, GphotoEntry>> photoMapByAlbumId;
 	private Map<String, GphotoEntry> albumMapByTopicId;
 	private Map<String, GphotoEntry> albumMapByTitle;
-	private Map<String, DataTopics> topicMapByTopicId;
+	private Map<String, DataTopicsParser> topicMapByTopicId;
 	
 	public static void main(String[] args) {
 		new App(args).process();
@@ -82,7 +83,7 @@ public class App {
 		photoMapByAlbumId = new HashMap<String, Map<String, GphotoEntry>>();
 		albumMapByTopicId = new HashMap<String, GphotoEntry>();
 		albumMapByTitle = new HashMap<String, GphotoEntry>();
-		topicMapByTopicId = new HashMap<String, DataTopics>();
+		topicMapByTopicId = new HashMap<String, DataTopicsParser>();
 		
 		settings = new Settings();
 		auth = new GoogleOAuth();
@@ -185,7 +186,7 @@ public class App {
 		    // Extract Topic
 		    int index = 0;
 		    for(Object row : rows) {
-		    	DataTopics topic = null;
+		    	DataTopicsParser topic = null;
 		    	if(DATA_TYPE.EXCEL.toString().equals(settings.getDataType())) {
 		    		topic = DotoQuizStructure.convertRowExcelToTopics((Row) row, type);
 				} else if(DATA_TYPE.GOOGLESHEET.toString().equals(settings.getDataType())) {
@@ -195,10 +196,10 @@ public class App {
 		        if(topic != null) {
 		        	if(type == APPLICATION_TYPE.DB) {
 		        		if(StringUtils.hasValue(topic.getTopicParentId())) {
-		        			topic.setDatTopics(topicMapByTopicId.get(topic.getTopicParentId()));
+		        			topic.setDatTopics( topicMapByTopicId.get(topic.getTopicParentId()).toDataTopics() );
 		        		}
 		    			log.info("Save or update topic: " + topic);
-		        		session.saveOrUpdate(topic);
+		        		session.saveOrUpdate( topic.toDataTopics() );
 		    		} else if(type == APPLICATION_TYPE.SYNC) {
 		    			topic = syncTopicToPicasa(topic);
 		    			
@@ -231,7 +232,7 @@ public class App {
 		    
 		    index = 0;
 		    for(Object row : rows) {
-		    	DataQuestions questionAnswer = null;
+		    	DataQuestionsParser questionAnswer = null;
 		    	
 		    	if(DATA_TYPE.EXCEL.toString().equals(settings.getDataType())) {
 		    		questionAnswer = DotoQuizStructure.convertRowExcelToQuestions((Row) row, type);
@@ -242,10 +243,10 @@ public class App {
     			if(questionAnswer != null) {
 		        	if(type == APPLICATION_TYPE.DB) {
 		        		questionAnswer.setMtQuestionType(HibernateUtil.getQuestionTypeByName(session, questionAnswer.getQuestionTypeData()));
-		        		session.saveOrUpdate(questionAnswer);
+		        		session.saveOrUpdate( questionAnswer.toDataQuestion() );
 		        		for(String topicId : questionAnswer.getTopics()) {
-		        			DataTopics datTopic = topicMapByTopicId.get(topicId);
-		        			HibernateUtil.SaveOrUpdateTopicQuestionData(session, datTopic, questionAnswer);
+		        			DataTopicsParser datTopic = topicMapByTopicId.get(topicId);
+		        			HibernateUtil.SaveOrUpdateTopicQuestionData(session, datTopic.toDataTopics(), questionAnswer.toDataQuestion());
 		        		}
 		        		log.info("Save or update QuestionAnswers: " + questionAnswer);
 		    		} else if(type == APPLICATION_TYPE.SYNC) {
@@ -328,7 +329,7 @@ public class App {
         webClient = null;
     }
 	
-	public DataTopics syncTopicToPicasa(DataTopics topic) {
+	public DataTopicsParser syncTopicToPicasa(DataTopicsParser topic) {
 		log.info("Sync Topics '" + topic.getId() + "'");
 		try {
 			GphotoEntry albumEntry;
@@ -370,7 +371,7 @@ public class App {
 		return topic;
 	}
 	
-	public DataQuestions syncQuestionAnswersToPicasa(DataQuestions answer) {
+	public DataQuestionsParser syncQuestionAnswersToPicasa(DataQuestionsParser answer) {
 		log.info("Sync QuestionAnswers '" + answer.getId() + "'");
 		
 		if(!DotoQuizConstant.YES.equals(answer.getIsProcessed())) {

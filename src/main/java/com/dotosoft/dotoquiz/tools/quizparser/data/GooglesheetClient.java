@@ -24,7 +24,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.dotosoft.dotoquiz.common.DotoQuizConstant;
+import com.dotosoft.dotoquiz.common.QuizParserConstant;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.gdata.client.spreadsheet.SpreadsheetService;
 import com.google.gdata.data.PlainTextConstruct;
@@ -38,7 +38,7 @@ import com.google.gdata.util.ServiceException;
 
 public class GooglesheetClient {
 	
-	private final SpreadsheetService service = new SpreadsheetService(DotoQuizConstant.SYNC_CLIENT_NAME);
+	private final SpreadsheetService service = new SpreadsheetService(QuizParserConstant.SYNC_CLIENT_NAME);
 
 	// Define the URL to request.  This should never change.
     private final URL SPREADSHEET_FEED_URL;
@@ -51,8 +51,8 @@ public class GooglesheetClient {
 		
 		service.setProtocolVersion(SpreadsheetService.Versions.V3);
 		service.setOAuth2Credentials( credential );
-        service.setConnectTimeout( 1000 * DotoQuizConstant.CONNECTION_TIMEOUT_SECS );
-        service.setReadTimeout(1000 * DotoQuizConstant.CONNECTION_TIMEOUT_SECS);
+        service.setConnectTimeout( 1000 * QuizParserConstant.CONNECTION_TIMEOUT_SECS );
+        service.setReadTimeout(1000 * QuizParserConstant.CONNECTION_TIMEOUT_SECS);
         
         // Get Spreadsheet Entry
         // Make a request to the API and get all spreadsheets.

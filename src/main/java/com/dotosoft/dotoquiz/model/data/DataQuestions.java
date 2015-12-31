@@ -1,6 +1,5 @@
 package com.dotosoft.dotoquiz.model.data;
 
-import java.util.Arrays;
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -8,23 +7,20 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 
-import com.dotosoft.dotoquiz.common.DotoQuizConstant.APPLICATION_TYPE;
 import com.dotosoft.dotoquiz.model.parameter.ParameterQuestionType;
 
 @Entity
 @Table(name = "dat_questions", catalog = "dotoquiz")
 public class DataQuestions implements java.io.Serializable {
 
-	public DataQuestions(String id, String mtQuestionType,
+	public DataQuestions(String id, 
 			String picasaId, String imagePicasaUrl, String additionalData,
 			String question, String isDelete, String correctAnswer,
 			String wrongAnswer1, String wrongAnswer2, String wrongAnswer3,
-			Date createdDt, String createdBy, String[] topics,
-			String isProcessed, APPLICATION_TYPE applicationType) {
+			Date createdDt, String createdBy) {
+		
 		this.id = id;
-		this.questionTypeData = mtQuestionType;
 		this.picasaId = picasaId;
 		this.imagePicasaUrl = imagePicasaUrl;
 		this.additionalData = additionalData;
@@ -36,60 +32,46 @@ public class DataQuestions implements java.io.Serializable {
 		this.wrongAnswer3 = wrongAnswer3;
 		this.createdDt = createdDt;
 		this.createdBy = createdBy;
-		this.topics = topics;
-		this.isProcessed = isProcessed;
-		this.applicationType = applicationType;
 	}
 
 	@Id
-	private String id;
+	protected String id;
 
 	@ManyToOne
-	private ParameterQuestionType mtQuestionType;
+	protected ParameterQuestionType mtQuestionType;
 
 	@Column(name = "picasaId", length = 100)
-	private String picasaId;
+	protected String picasaId;
 
 	@Column(name = "imagePicasaUrl", length = 1000)
-	private String imagePicasaUrl;
+	protected String imagePicasaUrl;
 
 	@Column(name = "additionalData", length = 1000)
-	private String additionalData;
+	protected String additionalData;
 
 	@Column(name = "question")
-	private String question;
+	protected String question;
 
 	@Column(name = "is_delete")
-	private String isDelete;
+	protected String isDelete;
 
 	@Column(name = "correct_answer")
-	private String correctAnswer;
+	protected String correctAnswer;
 
 	@Column(name = "wrong_answer1")
-	private String wrongAnswer1;
+	protected String wrongAnswer1;
 
 	@Column(name = "wrong_answer2")
-	private String wrongAnswer2;
+	protected String wrongAnswer2;
 
 	@Column(name = "wrong_answer3")
-	private String wrongAnswer3;
+	protected String wrongAnswer3;
 
 	@Column(name = "created_dt")
-	private Date createdDt;
+	protected Date createdDt;
 
 	@Column(name = "created_by")
-	private String createdBy;
-
-	// only need for batch
-	@Transient
-	private String[] topics;
-	@Transient
-	private String isProcessed;
-	@Transient
-	private APPLICATION_TYPE applicationType;
-	
-	@Transient
-	private String questionTypeData;
+	protected String createdBy;
 
 	public DataQuestions() {
 	}
@@ -112,46 +94,6 @@ public class DataQuestions implements java.io.Serializable {
 
 	public void setImagePicasaUrl(String imagePicasaUrl) {
 		this.imagePicasaUrl = imagePicasaUrl;
-	}
-
-	public String getAdditionalData() {
-		return additionalData;
-	}
-
-	public String getQuestionTypeData() {
-		return questionTypeData;
-	}
-
-	public void setQuestionTypeData(String questionTypeData) {
-		this.questionTypeData = questionTypeData;
-	}
-
-	public void setAdditionalData(String additionalData) {
-		this.additionalData = additionalData;
-	}
-
-	public String[] getTopics() {
-		return topics;
-	}
-
-	public void setTopics(String[] topics) {
-		this.topics = topics;
-	}
-
-	public String getIsProcessed() {
-		return isProcessed;
-	}
-
-	public void setIsProcessed(String isProcessed) {
-		this.isProcessed = isProcessed;
-	}
-
-	public APPLICATION_TYPE getApplicationType() {
-		return applicationType;
-	}
-
-	public void setApplicationType(APPLICATION_TYPE applicationType) {
-		this.applicationType = applicationType;
 	}
 
 	public String getCorrectAnswer() {
@@ -243,9 +185,7 @@ public class DataQuestions implements java.io.Serializable {
 				+ ", correctAnswer=" + correctAnswer + ", wrongAnswer1="
 				+ wrongAnswer1 + ", wrongAnswer2=" + wrongAnswer2
 				+ ", wrongAnswer3=" + wrongAnswer3 + ", createdDt=" + createdDt
-				+ ", createdBy=" + createdBy + ", topics="
-				+ Arrays.toString(topics) + ", isProcessed=" + isProcessed
-				+ ", applicationType=" + applicationType + "]";
+				+ ", createdBy=" + createdBy + "]";
 	}
 
 }

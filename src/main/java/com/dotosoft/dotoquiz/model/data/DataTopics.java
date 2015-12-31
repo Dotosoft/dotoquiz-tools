@@ -7,76 +7,53 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import javax.persistence.Transient;
-
-import com.dotosoft.dotoquiz.common.DotoQuizConstant.APPLICATION_TYPE;
 
 @Entity
 @Table(name = "dat_topics", catalog = "dotoquiz")
 public class DataTopics implements java.io.Serializable {
 	public DataTopics(String id, String picasaId, String imagePicasaUrl,
-			String topicParentId, String name, String description,
-			String imageUrl, String isDelete, Date createdDt, String createdBy,
-			String isProcessed, APPLICATION_TYPE applicationType) {
+			String name, String description,
+			String imageUrl, String isDelete, Date createdDt, String createdBy) {
 		this.id = id;
 		this.picasaId = picasaId;
 		this.imagePicasaUrl = imagePicasaUrl;
 		this.name = name;
-		this.topicParentId = topicParentId;
 		this.description = description;
 		this.imageUrl = imageUrl;
 		this.isDelete = isDelete;
 		this.createdDt = createdDt;
 		this.createdBy = createdBy;
-		this.isProcessed = isProcessed;
-		this.applicationType = applicationType;
 	}
 
 	@Id
-	private String id;
+	protected String id;
 
 	@Column(name = "picasaId", length = 100)
-	private String picasaId;
+	protected String picasaId;
 
 	@Column(name = "imagePicasaUrl", length = 1000)
-	private String imagePicasaUrl;
+	protected String imagePicasaUrl;
 
 	@ManyToOne
-	private DataTopics datTopics;
+	protected DataTopics datTopics;
 
 	@Column(name = "name", length = 100)
-	private String name;
+	protected String name;
 
 	@Column(name = "description")
-	private String description;
+	protected String description;
 
 	@Column(name = "image_url", length = 200)
-	private String imageUrl;
+	protected String imageUrl;
 
 	@Column(name = "is_delete", length = 1)
-	private String isDelete;
+	protected String isDelete;
 
 	@Column(name = "created_dt", length = 19)
-	private Date createdDt;
+	protected Date createdDt;
 
 	@Column(name = "created_by", length = 50)
-	private String createdBy;
-
-	// only need for batch
-	@Transient
-	private String isProcessed;
-	@Transient
-	private APPLICATION_TYPE applicationType;
-	@Transient
-	private String topicParentId;
-
-	public String getTopicParentId() {
-		return topicParentId;
-	}
-
-	public void setTopicParentId(String topicParentId) {
-		this.topicParentId = topicParentId;
-	}
+	protected String createdBy;
 
 	public DataTopics() {
 	}
@@ -149,14 +126,6 @@ public class DataTopics implements java.io.Serializable {
 		this.createdBy = createdBy;
 	}
 
-	public String getIsProcessed() {
-		return isProcessed;
-	}
-
-	public void setIsProcessed(String isProcessed) {
-		this.isProcessed = isProcessed;
-	}
-
 	public String getPicasaId() {
 		return picasaId;
 	}
@@ -181,14 +150,6 @@ public class DataTopics implements java.io.Serializable {
 		this.datTopics = datTopics;
 	}
 
-	public APPLICATION_TYPE getApplicationType() {
-		return applicationType;
-	}
-
-	public void setApplicationType(APPLICATION_TYPE applicationType) {
-		this.applicationType = applicationType;
-	}
-
 	@Override
 	public String toString() {
 		return "DataTopics [id=" + id + ", picasaId=" + picasaId
@@ -196,8 +157,7 @@ public class DataTopics implements java.io.Serializable {
 				+ datTopics + ", name=" + name + ", description=" + description
 				+ ", imageUrl=" + imageUrl + ", isDelete=" + isDelete
 				+ ", createdDt=" + createdDt + ", createdBy=" + createdBy
-				+ ", isProcessed=" + isProcessed + ", applicationType="
-				+ applicationType + "]";
+				+ "]";
 	}
 
 }
