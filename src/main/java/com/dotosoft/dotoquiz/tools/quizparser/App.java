@@ -39,6 +39,7 @@ import com.dotosoft.dotoquiz.common.QuizParserConstant.IMAGE_HOSTING_TYPE;
 import com.dotosoft.dotoquiz.model.data.DataTopics;
 import com.dotosoft.dotoquiz.model.data.custom.DataQuestionsParser;
 import com.dotosoft.dotoquiz.model.data.custom.DataTopicsParser;
+import com.dotosoft.dotoquiz.model.data.custom.ParameterAchievementParser;
 import com.dotosoft.dotoquiz.tools.quizparser.auth.GoogleOAuth;
 import com.dotosoft.dotoquiz.tools.quizparser.config.Settings;
 import com.dotosoft.dotoquiz.tools.quizparser.data.GooglesheetClient;
@@ -163,28 +164,72 @@ public class App {
 		Session session = null;
 		Transaction trx = null;
 
+		APPLICATION_TYPE type = APPLICATION_TYPE.valueOf(settings.getApplicationType());
+		
 		try {
-			APPLICATION_TYPE type = APPLICATION_TYPE.valueOf(settings.getApplicationType());
-			
 			if(APPLICATION_TYPE.DB.toString().equals(settings.getApplicationType())) {
 				session = HibernateUtil.getSessionFactory().openSession();
 	    		trx = session.beginTransaction();
 			}
 			
-			List rows = null;
+			List rowAchievements = null;
 			if(DATA_TYPE.EXCEL.toString().equals(settings.getDataType())) {
 			    file = new FileInputStream(settings.getSyncDataFile());
 			    workbook = new XSSFWorkbook(file);			 
+			    sheet = workbook.getSheetAt(1);
+			    rowAchievements = Lists.newArrayList(sheet.iterator());
+			} else if(DATA_TYPE.GOOGLESHEET.toString().equals(settings.getDataType())) {
+				googlesheetClient = auth.authenticateGooglesheet("TopQuizData", settings, false, syncState );
+			    fullSheet = googlesheetClient.getWorksheet(1);
+			    rowAchievements = googlesheetClient.getListRows(fullSheet);
+			}
+			
+			// Extract Achievement
+		    int index = 0;
+		    for(Object row : rowAchievements) {
+		    	ParameterAchievementParser achievement = null;
+		    	if(DATA_TYPE.EXCEL.toString().equals(settings.getDataType())) {
+		    		achievement = DotoQuizStructure.convertRowExcelToAchievement((Row) row, type);
+				} else if(DATA_TYPE.GOOGLESHEET.toString().equals(settings.getDataType())) {
+					achievement = DotoQuizStructure.convertRowGooglesheetExcelToAchievement((ListEntry) row, type);
+				}
+		    	
+		        if(achievement != null) {
+		        	if(type == APPLICATION_TYPE.DB) {
+		    			log.info("Save or update achievement: " + achievement);
+		        		session.saveOrUpdate( achievement.toParameterAchievements() );
+		    		} else if(type == APPLICATION_TYPE.SYNC) {
+		    			achievement = syncAchievementToPicasa(achievement);
+		    			
+		    			if(!DotoQuizConstant.YES.equals(achievement.getIsProcessed())) {
+		    				if(DATA_TYPE.EXCEL.toString().equals(settings.getDataType())) {
+		    					Row rowData = (Row) row;
+		    					rowData.getCell(1).setCellValue(achievement.getPicasaId());
+		    					rowData.getCell(2).setCellValue(achievement.getImagePicasaUrl());
+		    					rowData.getCell(7).setCellValue(DotoQuizConstant.YES);
+		    				} else if(DATA_TYPE.GOOGLESHEET.toString().equals(settings.getDataType())) {
+		    					ListEntry listEntry = (ListEntry) row;
+		    					listEntry.getCustomElements().setValueLocal("albumidpicasa", achievement.getPicasaId());
+				    			listEntry.getCustomElements().setValueLocal("imageurlpicasa", achievement.getImagePicasaUrl());
+				    			listEntry.getCustomElements().setValueLocal("isprocessed", DotoQuizConstant.YES);
+				    			listEntry.update();
+		    				}
+		    			}
+		    		}
+		        }
+		    }
+		    
+		    List rows = null;
+			if(DATA_TYPE.EXCEL.toString().equals(settings.getDataType())) { 
 			    sheet = workbook.getSheetAt(0);
 			    rows = Lists.newArrayList(sheet.iterator());
 			} else if(DATA_TYPE.GOOGLESHEET.toString().equals(settings.getDataType())) {
-				googlesheetClient = auth.authenticateGooglesheet("Pertanyaan", settings, false, syncState );
 			    fullSheet = googlesheetClient.getWorksheet(0);
 			    rows = googlesheetClient.getListRows(fullSheet);
 			}
 		    
 		    // Extract Topic
-		    int index = 0;
+		    index = 0;
 		    for(Object row : rows) {
 		    	DataTopicsParser topic = null;
 		    	if(DATA_TYPE.EXCEL.toString().equals(settings.getDataType())) {
@@ -329,6 +374,47 @@ public class App {
         webClient = null;
     }
 	
+	public ParameterAchievementParser syncAchievementToPicasa(ParameterAchievementParser achievement) {
+		log.info("Sync Topics '" + achievement.getId() + "'");
+		try {
+			GphotoEntry albumEntry;
+			if(albumMapByTitle.containsKey(achievement.getName())) {
+				albumEntry = albumMapByTitle.get(achievement.getName());
+			} else {
+				// Upload photo as QuestionAnswer
+				AlbumEntry myAlbum = new AlbumEntry();
+				myAlbum.setAccess(GphotoAccess.Value.PUBLIC);
+				myAlbum.setTitle(new PlainTextConstruct(achievement.getName()));
+				myAlbum.setDescription(new PlainTextConstruct(achievement.getDescription()));
+				albumEntry = webClient.insertAlbum(myAlbum);
+			}
+			
+			if(!DotoQuizConstant.YES.equals(achievement.getIsProcessed())) {
+				Map<String, GphotoEntry> photoEntryCollections = (Map<String, GphotoEntry>) photoMapByAlbumId.get(albumEntry.getId());
+				GphotoEntry photoEntry = photoEntryCollections != null ? photoEntryCollections.get(achievement.getImageUrl()) : null;
+				if(photoEntryCollections == null) photoEntryCollections = new HashMap<String, GphotoEntry>();
+				if(photoEntry == null) {
+					// Upload album as topic
+					log.info("there is no image '"+ achievement.getImageUrl() +"' at '" + achievement.getName() + "'. Wait for uploading...");
+					java.nio.file.Path topicImagePath = FileUtils.getPath(settings.getSyncDataFolder(), "achievement", achievement.getImageUrl());
+					if(!topicImagePath.toFile().exists()) {
+						log.error("File is not found at '" + topicImagePath.toString() + "'. Please put the file and start this app again.");
+						System.exit(1);
+					}
+					photoEntry = webClient.uploadImageToAlbum(topicImagePath.toFile(), null, albumEntry, MD5Checksum.getMD5Checksum(topicImagePath.toString()));
+					photoEntryCollections.put(((MediaContent)photoEntry.getContent()).getUri(), photoEntry);
+					photoMapByAlbumId.put(albumEntry.getId(), photoEntryCollections);
+				}
+				
+				achievement.setImagePicasaUrl( ((MediaContent)photoEntry.getContent()).getUri() );
+				achievement.setPicasaId(albumEntry.getGphotoId());
+			}
+		} catch (IOException | ServiceException e) {
+			e.printStackTrace();
+		}
+		return achievement;
+	}
+	
 	public DataTopicsParser syncTopicToPicasa(DataTopicsParser topic) {
 		log.info("Sync Topics '" + topic.getId() + "'");
 		try {
@@ -351,7 +437,7 @@ public class App {
 				if(photoEntry == null) {
 					// Upload album as topic
 					log.info("there is no image '"+ topic.getImageUrl() +"' at '" + topic.getName() + "'. Wait for uploading...");
-					java.nio.file.Path topicImagePath = FileUtils.getPath(settings.getSyncDataFolder(), topic.getName(), "topic.png");
+					java.nio.file.Path topicImagePath = FileUtils.getPath(settings.getSyncDataFolder(), topic.getName(), topic.getImageUrl());
 					if(!topicImagePath.toFile().exists()) {
 						log.error("File is not found at '" + topicImagePath.toString() + "'. Please put the file and start this app again.");
 						System.exit(1);

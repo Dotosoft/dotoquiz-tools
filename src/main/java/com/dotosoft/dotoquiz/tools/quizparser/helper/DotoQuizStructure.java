@@ -23,6 +23,7 @@ import com.dotosoft.dotoquiz.common.DotoQuizConstant;
 import com.dotosoft.dotoquiz.common.QuizParserConstant.APPLICATION_TYPE;
 import com.dotosoft.dotoquiz.model.data.custom.DataQuestionsParser;
 import com.dotosoft.dotoquiz.model.data.custom.DataTopicsParser;
+import com.dotosoft.dotoquiz.model.data.custom.ParameterAchievementParser;
 import com.google.gdata.data.spreadsheet.ListEntry;
 
 public class DotoQuizStructure {
@@ -46,8 +47,6 @@ public class DotoQuizStructure {
 		String isProcessed = ReadCellAsString(row.getCell(20), "");
 		
 		DataQuestionsParser qa = new DataQuestionsParser(pertanyaanId, questionType, picasaId, imagePicasaURL, additionalData, questionType, DotoQuizConstant.NO, correctAnswer, wrongAnswer1, wrongAnswer2, wrongAnswer3, new java.util.Date(), "system", topics, isProcessed, type);
-		qa.setApplicationType(type);
-		
 		return qa;
 	}
 
@@ -66,9 +65,23 @@ public class DotoQuizStructure {
 		
 		// DataTopics topic = new DataTopics(topicId, picasaId, imagePicasaURL, imageURL, topicName, topicDescription, topicParent, isProcessed);
 		DataTopicsParser topic = new DataTopicsParser(topicId, picasaId, imagePicasaURL, topicParent, topicName, topicDescription, imageURL, DotoQuizConstant.NO, new java.util.Date(), DotoQuizConstant.SYSTEM_USER, isProcessed, type);
-		topic.setApplicationType(type);
-		
 		return topic;
+	}
+	
+	public static ParameterAchievementParser convertRowExcelToAchievement(Row row, APPLICATION_TYPE type) {
+		String achievementId = ReadCellAsString(row.getCell(0), "");
+		if(achievementId.equals("")) return null;
+		
+		String picasaId = ReadCellAsString(row.getCell(1), "");
+		String imagePicasaURL = ReadCellAsString(row.getCell(2), "");
+		
+		String imageURL = ReadCellAsString(row.getCell(3), "");
+		String achievementName = ReadCellAsString(row.getCell(4), "");
+		String achievementDescription = ReadCellAsString(row.getCell(5), "");
+		String isProcessed = ReadCellAsString(row.getCell(6), "");
+		
+		ParameterAchievementParser achievement = new ParameterAchievementParser(achievementId, picasaId, imagePicasaURL, achievementName, achievementDescription, imageURL, DotoQuizConstant.NO, new java.util.Date(), DotoQuizConstant.SYSTEM_USER, isProcessed, type);
+		return achievement;
 	}
 	
 	// Googlesheet Data Converter
@@ -93,8 +106,6 @@ public class DotoQuizStructure {
 		String isProcessed = row.getCustomElements().getValue("isprocessed_2");
 		
 		DataQuestionsParser qa = new DataQuestionsParser(pertanyaanId, questionType, picasaId, imagePicasaURL, additionalData, questionType, DotoQuizConstant.NO, correctAnswer, wrongAnswer1, wrongAnswer2, wrongAnswer3, new java.util.Date(), "system", topics, isProcessed, type);
-		qa.setApplicationType(type);
-		
 		return qa;
 	}
 
@@ -112,21 +123,24 @@ public class DotoQuizStructure {
 		String isProcessed = row.getCustomElements().getValue("isprocessed");
 		
 		DataTopicsParser topic = new DataTopicsParser(topicId, picasaId, imagePicasaURL, topicParent, topicName, topicDescription, imageURL, DotoQuizConstant.NO, new java.util.Date(), DotoQuizConstant.SYSTEM_USER, isProcessed, type);
-		topic.setApplicationType(type);
-		
 		return topic;
 	}
 	
-//	/***
-//	 * Upload to picasaweb from folder structure and update imageURL
-//	 * 
-//	 * @return {@link QuestionAnswers}
-//	 */
-//	public static QuestionAnswers uploadImageQuestionAnswer(QuestionAnswers questionAnswer) {
-//		// TO-DO: get file image from folder structure to picasaweb amd update imageURL for data questionAnswer
-//		
-//		return questionAnswer;
-//	}
+	public static ParameterAchievementParser convertRowGooglesheetExcelToAchievement(ListEntry row, APPLICATION_TYPE type) {
+		String achievementId = row.getCustomElements().getValue("achievementid");
+		if(!StringUtils.hasValue(achievementId)) return null;
+		
+		String picasaId = row.getCustomElements().getValue("albumidpicasa");
+		String imagePicasaURL = row.getCustomElements().getValue("imageurlpicasa");
+		
+		String imageURL = row.getCustomElements().getValue("imageurl");
+		String achievementName = row.getCustomElements().getValue("achievementname");
+		String achievementDescription = row.getCustomElements().getValue("achievementdescription");
+		String isProcessed = row.getCustomElements().getValue("isprocessed");
+		
+		ParameterAchievementParser topic = new ParameterAchievementParser(achievementId, picasaId, imagePicasaURL, achievementName, achievementDescription, imageURL, DotoQuizConstant.NO, new java.util.Date(), DotoQuizConstant.SYSTEM_USER, isProcessed, type);
+		return topic;
+	}
 	
 	private static String ReadCellAsString(Cell cell, String defaultValue) {
 		String result = defaultValue;

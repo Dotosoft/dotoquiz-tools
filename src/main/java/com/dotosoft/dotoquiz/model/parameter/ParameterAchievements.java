@@ -15,12 +15,20 @@ import javax.persistence.Entity;
 @Table(name = "mt_achievements", catalog = "dotoquiz")
 public class ParameterAchievements implements java.io.Serializable {
 
+	public ParameterAchievements() {
+	}
+
+	public ParameterAchievements(String id) {
+		this.id = id;
+	}
+
 	public ParameterAchievements(String id, String name, String description,
-			String imageUrl, String imagePicasaUrl, String picasaId,
-			Date createdDt, String createdBy) {
+			String isDelete, String imageUrl, String imagePicasaUrl,
+			String picasaId, Date createdDt, String createdBy) {
 		this.id = id;
 		this.name = name;
 		this.description = description;
+		this.isDelete = isDelete;
 		this.imageUrl = imageUrl;
 		this.imagePicasaUrl = imagePicasaUrl;
 		this.picasaId = picasaId;
@@ -37,6 +45,9 @@ public class ParameterAchievements implements java.io.Serializable {
 	@Column(name = "description")
 	protected String description;
 
+	@Column(name = "is_delete")
+	protected String isDelete;
+
 	@Column(name = "image_url")
 	protected String imageUrl;
 
@@ -52,11 +63,12 @@ public class ParameterAchievements implements java.io.Serializable {
 	@Column(name = "created_by")
 	protected String createdBy;
 
-	public ParameterAchievements() {
+	public String getIsDelete() {
+		return isDelete;
 	}
 
-	public ParameterAchievements(String id) {
-		this.id = id;
+	public void setIsDelete(String isDelete) {
+		this.isDelete = isDelete;
 	}
 
 	public String getId() {
