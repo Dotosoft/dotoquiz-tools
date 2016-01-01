@@ -33,6 +33,7 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 
 import com.dotosoft.dotoquiz.common.DotoQuizConstant;
+import com.dotosoft.dotoquiz.common.QuizParserConstant;
 import com.dotosoft.dotoquiz.common.QuizParserConstant.APPLICATION_TYPE;
 import com.dotosoft.dotoquiz.common.QuizParserConstant.DATA_TYPE;
 import com.dotosoft.dotoquiz.common.QuizParserConstant.IMAGE_HOSTING_TYPE;
@@ -185,6 +186,10 @@ public class App {
 			}
 			
 			// Extract Achievement
+			DataTopicsParser topicAchievement = new DataTopicsParser("-1", "", "", "", "achievement", "achievementDescription", "topic.png", DotoQuizConstant.NO, new java.util.Date(), DotoQuizConstant.SYSTEM_USER, DotoQuizConstant.NO, type);
+			topicAchievement = syncTopicToPicasa(topicAchievement);
+			topicMapByTopicId.put(topicAchievement.getId(), topicAchievement);
+			
 		    int index = 0;
 		    for(Object row : rowAchievements) {
 		    	ParameterAchievementParser achievement = null;
@@ -218,7 +223,8 @@ public class App {
 		    		}
 		        }
 		    }
-		    
+			
+		    // Extract Topic
 		    List rows = null;
 			if(DATA_TYPE.EXCEL.toString().equals(settings.getDataType())) { 
 			    sheet = workbook.getSheetAt(0);
@@ -227,8 +233,6 @@ public class App {
 			    fullSheet = googlesheetClient.getWorksheet(0);
 			    rows = googlesheetClient.getListRows(fullSheet);
 			}
-		    
-		    // Extract Topic
 		    index = 0;
 		    for(Object row : rows) {
 		    	DataTopicsParser topic = null;
@@ -299,14 +303,14 @@ public class App {
 		    			if(!DotoQuizConstant.YES.equals(questionAnswer.getIsProcessed())) {
 		    				if(DATA_TYPE.EXCEL.toString().equals(settings.getDataType())) {
 		    					Row rowData = (Row) row;
-				    			if("image".equalsIgnoreCase(questionAnswer.getMtQuestionType().getName())) {
+				    			if("image".equalsIgnoreCase(questionAnswer.getQuestionTypeData())) {
 				    				rowData.getCell(11).setCellValue(questionAnswer.getPicasaId());
 				    				rowData.getCell(12).setCellValue(questionAnswer.getImagePicasaUrl());
 				    			}
 				    			rowData.getCell(20).setCellValue(DotoQuizConstant.YES);
 		    				} else if(DATA_TYPE.GOOGLESHEET.toString().equals(settings.getDataType())) {
 		    					ListEntry listEntry = (ListEntry) row;
-		    					if("image".equalsIgnoreCase(questionAnswer.getMtQuestionType().getName())) {
+		    					if("image".equalsIgnoreCase(questionAnswer.getQuestionTypeData())) {
 					    			listEntry.getCustomElements().setValueLocal("photoidpicasa", questionAnswer.getPicasaId());
 					    			listEntry.getCustomElements().setValueLocal("imageurlpicasa_2", questionAnswer.getImagePicasaUrl());
 				    			}
@@ -375,43 +379,36 @@ public class App {
     }
 	
 	public ParameterAchievementParser syncAchievementToPicasa(ParameterAchievementParser achievement) {
-		log.info("Sync Topics '" + achievement.getId() + "'");
-		try {
-			GphotoEntry albumEntry;
-			if(albumMapByTitle.containsKey(achievement.getName())) {
-				albumEntry = albumMapByTitle.get(achievement.getName());
-			} else {
-				// Upload photo as QuestionAnswer
-				AlbumEntry myAlbum = new AlbumEntry();
-				myAlbum.setAccess(GphotoAccess.Value.PUBLIC);
-				myAlbum.setTitle(new PlainTextConstruct(achievement.getName()));
-				myAlbum.setDescription(new PlainTextConstruct(achievement.getDescription()));
-				albumEntry = webClient.insertAlbum(myAlbum);
-			}
-			
-			if(!DotoQuizConstant.YES.equals(achievement.getIsProcessed())) {
-				Map<String, GphotoEntry> photoEntryCollections = (Map<String, GphotoEntry>) photoMapByAlbumId.get(albumEntry.getId());
+		log.info("Sync achievement '" + achievement.getId() + "'");
+		
+		if(!DotoQuizConstant.YES.equals(achievement.getIsProcessed())) {
+			try {
+				GphotoEntry achievementTopic = albumMapByTopicId.get("-1");
+				
+				// Check image file is valid or not
+				java.nio.file.Path achievementImagePath = FileUtils.getPath(settings.getSyncDataFolder(), achievementTopic.getTitle().getPlainText(), achievement.getImageUrl());
+				if(!achievementImagePath.toFile().exists()) {
+					log.error("File is not found at '" + achievementImagePath.toString() + "'. Please put the file and start this app again.");
+					System.exit(1);
+				}
+				
+				// Check image at picasa
+				Map<String, GphotoEntry> photoEntryCollections = photoMapByAlbumId.get(achievementTopic.getId());
 				GphotoEntry photoEntry = photoEntryCollections != null ? photoEntryCollections.get(achievement.getImageUrl()) : null;
 				if(photoEntryCollections == null) photoEntryCollections = new HashMap<String, GphotoEntry>();
 				if(photoEntry == null) {
-					// Upload album as topic
-					log.info("there is no image '"+ achievement.getImageUrl() +"' at '" + achievement.getName() + "'. Wait for uploading...");
-					java.nio.file.Path topicImagePath = FileUtils.getPath(settings.getSyncDataFolder(), "achievement", achievement.getImageUrl());
-					if(!topicImagePath.toFile().exists()) {
-						log.error("File is not found at '" + topicImagePath.toString() + "'. Please put the file and start this app again.");
-						System.exit(1);
-					}
-					photoEntry = webClient.uploadImageToAlbum(topicImagePath.toFile(), null, albumEntry, MD5Checksum.getMD5Checksum(topicImagePath.toString()));
+					photoEntry = webClient.uploadImageToAlbum(achievementImagePath.toFile(), null, achievementTopic, MD5Checksum.getMD5Checksum(achievementImagePath.toString()));
 					photoEntryCollections.put(((MediaContent)photoEntry.getContent()).getUri(), photoEntry);
-					photoMapByAlbumId.put(albumEntry.getId(), photoEntryCollections);
+					photoMapByAlbumId.put(achievementTopic.getId(), photoEntryCollections);
 				}
 				
 				achievement.setImagePicasaUrl( ((MediaContent)photoEntry.getContent()).getUri() );
-				achievement.setPicasaId(albumEntry.getGphotoId());
+				achievement.setPicasaId( photoEntry.getGphotoId() );
+			} catch (IOException | ServiceException e) {
+				e.printStackTrace();
 			}
-		} catch (IOException | ServiceException e) {
-			e.printStackTrace();
 		}
+		
 		return achievement;
 	}
 	
@@ -462,7 +459,7 @@ public class App {
 		
 		if(!DotoQuizConstant.YES.equals(answer.getIsProcessed())) {
 			try {
-				if("image".equalsIgnoreCase(answer.getMtQuestionType().getName()) && StringUtils.hasValue(answer.getAdditionalData())) {
+				if("image".equalsIgnoreCase(answer.getQuestionTypeData()) && StringUtils.hasValue(answer.getAdditionalData())) {
 					GphotoEntry firstTopic = albumMapByTopicId.get(answer.getTopics()[0]);
 					// Check Topic is valid or not
 					if(firstTopic == null) {
