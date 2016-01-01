@@ -41,7 +41,7 @@ import javax.swing.JFrame;
 import org.apache.log4j.Logger;
 
 import com.dotosoft.dotoquiz.common.QuizParserConstant;
-import com.dotosoft.dotoquiz.tools.quizparser.DotoQuizGoogle;
+import com.dotosoft.dotoquiz.tools.quizparser.App;
 import com.dotosoft.dotoquiz.tools.quizparser.config.Settings;
 import com.dotosoft.dotoquiz.tools.quizparser.data.GooglesheetClient;
 import com.dotosoft.dotoquiz.tools.quizparser.images.PicasawebClient;
@@ -157,7 +157,7 @@ public class GoogleOAuth {
 
             state.setStatus( "Requesting Google Authentication...");
             
-            clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(DotoQuizGoogle.class.getResourceAsStream("/client_secrets.json")));
+            clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(App.class.getResourceAsStream("/client_secrets.json")));
             if (clientSecrets.getDetails().getClientId().startsWith("Enter") || clientSecrets.getDetails().getClientSecret().startsWith("Enter ")) {
     			System.out.println("Enter Client ID and Secret from https://code.google.com/apis/console/ " 
     					+ "into oauth2-cmdline-sample/src/main/resources/client_secrets.json");
@@ -213,7 +213,7 @@ public class GoogleOAuth {
         log.info("Getting access token for refresh token..");
 
         try {
-        	clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(DotoQuizGoogle.class.getResourceAsStream("/client_secrets.json")));
+        	clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(App.class.getResourceAsStream("/client_secrets.json")));
             if (clientSecrets.getDetails().getClientId().startsWith("Enter") || clientSecrets.getDetails().getClientSecret().startsWith("Enter ")) {
     			System.out.println("Enter Client ID and Secret from https://code.google.com/apis/console/ " 
     					+ "into oauth2-cmdline-sample/src/main/resources/client_secrets.json");
