@@ -201,8 +201,8 @@ public class App {
 		    	
 		        if(achievement != null) {
 		        	if(type == APPLICATION_TYPE.DB) {
-		    			log.info("Save or update achievement: " + achievement);
 		        		session.saveOrUpdate( achievement.toParameterAchievements() );
+		        		log.info("Save or update achievement: " + achievement);
 		    		} else if(type == APPLICATION_TYPE.SYNC) {
 		    			achievement = syncAchievementToPicasa(achievement);
 		    			
@@ -223,6 +223,11 @@ public class App {
 		    		}
 		        }
 		    }
+		    
+		    if(APPLICATION_TYPE.DB.toString().equals(settings.getApplicationType())) {
+		    	trx.commit();
+		    	trx = session.beginTransaction();
+			}
 			
 		    // Extract Topic
 		    List rows = null;
@@ -247,8 +252,8 @@ public class App {
 		        		if(StringUtils.hasValue(topic.getTopicParentId())) {
 		        			topic.setDatTopics( topicMapByTopicId.get(topic.getTopicParentId()).toDataTopics() );
 		        		}
-		    			log.info("Save or update topic: " + topic);
 		        		session.saveOrUpdate( topic.toDataTopics() );
+		    			log.info("Save or update topic: " + topic);
 		    		} else if(type == APPLICATION_TYPE.SYNC) {
 		    			topic = syncTopicToPicasa(topic);
 		    			
@@ -272,6 +277,11 @@ public class App {
 		        }
 		    }
 		    
+		    if(APPLICATION_TYPE.DB.toString().equals(settings.getApplicationType())) {
+		    	trx.commit();
+		    	trx = session.beginTransaction();
+			}
+		    
 		    // Extract QuestionAnswers
 		    if(DATA_TYPE.EXCEL.toString().equals(settings.getDataType())) {			 
 			    rows = Lists.newArrayList(sheet.iterator());
@@ -293,11 +303,11 @@ public class App {
 		        	if(type == APPLICATION_TYPE.DB) {
 		        		questionAnswer.setMtQuestionType(HibernateUtil.getQuestionTypeByName(session, questionAnswer.getQuestionTypeData()));
 		        		session.saveOrUpdate( questionAnswer.toDataQuestion() );
+		        		log.info("Save or update QuestionAnswers: " + questionAnswer);
 		        		for(String topicId : questionAnswer.getTopics()) {
 		        			DataTopicsParser datTopic = topicMapByTopicId.get(topicId);
 		        			HibernateUtil.SaveOrUpdateTopicQuestionData(session, datTopic.toDataTopics(), questionAnswer.toDataQuestion());
 		        		}
-		        		log.info("Save or update QuestionAnswers: " + questionAnswer);
 		    		} else if(type == APPLICATION_TYPE.SYNC) {
 		    			questionAnswer = syncQuestionAnswersToPicasa(questionAnswer);		    	
 		    			if(!DotoQuizConstant.YES.equals(questionAnswer.getIsProcessed())) {

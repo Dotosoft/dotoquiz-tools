@@ -59,7 +59,7 @@ public class ParameterAchievementParser extends ParameterAchievements {
 	
 	public ParameterAchievements toParameterAchievements() throws IllegalAccessException, InvocationTargetException {
 		ParameterAchievements achievement = new ParameterAchievements();
-		BeanUtils.copyProperties(this, achievement);
+		BeanUtils.copyProperties(achievement, this);
 		return achievement;
 	}
 
