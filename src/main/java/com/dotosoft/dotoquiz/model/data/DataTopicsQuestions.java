@@ -24,22 +24,22 @@ public class DataTopicsQuestions implements java.io.Serializable {
 	}
 
 	@Id
-	private String id;
+	protected String id;
 
 	@ManyToOne
-	private DataQuestions datQuestions;
+	protected DataQuestions datQuestions;
 
 	@ManyToOne
-	private DataTopics datTopics;
+	protected DataTopics datTopics;
 
 	@Column(name = "is_delete")
-	private String isDelete;
+	protected String isDelete;
 
 	@Column(name = "created_dt")
-	private Date createdDt;
+	protected Date createdDt;
 
 	@Column(name = "created_by")
-	private String createdBy;
+	protected String createdBy;
 
 	public DataTopicsQuestions() {
 	}

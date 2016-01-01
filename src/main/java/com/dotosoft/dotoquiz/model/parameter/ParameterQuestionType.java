@@ -12,22 +12,22 @@ import javax.persistence.Table;
 public class ParameterQuestionType implements java.io.Serializable {
 
 	@Id
-	private String id;
+	protected String id;
 
 	@Column(name = "name", length = 45)
-	private String name;
+	protected String name;
 
 	@Column(name = "description")
-	private String description;
+	protected String description;
 
 	@Column(name = "is_delete", length = 1)
-	private String isDelete;
+	protected String isDelete;
 
 	@Column(name = "created_dt", length = 19)
-	private Date createdDt;
+	protected Date createdDt;
 
 	@Column(name = "created_by", length = 50)
-	private String createdBy;
+	protected String createdBy;
 
 	public ParameterQuestionType() {
 	}
