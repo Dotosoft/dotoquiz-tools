@@ -78,12 +78,6 @@
 			<version>3.13</version>
 		</dependency>
 		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>3.8.1</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
 			<groupId>javax.mail</groupId>
 			<artifactId>mail</artifactId>
 			<version>1.4</version>
@@ -112,21 +106,6 @@
 			<groupId>org.apache.sanselan</groupId>
 			<artifactId>sanselan</artifactId>
 			<version>0.97-incubator</version>
-		</dependency>
-		<dependency>
-			<groupId>net.java.dev.jna</groupId>
-			<artifactId>platform</artifactId>
-			<version>3.4.0</version>
-		</dependency>
-		<dependency>
-			<groupId>net.java.dev.jna</groupId>
-			<artifactId>jna</artifactId>
-			<version>4.1.0</version>
-		</dependency>
-		<dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
-			<version>1.2.17</version>
 		</dependency>
 		<dependency>
 			<groupId>com.fasterxml.jackson.dataformat</groupId>
@@ -184,7 +163,6 @@
 			<artifactId>dotoquiz-common</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
-		
 	</dependencies>
 
 	<build>
@@ -194,8 +172,8 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.1</version>
 				<configuration>
-					<source>1.7</source>
-					<target>1.7</target>
+					<source>1.8</source>
+					<target>1.8</target>
 					<encoding>UTF-8</encoding>
 				</configuration>
 			</plugin>

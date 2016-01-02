@@ -1,6 +1,6 @@
 package com.dotosoft.tools.dataquizparser.helper;
 
-import com.dotosoft.dotoquiz.tools.quizparser.helper.MD5Checksum;
+import com.dotosoft.dotoquiz.utils.MD5Checksum;
 import com.google.gdata.data.docs.Md5Checksum;
 
 import junit.framework.Test;

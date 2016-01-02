@@ -24,6 +24,7 @@ import com.dotosoft.dotoquiz.tools.quizparser.common.QuizParserConstant.APPLICAT
 import com.dotosoft.dotoquiz.tools.quizparser.data.custom.DataQuestionsParser;
 import com.dotosoft.dotoquiz.tools.quizparser.data.custom.DataTopicsParser;
 import com.dotosoft.dotoquiz.tools.quizparser.data.custom.ParameterAchievementParser;
+import com.dotosoft.dotoquiz.utils.StringUtils;
 import com.google.gdata.data.spreadsheet.ListEntry;
 
 public class DotoQuizStructure {
