@@ -37,7 +37,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 
 import com.dotosoft.dotoquiz.common.DotoQuizConstant;
-import com.dotosoft.dotoquiz.common.QuizParserConstant;
+import com.dotosoft.dotoquiz.tools.quizparser.common.QuizParserConstant;
 import com.dotosoft.dotoquiz.tools.quizparser.helper.TimeUtils;
 import com.dotosoft.dotoquiz.tools.quizparser.images.metadata.ImageInformation;
 import com.google.api.client.auth.oauth2.Credential;

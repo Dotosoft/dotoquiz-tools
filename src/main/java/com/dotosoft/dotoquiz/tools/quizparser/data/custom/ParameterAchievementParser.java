@@ -1,4 +1,4 @@
-package com.dotosoft.dotoquiz.model.data.custom;
+package com.dotosoft.dotoquiz.tools.quizparser.data.custom;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Date;
@@ -8,8 +8,8 @@ import javax.persistence.Transient;
 import org.apache.commons.beanutils.BeanUtils;
 
 import com.dotosoft.dotoquiz.common.DotoQuizConstant;
-import com.dotosoft.dotoquiz.common.QuizParserConstant.APPLICATION_TYPE;
 import com.dotosoft.dotoquiz.model.parameter.ParameterAchievements;
+import com.dotosoft.dotoquiz.tools.quizparser.common.QuizParserConstant.APPLICATION_TYPE;
 
 public class ParameterAchievementParser extends ParameterAchievements {
 	public ParameterAchievementParser(String id, String picasaId,

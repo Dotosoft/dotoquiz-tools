@@ -1,4 +1,4 @@
-package com.dotosoft.dotoquiz.common;
+package com.dotosoft.dotoquiz.tools.quizparser.common;
 
 public class QuizParserConstant {
 	public enum APPLICATION_TYPE {

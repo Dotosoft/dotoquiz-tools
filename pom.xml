@@ -19,8 +19,6 @@
 		<project.http.version>1.19.0</project.http.version>
 		<project.oauth.version>1.19.0</project.oauth.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<hibernate.version>4.3.6.Final</hibernate.version>
-		<mysql.connector.version>5.1.31</mysql.connector.version>
 	</properties>
 
 	<dependencies>
@@ -175,38 +173,18 @@
 			<artifactId>json-simple</artifactId>
 			<version>1.1.1</version>
 		</dependency>
+		
 		<dependency>
-			<groupId>commons-beanutils</groupId>
-			<artifactId>commons-beanutils</artifactId>
-			<version>1.9.2</version>
-		</dependency>
-
-		<!-- Hibernate -->
-		<dependency>
-			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate-core</artifactId>
-			<version>${hibernate.version}</version>
-		</dependency>
-
-		<!-- jsr303 validation -->
-		<dependency>
-			<groupId>javax.validation</groupId>
-			<artifactId>validation-api</artifactId>
-			<version>1.1.0.Final</version>
+			<groupId>com.googlecode.json-simple</groupId>
+			<artifactId>json-simple</artifactId>
+			<version>1.1.1</version>
 		</dependency>
 		<dependency>
-			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate-validator</artifactId>
-			<version>5.1.3.Final</version>
+			<groupId>com.dotosoft.dotoquiz</groupId>
+			<artifactId>dotoquiz-common</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
-
-		<!-- MySQL -->
-		<dependency>
-			<groupId>mysql</groupId>
-			<artifactId>mysql-connector-java</artifactId>
-			<version>${mysql.connector.version}</version>
-		</dependency>
-
+		
 	</dependencies>
 
 	<build>

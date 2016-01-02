@@ -24,7 +24,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.dotosoft.dotoquiz.common.QuizParserConstant;
+import com.dotosoft.dotoquiz.tools.quizparser.common.QuizParserConstant;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.gdata.client.spreadsheet.SpreadsheetService;
 import com.google.gdata.data.PlainTextConstruct;

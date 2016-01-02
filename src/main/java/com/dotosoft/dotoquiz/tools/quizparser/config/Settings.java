@@ -23,10 +23,10 @@ import java.util.prefs.Preferences;
 import org.apache.log4j.Logger;
 
 import com.dotosoft.dotoquiz.common.DotoQuizConstant;
-import com.dotosoft.dotoquiz.common.QuizParserConstant;
-import com.dotosoft.dotoquiz.common.QuizParserConstant.APPLICATION_TYPE;
-import com.dotosoft.dotoquiz.common.QuizParserConstant.DATA_TYPE;
-import com.dotosoft.dotoquiz.common.QuizParserConstant.IMAGE_HOSTING_TYPE;
+import com.dotosoft.dotoquiz.tools.quizparser.common.QuizParserConstant;
+import com.dotosoft.dotoquiz.tools.quizparser.common.QuizParserConstant.APPLICATION_TYPE;
+import com.dotosoft.dotoquiz.tools.quizparser.common.QuizParserConstant.DATA_TYPE;
+import com.dotosoft.dotoquiz.tools.quizparser.common.QuizParserConstant.IMAGE_HOSTING_TYPE;
 
 /**
  * General settings class for loading/saving prefs

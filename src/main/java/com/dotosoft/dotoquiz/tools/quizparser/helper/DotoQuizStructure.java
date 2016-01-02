@@ -20,10 +20,10 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 
 import com.dotosoft.dotoquiz.common.DotoQuizConstant;
-import com.dotosoft.dotoquiz.common.QuizParserConstant.APPLICATION_TYPE;
-import com.dotosoft.dotoquiz.model.data.custom.DataQuestionsParser;
-import com.dotosoft.dotoquiz.model.data.custom.DataTopicsParser;
-import com.dotosoft.dotoquiz.model.data.custom.ParameterAchievementParser;
+import com.dotosoft.dotoquiz.tools.quizparser.common.QuizParserConstant.APPLICATION_TYPE;
+import com.dotosoft.dotoquiz.tools.quizparser.data.custom.DataQuestionsParser;
+import com.dotosoft.dotoquiz.tools.quizparser.data.custom.DataTopicsParser;
+import com.dotosoft.dotoquiz.tools.quizparser.data.custom.ParameterAchievementParser;
 import com.google.gdata.data.spreadsheet.ListEntry;
 
 public class DotoQuizStructure {

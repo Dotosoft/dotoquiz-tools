@@ -40,8 +40,8 @@ import javax.swing.JFrame;
 
 import org.apache.log4j.Logger;
 
-import com.dotosoft.dotoquiz.common.QuizParserConstant;
 import com.dotosoft.dotoquiz.tools.quizparser.App;
+import com.dotosoft.dotoquiz.tools.quizparser.common.QuizParserConstant;
 import com.dotosoft.dotoquiz.tools.quizparser.config.Settings;
 import com.dotosoft.dotoquiz.tools.quizparser.data.GooglesheetClient;
 import com.dotosoft.dotoquiz.tools.quizparser.images.PicasawebClient;
