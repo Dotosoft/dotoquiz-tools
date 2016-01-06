@@ -2,6 +2,10 @@ package com.dotosoft.tools.dataquizparser;
 
 import java.io.IOException;
 
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
+
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
@@ -12,10 +16,6 @@ import com.dotosoft.dotoquiz.tools.quizparser.data.GooglesheetClient;
 import com.dotosoft.dotoquiz.tools.quizparser.utils.SyncState;
 import com.google.gdata.data.spreadsheet.WorksheetEntry;
 import com.google.gdata.util.ServiceException;
-
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
 
 /**
  * Unit test for simple App.

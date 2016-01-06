@@ -87,12 +87,14 @@ public class Settings {
 				applicationType = args[0];
         	} else {
         		showError();
+        		return false;
         	}
         	
         	if(IMAGE_HOSTING_TYPE.valueOf(args[1]) != null) {
 				imageHostingType = args[1];
         	} else {
         		showError();
+        		return false;
         	}
         	
         	saveSettings();
@@ -103,18 +105,21 @@ public class Settings {
         	try {
         		if(APPLICATION_TYPE.CLEAR.toString().equals(args[0])) {
         			showError();
+        			return false;
         		}
         		
         		if(APPLICATION_TYPE.valueOf(args[0]) != null) {
 					applicationType = args[0];
 	        	} else {
 	        		showError();
+	        		return false;
 	        	}
         		
         		if(IMAGE_HOSTING_TYPE.valueOf(args[1]) != null) {
 					imageHostingType = args[1];
 	        	} else {
 	        		showError();
+	        		return false;
 	        	}
         		
 	        	if(DATA_TYPE.valueOf(args[2]) != null) {
@@ -125,16 +130,19 @@ public class Settings {
 					}
 	        	} else {
 	        		showError();
+	        		return false;
 	        	}
 	        	
 				saveSettings();
 				
         	} catch(IllegalArgumentException ex) {
         		showError();
+        		return false;
         	}
         } else {
         	if( syncDataFile == null || ! syncDataFile.exists() || applicationType == null || dataType == null || imageHostingType == null ) {
 				showError();
+				return false;
 			}
         }
         
@@ -149,7 +157,7 @@ public class Settings {
     public void showError() {
     	log.error( "Error: Could not run DataQuizParser.");
     	log.info("Run: java -jar DataQuizParser.jar [CLEAR|DB|SYNC] [PICASA] [GOOGLESHEET|EXCEL] [File Excel]");
-		System.exit(1);
+		// System.exit(1);
     }
 
     public void saveSettings() {

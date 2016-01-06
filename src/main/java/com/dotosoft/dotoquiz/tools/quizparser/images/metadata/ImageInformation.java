@@ -16,20 +16,6 @@
 
 package com.dotosoft.dotoquiz.tools.quizparser.images.metadata;
 
-import com.drew.imaging.ImageMetadataReader;
-import com.drew.imaging.ImageProcessingException;
-import com.drew.metadata.Directory;
-import com.drew.metadata.Metadata;
-import com.drew.metadata.MetadataException;
-import com.drew.metadata.exif.ExifDirectoryBase;
-import com.drew.metadata.exif.ExifIFD0Directory;
-import com.drew.metadata.exif.ExifSubIFDDirectory;
-import com.drew.metadata.iptc.IptcDescriptor;
-import com.drew.metadata.iptc.IptcDirectory;
-import com.drew.metadata.jpeg.JpegDirectory;
-import com.sun.xml.internal.ws.api.wsdl.parser.MetaDataResolver;
-import org.apache.log4j.Logger;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -38,6 +24,18 @@ import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Date;
 import java.util.List;
+
+import org.apache.log4j.Logger;
+
+import com.drew.imaging.ImageMetadataReader;
+import com.drew.imaging.ImageProcessingException;
+import com.drew.metadata.Metadata;
+import com.drew.metadata.MetadataException;
+import com.drew.metadata.exif.ExifDirectoryBase;
+import com.drew.metadata.exif.ExifIFD0Directory;
+import com.drew.metadata.exif.ExifSubIFDDirectory;
+import com.drew.metadata.iptc.IptcDirectory;
+import com.drew.metadata.jpeg.JpegDirectory;
 
 // Inner class containing image information
 public class ImageInformation {

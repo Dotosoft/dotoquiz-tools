@@ -110,8 +110,6 @@ public class App {
 	                settings.showError();
 	            }
 	        }
-		} else {
-			settings.showError();
 		}
 	}
 	
