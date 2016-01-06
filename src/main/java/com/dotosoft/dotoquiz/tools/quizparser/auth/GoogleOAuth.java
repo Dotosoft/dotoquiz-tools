@@ -25,16 +25,16 @@ import java.security.GeneralSecurityException;
 import java.util.Arrays;
 import java.util.List;
 
-import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.concurrent.Worker;
-import javafx.concurrent.Worker.State;
-import javafx.embed.swing.JFXPanel;
-import javafx.scene.Group;
-import javafx.scene.Scene;
-import javafx.scene.web.WebEngine;
-import javafx.scene.web.WebView;
+//import javafx.application.Platform;
+//import javafx.beans.value.ChangeListener;
+//import javafx.beans.value.ObservableValue;
+//import javafx.concurrent.Worker;
+//import javafx.concurrent.Worker.State;
+//import javafx.embed.swing.JFXPanel;
+//import javafx.scene.Group;
+//import javafx.scene.Scene;
+//import javafx.scene.web.WebEngine;
+//import javafx.scene.web.WebView;
 
 import javax.swing.JFrame;
 
@@ -168,27 +168,27 @@ public class GoogleOAuth {
     		GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(httpTransport, JSON_FACTORY, clientSecrets, SCOPES).setDataStoreFactory(dataStoreFactory).build();
     		
     		if(allowInteractive) {
-    			String redirectUrl = clientSecrets.getDetails().getRedirectUris().get(0);
-    			String authorizationUrl = flow.newAuthorizationUrl()
-                        .setRedirectUri(redirectUrl)
-                        .setAccessType("offline")
-                        .setApprovalPrompt("force")
-                        .build();
-
-			    // Display the interactive GUI for the user to log in via the browser
-			    String code = initAndShowGUI( authorizationUrl, state );
-			
-			    log.info("Token received from UI. Requesting credentials...");
-			
-			    // Now we have the code from the interactive login, set up the
-			    // credentials request and call it.
-			    GoogleTokenResponse response = flow.newTokenRequest(code)
-			    	.setRedirectUri(redirectUrl).execute();
-			
-			    // Retrieve the credential from the request response
-			    cred = new GoogleCredential.Builder().setTransport(httpTransport)
-			    	.setJsonFactory(JSON_FACTORY).setClientSecrets(clientSecrets.getDetails().getClientId(), clientSecrets.getDetails().getClientSecret())
-			    	.build().setFromTokenResponse(response);
+//    			String redirectUrl = clientSecrets.getDetails().getRedirectUris().get(0);
+//    			String authorizationUrl = flow.newAuthorizationUrl()
+//                        .setRedirectUri(redirectUrl)
+//                        .setAccessType("offline")
+//                        .setApprovalPrompt("force")
+//                        .build();
+//
+//			    // Display the interactive GUI for the user to log in via the browser
+//			    String code = initAndShowGUI( authorizationUrl, state );
+//			
+//			    log.info("Token received from UI. Requesting credentials...");
+//			
+//			    // Now we have the code from the interactive login, set up the
+//			    // credentials request and call it.
+//			    GoogleTokenResponse response = flow.newTokenRequest(code)
+//			    	.setRedirectUri(redirectUrl).execute();
+//			
+//			    // Retrieve the credential from the request response
+//			    cred = new GoogleCredential.Builder().setTransport(httpTransport)
+//			    	.setJsonFactory(JSON_FACTORY).setClientSecrets(clientSecrets.getDetails().getClientId(), clientSecrets.getDetails().getClientSecret())
+//			    	.build().setFromTokenResponse(response);
 			
     		} else {
 	            // Retrieve the credential from the request response
@@ -238,113 +238,113 @@ public class GoogleOAuth {
     }
     
     
-    // build UI
-    private static String initAndShowGUI(final String url, final SyncState state ) {
-
-        log.info("Displaying OAuth Login frame...");
-
-        final JFrame frame = new JFrame("Authenticate Picasa");
-        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-
-        frame.getContentPane().setLayout(null); // do the layout manually
-
-        final JFXPanel fxPanel = new JFXPanel();
-
-        frame.add(fxPanel);
-        frame.setVisible(true);
-
-        fxPanel.setSize(frameSize);
-        fxPanel.setLocation(0,0);
-
-        frame.getContentPane().setPreferredSize(frameSize);
-
-        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        frame.setLocation(screenSize.width / 2 - fxPanel.getSize().width / 2, screenSize.height / 2 - fxPanel.getSize().height / 2);
-
-        frame.pack();
-        frame.setResizable(false);
-
-        String authToken = "";
-
-        try {
-            Platform.runLater(new Runnable() {
-                public void run() {
-                    log.info( "Initialising login frame on background thread.");
-                    synchronized ( lock ){
-                        initWebView(fxPanel, frame, url, state );
-                    }
-                }
-            });
-
-            synchronized ( lock ) {
-                lock.wait();
-
-                log.info( "User closed window.");
-
-                authToken = token;
-            }
-        }
-        catch( Exception ex ){
-            log.error("Unexpected exception opening interactive login screen.");
-        }
-
-        return authToken;
-    }
-
-    /* Creates a WebView and fires up google.com */
-    private static void initWebView(final JFXPanel fxPanel, final JFrame frame, String url, final SyncState state ) {
-        log.info( "Initialising WebView on GUI thread...");
-
-        Group group = new Group();
-        Scene scene = new Scene(group);
-        fxPanel.setScene(scene);
-
-        WebView webView = new WebView();
-
-        group.getChildren().add(webView);
-        webView.setMinSize(frameSize.width, frameSize.height);
-        webView.setMaxSize(frameSize.width, frameSize.height);
-        webView.setZoom( 0.80 );
-
-        // Obtain the webEngine to navigate
-        final WebEngine webEngine = webView.getEngine();
-
-        webEngine.getLoadWorker().stateProperty().addListener(
-                new ChangeListener<State>() {
-                    public void changed(ObservableValue ov, State oldState, State newState) {
-
-                        HandleWebTitleChange( webEngine, frame, newState, state );
-                    }
-                });
-
-        webEngine.load(url);
-    }
-
-    private static void HandleWebTitleChange( WebEngine webEngine, JFrame frame, State newState, SyncState state )
-    {
-        if (newState == Worker.State.SUCCEEDED) {
-            log.info("Page refreshed: " + webEngine.getTitle());
-
-            frame.setTitle(webEngine.getTitle());
-
-            if( webEngine.getTitle().startsWith( SUCCESS_CODE ) ) {
-
-                synchronized ( lock ) {
-                    token = webEngine.getTitle().substring( SUCCESS_CODE.length() );
-                    state.setStatus( "Login successful.");
-                    lock.notify();
-                }
-
-                log.info("Hiding login panel.");
-
-                frame.setVisible( false );
-            }
-        }
-        else if( newState == Worker.State.FAILED ) {
-            log.error("Error loading Google Auth Page!");
-            state.setStatus( "Unable to load Google Authentication page.");
-            state.cancel( true );
-            frame.setVisible(false);
-        }
-    }
+//    // build UI
+//    private static String initAndShowGUI(final String url, final SyncState state ) {
+//
+//        log.info("Displaying OAuth Login frame...");
+//
+//        final JFrame frame = new JFrame("Authenticate Picasa");
+//        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+//
+//        frame.getContentPane().setLayout(null); // do the layout manually
+//
+//        final JFXPanel fxPanel = new JFXPanel();
+//
+//        frame.add(fxPanel);
+//        frame.setVisible(true);
+//
+//        fxPanel.setSize(frameSize);
+//        fxPanel.setLocation(0,0);
+//
+//        frame.getContentPane().setPreferredSize(frameSize);
+//
+//        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+//        frame.setLocation(screenSize.width / 2 - fxPanel.getSize().width / 2, screenSize.height / 2 - fxPanel.getSize().height / 2);
+//
+//        frame.pack();
+//        frame.setResizable(false);
+//
+//        String authToken = "";
+//
+//        try {
+//            Platform.runLater(new Runnable() {
+//                public void run() {
+//                    log.info( "Initialising login frame on background thread.");
+//                    synchronized ( lock ){
+//                        initWebView(fxPanel, frame, url, state );
+//                    }
+//                }
+//            });
+//
+//            synchronized ( lock ) {
+//                lock.wait();
+//
+//                log.info( "User closed window.");
+//
+//                authToken = token;
+//            }
+//        }
+//        catch( Exception ex ){
+//            log.error("Unexpected exception opening interactive login screen.");
+//        }
+//
+//        return authToken;
+//    }
+//
+//    /* Creates a WebView and fires up google.com */
+//    private static void initWebView(final JFXPanel fxPanel, final JFrame frame, String url, final SyncState state ) {
+//        log.info( "Initialising WebView on GUI thread...");
+//
+//        Group group = new Group();
+//        Scene scene = new Scene(group);
+//        fxPanel.setScene(scene);
+//
+//        WebView webView = new WebView();
+//
+//        group.getChildren().add(webView);
+//        webView.setMinSize(frameSize.width, frameSize.height);
+//        webView.setMaxSize(frameSize.width, frameSize.height);
+//        webView.setZoom( 0.80 );
+//
+//        // Obtain the webEngine to navigate
+//        final WebEngine webEngine = webView.getEngine();
+//
+//        webEngine.getLoadWorker().stateProperty().addListener(
+//                new ChangeListener<State>() {
+//                    public void changed(ObservableValue ov, State oldState, State newState) {
+//
+//                        HandleWebTitleChange( webEngine, frame, newState, state );
+//                    }
+//                });
+//
+//        webEngine.load(url);
+//    }
+//
+//    private static void HandleWebTitleChange( WebEngine webEngine, JFrame frame, State newState, SyncState state )
+//    {
+//        if (newState == Worker.State.SUCCEEDED) {
+//            log.info("Page refreshed: " + webEngine.getTitle());
+//
+//            frame.setTitle(webEngine.getTitle());
+//
+//            if( webEngine.getTitle().startsWith( SUCCESS_CODE ) ) {
+//
+//                synchronized ( lock ) {
+//                    token = webEngine.getTitle().substring( SUCCESS_CODE.length() );
+//                    state.setStatus( "Login successful.");
+//                    lock.notify();
+//                }
+//
+//                log.info("Hiding login panel.");
+//
+//                frame.setVisible( false );
+//            }
+//        }
+//        else if( newState == Worker.State.FAILED ) {
+//            log.error("Error loading Google Auth Page!");
+//            state.setStatus( "Unable to load Google Authentication page.");
+//            state.cancel( true );
+//            frame.setVisible(false);
+//        }
+//    }
 }

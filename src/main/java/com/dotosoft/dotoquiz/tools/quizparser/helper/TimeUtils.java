@@ -17,9 +17,9 @@
 package com.dotosoft.dotoquiz.tools.quizparser.helper;
 
 import java.io.File;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
+//import java.time.Instant;
+//import java.time.LocalDateTime;
+//import java.time.ZoneId;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -32,10 +32,10 @@ import com.google.gdata.data.photos.PhotoEntry;
  * Wrapper for useful time utilities...
  */
 public class TimeUtils {
-    public static LocalDateTime getTimeFromMS( long milli ) {
-        Instant instant = Instant.ofEpochMilli(milli);
-        return LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
-    }
+//    public static LocalDateTime getTimeFromMS( long milli ) {
+//        Instant instant = Instant.ofEpochMilli(milli);
+//        return LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
+//    }
 
     public static void sortPhotoEntriesNewestFirst( List<PhotoEntry> photos )
     {
