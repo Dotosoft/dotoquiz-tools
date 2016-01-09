@@ -2,33 +2,58 @@ package com.dotosoft.dotoquiz.tools.quizparser.utils;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Properties;
 import java.util.UUID;
 
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
-import org.hibernate.id.UUIDGenerator;
 
 import com.dotosoft.dotoquiz.common.DotoQuizConstant;
 import com.dotosoft.dotoquiz.model.data.DataQuestions;
 import com.dotosoft.dotoquiz.model.data.DataTopics;
 import com.dotosoft.dotoquiz.model.data.DataTopicsQuestions;
 import com.dotosoft.dotoquiz.model.parameter.ParameterQuestionType;
+import com.dotosoft.dotoquiz.tools.quizparser.config.Settings;
   
 public class HibernateUtil {
   
-    private static final SessionFactory sessionFactory = buildSessionFactory();
+    private static SessionFactory sessionFactory;
   
-    private static SessionFactory buildSessionFactory() {
+    private static SessionFactory buildSessionFactory(Settings setting) {
         try {
-            // Create the SessionFactory from hibernate.cfg.xml
-            return new Configuration().configure().buildSessionFactory();
+        	Properties prop= new Properties();
+        	prop.setProperty("hibernate.connection.driver_class", setting.getConnection().getDriverClass());
+        	prop.setProperty("hibernate.connection.url", setting.getConnection().getUrl());                                
+        	prop.setProperty("hibernate.connection.username", setting.getConnection().getUser());     
+        	prop.setProperty("hibernate.connection.password", setting.getConnection().getPassword());
+        	prop.setProperty("hibernate.connection.pool_size", String.valueOf(setting.getConnection().getPoolSize()));
+	        prop.setProperty("hibernate.dialect", setting.getDialect());
+	        prop.setProperty("hibernate.hbm2ddl.auto", setting.getHbm2ddl());
+	        prop.setProperty("hibernate.show_sql", setting.getShowSQL());
+			
+	        Configuration annotationConfig = new Configuration().addProperties(prop);
+	        
+	        for(String packageMap : setting.getMappingPackages()) {
+	        	annotationConfig.addPackage( packageMap ); 
+	        }
+	        
+	        for(String classMap : setting.getMappingClasses()) {
+	        	annotationConfig.addAnnotatedClass( Class.forName(classMap) ); 
+	        }
+	        
+	        StandardServiceRegistryBuilder ssrb = new StandardServiceRegistryBuilder().applySettings(annotationConfig.getProperties());
+            sessionFactory = annotationConfig.buildSessionFactory(ssrb.build());
+        	
         } catch (Throwable ex) {
             // Make sure you log the exception, as it might be swallowed
             System.err.println("Initial SessionFactory creation failed." + ex);
             throw new ExceptionInInitializerError(ex);
         }
+        
+        return sessionFactory;
     }
   
     public static SessionFactory getSessionFactory() {

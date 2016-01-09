@@ -36,7 +36,7 @@ import com.dotosoft.dotoquiz.tools.quizparser.auth.GoogleOAuth;
 import com.dotosoft.dotoquiz.tools.quizparser.common.QuizParserConstant.APPLICATION_TYPE;
 import com.dotosoft.dotoquiz.tools.quizparser.common.QuizParserConstant.DATA_TYPE;
 import com.dotosoft.dotoquiz.tools.quizparser.common.QuizParserConstant.IMAGE_HOSTING_TYPE;
-import com.dotosoft.dotoquiz.tools.quizparser.config.Settings;
+import com.dotosoft.dotoquiz.tools.quizparser.config.OldSettings;
 import com.dotosoft.dotoquiz.tools.quizparser.data.GooglesheetClient;
 import com.dotosoft.dotoquiz.tools.quizparser.data.custom.DataQuestionsParser;
 import com.dotosoft.dotoquiz.tools.quizparser.data.custom.DataTopicsParser;
@@ -62,7 +62,7 @@ public class App {
 	
 	private static final Logger log = LogManager.getLogger(App.class.getName());
 	
-	private Settings settings;
+	private OldSettings settings;
 	private GoogleOAuth auth;
 	private SyncState syncState;
 	private PicasawebClient webClient;
@@ -84,7 +84,7 @@ public class App {
 		albumMapByTitle = new HashMap<String, GphotoEntry>();
 		topicMapByTopicId = new HashMap<String, DataTopicsParser>();
 		
-		settings = new Settings();
+		settings = new OldSettings();
 		auth = new GoogleOAuth();
 		syncState = new SyncState();
 		

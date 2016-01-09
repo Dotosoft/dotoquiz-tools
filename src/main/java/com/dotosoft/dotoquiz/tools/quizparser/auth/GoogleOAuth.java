@@ -18,6 +18,7 @@ package com.dotosoft.dotoquiz.tools.quizparser.auth;
 
 import java.awt.Dimension;
 import java.awt.Toolkit;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.UnknownHostException;
@@ -36,13 +37,14 @@ import java.util.List;
 //import javafx.scene.web.WebEngine;
 //import javafx.scene.web.WebView;
 
+
 import javax.swing.JFrame;
 
 import org.apache.log4j.Logger;
 
 import com.dotosoft.dotoquiz.tools.quizparser.App;
 import com.dotosoft.dotoquiz.tools.quizparser.common.QuizParserConstant;
-import com.dotosoft.dotoquiz.tools.quizparser.config.Settings;
+import com.dotosoft.dotoquiz.tools.quizparser.config.OldSettings;
 import com.dotosoft.dotoquiz.tools.quizparser.data.GooglesheetClient;
 import com.dotosoft.dotoquiz.tools.quizparser.images.PicasawebClient;
 import com.dotosoft.dotoquiz.tools.quizparser.utils.SyncState;
@@ -92,6 +94,7 @@ public class GoogleOAuth {
 
 	/** Global instance of the HTTP transport. */
 	private static HttpTransport httpTransport;
+	private static FileInputStream clientSecretIS;
 	
 	/** OAuth 2.0 scopes. */
 	private static final List<String> SCOPES = Arrays.asList(
@@ -103,6 +106,7 @@ public class GoogleOAuth {
     	try {
 			httpTransport = GoogleNetHttpTransport.newTrustedTransport();
 			dataStoreFactory = new FileDataStoreFactory(DATA_STORE_DIR);
+			clientSecretIS = new FileInputStream("client_secrets.json");
 		} catch (IOException e) {
 			System.err.println(e.getMessage());
 		} catch (Throwable t) {
@@ -110,7 +114,7 @@ public class GoogleOAuth {
 		}
     }
 
-    public PicasawebClient authenticatePicasa( Settings settings, boolean allowInteractive, SyncState state ) throws IOException, GeneralSecurityException {
+    public PicasawebClient authenticatePicasa( OldSettings settings, boolean allowInteractive, SyncState state ) throws IOException, GeneralSecurityException {
     	Credential cred = authenticateOauth(settings, allowInteractive, state);
 
         if( cred != null ){
@@ -124,7 +128,7 @@ public class GoogleOAuth {
         return null;
     }
     
-    public GooglesheetClient authenticateGooglesheet(String googlesheetFileName, Settings settings, boolean allowInteractive, SyncState state) throws IOException, GeneralSecurityException, IOException, ServiceException  {
+    public GooglesheetClient authenticateGooglesheet(String googlesheetFileName, OldSettings settings, boolean allowInteractive, SyncState state) throws IOException, GeneralSecurityException, IOException, ServiceException  {
     	Credential cred = authenticateOauth(settings, allowInteractive, state);
 
         if( cred != null ){
@@ -138,7 +142,7 @@ public class GoogleOAuth {
         return null;
     }
     
-    private Credential authenticateOauth( Settings settings, boolean allowInteractive, SyncState state )  throws IOException, GeneralSecurityException {
+    private Credential authenticateOauth( OldSettings settings, boolean allowInteractive, SyncState state )  throws IOException, GeneralSecurityException {
     	log.info("Preparing to authenticate via OAuth...");
         Credential cred = null;
 
@@ -157,7 +161,9 @@ public class GoogleOAuth {
 
             state.setStatus( "Requesting Google Authentication...");
             
-            clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(App.class.getResourceAsStream("/client_secrets.json")));
+            if(clientSecrets == null) {
+            	clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(clientSecretIS));
+            }
             if (clientSecrets.getDetails().getClientId().startsWith("Enter") || clientSecrets.getDetails().getClientSecret().startsWith("Enter ")) {
     			System.out.println("Enter Client ID and Secret from https://code.google.com/apis/console/ " 
     					+ "into oauth2-cmdline-sample/src/main/resources/client_secrets.json");
@@ -213,7 +219,9 @@ public class GoogleOAuth {
         log.info("Getting access token for refresh token..");
 
         try {
-        	clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(App.class.getResourceAsStream("/client_secrets.json")));
+        	if(clientSecrets == null) {
+        		clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(clientSecretIS));
+        	}
             if (clientSecrets.getDetails().getClientId().startsWith("Enter") || clientSecrets.getDetails().getClientSecret().startsWith("Enter ")) {
     			System.out.println("Enter Client ID and Secret from https://code.google.com/apis/console/ " 
     					+ "into oauth2-cmdline-sample/src/main/resources/client_secrets.json");
