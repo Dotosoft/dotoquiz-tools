@@ -36,7 +36,7 @@ import com.dotosoft.dotoquiz.tools.quizparser.auth.GoogleOAuth;
 import com.dotosoft.dotoquiz.tools.quizparser.common.QuizParserConstant.APPLICATION_TYPE;
 import com.dotosoft.dotoquiz.tools.quizparser.common.QuizParserConstant.DATA_TYPE;
 import com.dotosoft.dotoquiz.tools.quizparser.common.QuizParserConstant.IMAGE_HOSTING_TYPE;
-import com.dotosoft.dotoquiz.tools.quizparser.config.OldSettings;
+import com.dotosoft.dotoquiz.tools.quizparser.config.Settings;
 import com.dotosoft.dotoquiz.tools.quizparser.data.GooglesheetClient;
 import com.dotosoft.dotoquiz.tools.quizparser.data.custom.DataQuestionsParser;
 import com.dotosoft.dotoquiz.tools.quizparser.data.custom.DataTopicsParser;
@@ -62,7 +62,7 @@ public class App {
 	
 	private static final Logger log = LogManager.getLogger(App.class.getName());
 	
-	private OldSettings settings;
+	private Settings settings;
 	private GoogleOAuth auth;
 	private SyncState syncState;
 	private PicasawebClient webClient;
@@ -84,16 +84,21 @@ public class App {
 		albumMapByTitle = new HashMap<String, GphotoEntry>();
 		topicMapByTopicId = new HashMap<String, DataTopicsParser>();
 		
-		settings = new OldSettings();
-		auth = new GoogleOAuth();
+		settings = new Settings();
 		syncState = new SyncState();
 		
 		if( settings.loadSettings(args) ) {
+			auth = new GoogleOAuth(settings);
+			
+			if(APPLICATION_TYPE.DB.toString().equals(settings.getApplicationType())) {
+				log.info("Building hibernate...");
+				HibernateUtil.buildSessionFactory(settings);
+			}
 			
 			log.info("Initialising Web client and authenticating...");
 	        if( webClient == null ) {
 	            try {
-	                webClient = auth.authenticatePicasa(settings, false, syncState );
+	                webClient = auth.authenticatePicasa(false, syncState );
 	            }
 	            catch( Exception _ex ) {
 	            	settings.showError();
@@ -187,12 +192,7 @@ public class App {
 			
 		    int index = 0;
 		    for(Object row : rowAchievements) {
-		    	ParameterAchievementParser achievement = null;
-		    	if(DATA_TYPE.EXCEL.toString().equals(settings.getDataType())) {
-		    		achievement = DotoQuizStructure.convertRowExcelToAchievement((Row) row, type);
-				} else if(DATA_TYPE.GOOGLESHEET.toString().equals(settings.getDataType())) {
-					achievement = DotoQuizStructure.convertRowGooglesheetExcelToAchievement((ListEntry) row, type);
-				}
+		    	ParameterAchievementParser achievement = DotoQuizStructure.convertDataToAchievement(row, settings);
 		    	
 		        if(achievement != null) {
 		        	if(type == APPLICATION_TYPE.DB) {
@@ -235,12 +235,7 @@ public class App {
 			}
 		    index = 0;
 		    for(Object row : rows) {
-		    	DataTopicsParser topic = null;
-		    	if(DATA_TYPE.EXCEL.toString().equals(settings.getDataType())) {
-		    		topic = DotoQuizStructure.convertRowExcelToTopics((Row) row, type);
-				} else if(DATA_TYPE.GOOGLESHEET.toString().equals(settings.getDataType())) {
-					topic = DotoQuizStructure.convertRowGooglesheetExcelToTopics((ListEntry) row, type);
-				}
+		    	DataTopicsParser topic = DotoQuizStructure.convertDataToTopics(row, settings);
 		    	
 		        if(topic != null) {
 		        	if(type == APPLICATION_TYPE.DB) {
@@ -286,13 +281,7 @@ public class App {
 		    
 		    index = 0;
 		    for(Object row : rows) {
-		    	DataQuestionsParser questionAnswer = null;
-		    	
-		    	if(DATA_TYPE.EXCEL.toString().equals(settings.getDataType())) {
-		    		questionAnswer = DotoQuizStructure.convertRowExcelToQuestions((Row) row, type);
-				} else if(DATA_TYPE.GOOGLESHEET.toString().equals(settings.getDataType())) {
-					questionAnswer = DotoQuizStructure.convertRowGooglesheetToQuestions((ListEntry) row, type);
-				}
+		    	DataQuestionsParser questionAnswer = DotoQuizStructure.convertDataToAnswerQuestion(row, settings);
 		    	
     			if(questionAnswer != null) {
 		        	if(type == APPLICATION_TYPE.DB) {

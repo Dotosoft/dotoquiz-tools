@@ -12,6 +12,10 @@ public class QuizParserConstant {
 	public enum IMAGE_HOSTING_TYPE {
 		PICASA
 	}
+	
+	public static final String PARSE_TOPIC = "TOPIC";
+	public static final String PARSE_QUESTION_ANSWER = "QUESTION_ANSWER";
+	public static final String PARSE_ACHIEVEMENT = "ACHIEVEMENT";
 
 	public static final String SCOPE_PICASA = "https://picasaweb.google.com/data/";
 	public static final String SCOPE_GOOGLESHEET = "https://spreadsheets.google.com/feeds";

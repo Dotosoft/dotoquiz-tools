@@ -17,7 +17,6 @@
 package com.dotosoft.dotoquiz.tools.quizparser.auth;
 
 import java.awt.Dimension;
-import java.awt.Toolkit;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -26,25 +25,10 @@ import java.security.GeneralSecurityException;
 import java.util.Arrays;
 import java.util.List;
 
-//import javafx.application.Platform;
-//import javafx.beans.value.ChangeListener;
-//import javafx.beans.value.ObservableValue;
-//import javafx.concurrent.Worker;
-//import javafx.concurrent.Worker.State;
-//import javafx.embed.swing.JFXPanel;
-//import javafx.scene.Group;
-//import javafx.scene.Scene;
-//import javafx.scene.web.WebEngine;
-//import javafx.scene.web.WebView;
-
-
-import javax.swing.JFrame;
-
 import org.apache.log4j.Logger;
 
-import com.dotosoft.dotoquiz.tools.quizparser.App;
 import com.dotosoft.dotoquiz.tools.quizparser.common.QuizParserConstant;
-import com.dotosoft.dotoquiz.tools.quizparser.config.OldSettings;
+import com.dotosoft.dotoquiz.tools.quizparser.config.Settings;
 import com.dotosoft.dotoquiz.tools.quizparser.data.GooglesheetClient;
 import com.dotosoft.dotoquiz.tools.quizparser.images.PicasawebClient;
 import com.dotosoft.dotoquiz.tools.quizparser.utils.SyncState;
@@ -63,6 +47,16 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.store.DataStoreFactory;
 import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.gdata.util.ServiceException;
+//import javafx.application.Platform;
+//import javafx.beans.value.ChangeListener;
+//import javafx.beans.value.ObservableValue;
+//import javafx.concurrent.Worker;
+//import javafx.concurrent.Worker.State;
+//import javafx.embed.swing.JFXPanel;
+//import javafx.scene.Group;
+//import javafx.scene.Scene;
+//import javafx.scene.web.WebEngine;
+//import javafx.scene.web.WebView;
 
 /**
  * Utility class to authenticate using Oauth 2.0.
@@ -79,12 +73,13 @@ public class GoogleOAuth {
     private static volatile String token;
     private static final String SUCCESS_CODE = "Success code=";
 
-    private static GoogleClientSecrets clientSecrets;
+//    private static GoogleClientSecrets clientSecrets;
     /** Global instance of the JSON factory. */
 	private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
 	
 	/** Directory to store user credentials. */
-	private static final java.io.File DATA_STORE_DIR = new java.io.File( System.getProperty("user.home"), ".store/oauth2_dotoquiz" );
+	// private static final java.io.File DATA_STORE_DIR = new java.io.File( System.getProperty("user.home"), ".store/oauth2_dotoquiz" );
+	private static java.io.File DATA_STORE_DIR;
 	
 	/**
 	 * Global instance of the {@link DataStoreFactory}. The best practice is to
@@ -94,28 +89,30 @@ public class GoogleOAuth {
 
 	/** Global instance of the HTTP transport. */
 	private static HttpTransport httpTransport;
-	private static FileInputStream clientSecretIS;
+//	private static FileInputStream clientSecretIS;
+	private Settings setting;
 	
 	/** OAuth 2.0 scopes. */
 	private static final List<String> SCOPES = Arrays.asList(
 			QuizParserConstant.SCOPE_PICASA, 
 			QuizParserConstant.SCOPE_GOOGLESHEET);
 
-    public GoogleOAuth()
+    public GoogleOAuth( Settings settings )
     {
     	try {
+    		this.setting = settings;
+    		DATA_STORE_DIR = new java.io.File( setting.getDataStoreDir() );
+    		
 			httpTransport = GoogleNetHttpTransport.newTrustedTransport();
 			dataStoreFactory = new FileDataStoreFactory(DATA_STORE_DIR);
-			clientSecretIS = new FileInputStream("client_secrets.json");
-		} catch (IOException e) {
-			System.err.println(e.getMessage());
-		} catch (Throwable t) {
-			t.printStackTrace();
+//			clientSecretIS = new FileInputStream("client_secrets.json");
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
     }
 
-    public PicasawebClient authenticatePicasa( OldSettings settings, boolean allowInteractive, SyncState state ) throws IOException, GeneralSecurityException {
-    	Credential cred = authenticateOauth(settings, allowInteractive, state);
+    public PicasawebClient authenticatePicasa( boolean allowInteractive, SyncState state ) throws IOException, GeneralSecurityException {
+    	Credential cred = authenticateOauth( allowInteractive, state );
 
         if( cred != null ){
 
@@ -128,8 +125,8 @@ public class GoogleOAuth {
         return null;
     }
     
-    public GooglesheetClient authenticateGooglesheet(String googlesheetFileName, OldSettings settings, boolean allowInteractive, SyncState state) throws IOException, GeneralSecurityException, IOException, ServiceException  {
-    	Credential cred = authenticateOauth(settings, allowInteractive, state);
+    public GooglesheetClient authenticateGooglesheet(String googlesheetFileName, Settings settings, boolean allowInteractive, SyncState state) throws IOException, GeneralSecurityException, IOException, ServiceException  {
+    	Credential cred = authenticateOauth(allowInteractive, state);
 
         if( cred != null ){
 
@@ -142,11 +139,11 @@ public class GoogleOAuth {
         return null;
     }
     
-    private Credential authenticateOauth( OldSettings settings, boolean allowInteractive, SyncState state )  throws IOException, GeneralSecurityException {
+    private Credential authenticateOauth( boolean allowInteractive, SyncState state )  throws IOException, GeneralSecurityException {
     	log.info("Preparing to authenticate via OAuth...");
         Credential cred = null;
 
-        String refreshToken = settings.getRefreshToken();
+        String refreshToken = setting.getRefreshToken();
         if( refreshToken != null )
         {
             // We have a refresh token - so get some refreshed credentials
@@ -161,17 +158,18 @@ public class GoogleOAuth {
 
             state.setStatus( "Requesting Google Authentication...");
             
-            if(clientSecrets == null) {
-            	clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(clientSecretIS));
-            }
-            if (clientSecrets.getDetails().getClientId().startsWith("Enter") || clientSecrets.getDetails().getClientSecret().startsWith("Enter ")) {
-    			System.out.println("Enter Client ID and Secret from https://code.google.com/apis/console/ " 
-    					+ "into oauth2-cmdline-sample/src/main/resources/client_secrets.json");
-    			System.exit(1);
-    		}
+//            if(clientSecrets == null) {
+//            	clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(clientSecretIS));
+//            }
+//            if (clientSecrets.getDetails().getClientId().startsWith("Enter") || clientSecrets.getDetails().getClientSecret().startsWith("Enter ")) {
+//    			System.out.println("Enter Client ID and Secret from https://code.google.com/apis/console/ " 
+//    					+ "into oauth2-cmdline-sample/src/main/resources/client_secrets.json");
+//    			System.exit(1);
+//    		}
     		
     		// set up authorization code flow
-    		GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(httpTransport, JSON_FACTORY, clientSecrets, SCOPES).setDataStoreFactory(dataStoreFactory).build();
+    		// GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(httpTransport, JSON_FACTORY, clientSecrets, SCOPES).setDataStoreFactory(dataStoreFactory).build();
+            GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(httpTransport, JSON_FACTORY, setting.getClientSecret().getClientId(), setting.getClientSecret().getClientSecret(), SCOPES).setDataStoreFactory(dataStoreFactory).build();
     		
     		if(allowInteractive) {
 //    			String redirectUrl = clientSecrets.getDetails().getRedirectUris().get(0);
@@ -198,7 +196,7 @@ public class GoogleOAuth {
 			
     		} else {
 	            // Retrieve the credential from the request response
-	    		LocalServerReceiver receiver = new LocalServerReceiver.Builder().setHost("127.0.0.1").setPort(8080).build();
+	    		LocalServerReceiver receiver = new LocalServerReceiver.Builder().setHost(setting.getAuthenticationServer().getIp()).setPort(setting.getAuthenticationServer().getPort()).build();
 	    		cred = new AuthorizationCodeInstalledApp(flow, receiver).authorize("user");
     		}
     		
@@ -206,8 +204,8 @@ public class GoogleOAuth {
             log.info("Credentials received - storing refresh token...");
 
             // Squirrel this away for next time
-            settings.setRefreshToken( cred.getRefreshToken() );
-            settings.saveSettings();
+//            setting.setRefreshToken( cred.getRefreshToken() );
+//            setting.saveSettings();
         }
         
         return cred;
@@ -219,18 +217,21 @@ public class GoogleOAuth {
         log.info("Getting access token for refresh token..");
 
         try {
-        	if(clientSecrets == null) {
-        		clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(clientSecretIS));
-        	}
-            if (clientSecrets.getDetails().getClientId().startsWith("Enter") || clientSecrets.getDetails().getClientSecret().startsWith("Enter ")) {
-    			System.out.println("Enter Client ID and Secret from https://code.google.com/apis/console/ " 
-    					+ "into oauth2-cmdline-sample/src/main/resources/client_secrets.json");
-    			System.exit(1);
-    		}
+//        	if(clientSecrets == null) {
+//        		clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(clientSecretIS));
+//        	}
+//            if (clientSecrets.getDetails().getClientId().startsWith("Enter") || clientSecrets.getDetails().getClientSecret().startsWith("Enter ")) {
+//    			System.out.println("Enter Client ID and Secret from https://code.google.com/apis/console/ " 
+//    					+ "into oauth2-cmdline-sample/src/main/resources/client_secrets.json");
+//    			System.exit(1);
+//    		}
             
+//            GoogleTokenResponse response = new GoogleRefreshTokenRequest(
+//                    httpTransport, JSON_FACTORY, refreshCode, clientSecrets.getDetails().getClientId(), clientSecrets.getDetails().getClientSecret() )
+//                    .execute();
             GoogleTokenResponse response = new GoogleRefreshTokenRequest(
-                    httpTransport, JSON_FACTORY, refreshCode, clientSecrets.getDetails().getClientId(), clientSecrets.getDetails().getClientSecret() )
-                    .execute();
+            		httpTransport, JSON_FACTORY, refreshCode, setting.getClientSecret().getClientId(), setting.getClientSecret().getClientSecret() )
+            .execute();
 
             return new GoogleCredential().setAccessToken(response.getAccessToken());
 

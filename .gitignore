@@ -11,3 +11,4 @@ client_secrets.json
 .DS_Store
 *.log
 hibernate.cfg.xml
+settings.yaml

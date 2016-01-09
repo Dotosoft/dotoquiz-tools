@@ -6,31 +6,93 @@ import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
+import org.apache.commons.beanutils.BeanUtils;
 import org.apache.log4j.Logger;
 import org.yaml.snakeyaml.Yaml;
 
 import com.dotosoft.dotoquiz.config.Configuration;
+import com.dotosoft.dotoquiz.tools.quizparser.config.model.AchievementStructure;
+import com.dotosoft.dotoquiz.tools.quizparser.config.model.AnswerQuestionStructure;
+import com.dotosoft.dotoquiz.tools.quizparser.config.model.AuthenticationServer;
+import com.dotosoft.dotoquiz.tools.quizparser.config.model.ClientSecret;
+import com.dotosoft.dotoquiz.tools.quizparser.config.model.TopicStructure;
 
 public class Settings extends Configuration {
-	
+
 	private static final Logger log = Logger.getLogger(Settings.class);
 	private Yaml yaml = new Yaml();
-	
+
 	private String fileconfig;
-	
+
 	private String applicationType;
 	private String dataType;
 	private String imageHostingType;
 	private String refreshToken;
 	private String syncDataFile;
 	private String syncDataFolder;
+	
+	private String dataStoreDir;
+
+	private ClientSecret clientSecret;
+	private AuthenticationServer authenticationServer;
+
+	private TopicStructure topicStructure;
+	private AnswerQuestionStructure answerQuestionStructure;
+	private AchievementStructure achievementStructure;
+
+	public String getDataStoreDir() {
+		return dataStoreDir;
+	}
+
+	public void setDataStoreDir(String dataStoreDir) {
+		this.dataStoreDir = dataStoreDir;
+	}
+
+	public ClientSecret getClientSecret() {
+		return clientSecret;
+	}
+
+	public void setClientSecret(ClientSecret clientSecret) {
+		this.clientSecret = clientSecret;
+	}
+
+	public AuthenticationServer getAuthenticationServer() {
+		return authenticationServer;
+	}
+
+	public void setAuthenticationServer(
+			AuthenticationServer authenticationServer) {
+		this.authenticationServer = authenticationServer;
+	}
+
+	public AchievementStructure getAchievementStructure() {
+		return achievementStructure;
+	}
+
+	public void setAchievementStructure(
+			AchievementStructure achievementStructure) {
+		this.achievementStructure = achievementStructure;
+	}
+
+	public TopicStructure getTopicStructure() {
+		return topicStructure;
+	}
+
+	public void setTopicStructure(TopicStructure topicStructure) {
+		this.topicStructure = topicStructure;
+	}
+
+	public AnswerQuestionStructure getAnswerQuestionStructure() {
+		return answerQuestionStructure;
+	}
+
+	public void setAnswerQuestionStructure(
+			AnswerQuestionStructure answerQuestionStructure) {
+		this.answerQuestionStructure = answerQuestionStructure;
+	}
 
 	public String getApplicationType() {
 		return applicationType;
-	}
-
-	public void setApplicationType(String applicationType) {
-		this.applicationType = applicationType;
 	}
 
 	public String getDataType() {
@@ -72,41 +134,45 @@ public class Settings extends Configuration {
 	public void setSyncDataFolder(String syncDataFolder) {
 		this.syncDataFolder = syncDataFolder;
 	}
-	
+
 	public void showError() {
-    	log.error( "Error: Could not run DataQuizParser." );
-    	log.info( "Run: java -jar DataQuizParser.jar [file config] [CLEAR|DB|SYNC]" );
-    }
+		log.error("Error: Could not run DataQuizParser.");
+		log.info("Run: java -jar DataQuizParser.jar [file config] [CLEAR|DB|SYNC]");
+	}
 
 	public boolean loadSettings(String args[]) {
 		try {
-			fileconfig = args[ 0 ]; 
-			
-			InputStream in = Files.newInputStream( Paths.get( fileconfig ) );
-	        Configuration config = yaml.loadAs( in, Configuration.class );
-	        log.info( config );
-	        Writer writer = new FileWriter( "output-" + args[ 0 ] );
-	        yaml.dump(config, writer);
-	        writer.close();
+			if (args.length != 2) {
+				showError();
+				return false;
+			}
+
+			fileconfig = args[0];
+			applicationType = args[1];
+
+			InputStream in = Files.newInputStream(Paths.get(fileconfig));
+			Settings setting = yaml.loadAs(in, Settings.class);
+			BeanUtils.copyProperties(this, setting);
+			log.info(setting);
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			showError();
 			return false;
 		}
-		
+
 		return true;
 	}
-	
+
 	public boolean saveSettings() {
 		try {
-			Writer writer = new FileWriter( "output-" + fileconfig );
-	        yaml.dump(this, writer);
-	        writer.close();
+			Writer writer = new FileWriter(fileconfig);
+			yaml.dump(this, writer);
+			writer.close();
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			return false;
 		}
-		
+
 		return true;
 	}
 }

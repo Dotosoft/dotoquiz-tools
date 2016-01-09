@@ -1,6 +1,0 @@
-!!com.dotosoft.dotoquiz.tools.quizparser.config.Configuration
-connection: {poolSize: 5, url: 'jdbc:mysql://localhost:3306/db'}
-protocols: [http, https]
-released: 2012-11-30T00:00:00Z
-users: {tom: passwd, bob: passwd}
-version: '99'

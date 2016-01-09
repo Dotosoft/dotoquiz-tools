@@ -11,7 +11,7 @@ import org.apache.log4j.Logger;
 
 import com.dotosoft.dotoquiz.tools.quizparser.App;
 import com.dotosoft.dotoquiz.tools.quizparser.auth.GoogleOAuth;
-import com.dotosoft.dotoquiz.tools.quizparser.config.OldSettings;
+import com.dotosoft.dotoquiz.tools.quizparser.config.Settings;
 import com.dotosoft.dotoquiz.tools.quizparser.data.GooglesheetClient;
 import com.dotosoft.dotoquiz.tools.quizparser.utils.SyncState;
 import com.google.gdata.data.spreadsheet.WorksheetEntry;
@@ -24,7 +24,7 @@ public class AppTest  extends TestCase
 {
 	private static final Logger log = LogManager.getLogger(App.class.getName());
 	
-	private OldSettings settings;
+	private Settings settings;
 	private GoogleOAuth auth;
 	private SyncState syncState;
 	private GooglesheetClient webClient;
@@ -58,11 +58,11 @@ public class AppTest  extends TestCase
      */
     public void testApp() throws IOException, ServiceException
     {
-    	settings = new OldSettings();
-		auth = new GoogleOAuth();
+    	settings = new Settings();
 		syncState = new SyncState();
 		
 		if( settings.loadSettings(args) ) {
+			auth = new GoogleOAuth(settings);
 			
 			log.info("Initialising Web client and authenticating...");
 	        if( webClient == null ) {

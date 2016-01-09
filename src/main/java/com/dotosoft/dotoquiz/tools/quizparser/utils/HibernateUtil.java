@@ -22,7 +22,7 @@ public class HibernateUtil {
   
     private static SessionFactory sessionFactory;
   
-    private static SessionFactory buildSessionFactory(Settings setting) {
+    public static SessionFactory buildSessionFactory(Settings setting) {
         try {
         	Properties prop= new Properties();
         	prop.setProperty("hibernate.connection.driver_class", setting.getConnection().getDriverClass());
