@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.List;
 
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.log4j.Logger;
@@ -32,6 +33,8 @@ public class Settings extends Configuration {
 	private String syncDataFolder;
 	
 	private String dataStoreDir;
+	private List<String> achievements;
+	private List<String> datas;
 
 	private ClientSecret clientSecret;
 	private AuthenticationServer authenticationServer;
@@ -39,6 +42,22 @@ public class Settings extends Configuration {
 	private TopicStructure topicStructure;
 	private AnswerQuestionStructure answerQuestionStructure;
 	private AchievementStructure achievementStructure;
+
+	public List<String> getAchievements() {
+		return achievements;
+	}
+
+	public void setAchievements(List<String> achievements) {
+		this.achievements = achievements;
+	}
+
+	public List<String> getDatas() {
+		return datas;
+	}
+
+	public void setDatas(List<String> datas) {
+		this.datas = datas;
+	}
 
 	public String getDataStoreDir() {
 		return dataStoreDir;
@@ -153,7 +172,6 @@ public class Settings extends Configuration {
 			InputStream in = Files.newInputStream(Paths.get(fileconfig));
 			Settings setting = yaml.loadAs(in, Settings.class);
 			BeanUtils.copyProperties(this, setting);
-			log.info(setting);
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			showError();

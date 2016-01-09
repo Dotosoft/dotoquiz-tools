@@ -180,7 +180,7 @@ public class App {
 			    sheet = workbook.getSheetAt(1);
 			    rowAchievements = Lists.newArrayList(sheet.iterator());
 			} else if(DATA_TYPE.GOOGLESHEET.toString().equals(settings.getDataType())) {
-				googlesheetClient = auth.authenticateGooglesheet("TopQuizData", settings, false, syncState );
+				googlesheetClient = auth.authenticateGooglesheet(settings.getSyncDataFile(), settings, false, syncState );
 			    fullSheet = googlesheetClient.getWorksheet(1);
 			    rowAchievements = googlesheetClient.getListRows(fullSheet);
 			}
