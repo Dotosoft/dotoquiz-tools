@@ -204,8 +204,8 @@ public class GoogleOAuth {
             log.info("Credentials received - storing refresh token...");
 
             // Squirrel this away for next time
-//            setting.setRefreshToken( cred.getRefreshToken() );
-//            setting.saveSettings();
+            setting.setRefreshToken( cred.getRefreshToken() );
+            setting.saveSettings();
         }
         
         return cred;

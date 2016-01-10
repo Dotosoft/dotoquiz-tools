@@ -33,8 +33,8 @@ public class Settings extends Configuration {
 	private String syncDataFolder;
 	
 	private String dataStoreDir;
-	private List<String> achievements;
-	private List<String> datas;
+	private String achievements;
+	private String datas;
 
 	private ClientSecret clientSecret;
 	private AuthenticationServer authenticationServer;
@@ -43,19 +43,19 @@ public class Settings extends Configuration {
 	private AnswerQuestionStructure answerQuestionStructure;
 	private AchievementStructure achievementStructure;
 
-	public List<String> getAchievements() {
+	public String getAchievements() {
 		return achievements;
 	}
 
-	public void setAchievements(List<String> achievements) {
+	public void setAchievements(String achievements) {
 		this.achievements = achievements;
 	}
 
-	public List<String> getDatas() {
+	public String getDatas() {
 		return datas;
 	}
 
-	public void setDatas(List<String> datas) {
+	public void setDatas(String datas) {
 		this.datas = datas;
 	}
 
