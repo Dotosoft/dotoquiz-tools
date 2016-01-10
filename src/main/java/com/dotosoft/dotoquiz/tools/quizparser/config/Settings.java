@@ -156,7 +156,7 @@ public class Settings extends Configuration {
 
 	public void showError() {
 		log.error("Error: Could not run DataQuizParser.");
-		log.info("Run: java -jar DataQuizParser.jar [file config] [CLEAR|DB|SYNC]");
+		log.info("Run: java -jar DataQuizParser.jar [CLEAR|DB|SYNC] [file config]");
 	}
 
 	public boolean loadSettings(String args[]) {
@@ -166,8 +166,8 @@ public class Settings extends Configuration {
 				return false;
 			}
 
-			fileconfig = args[0];
-			applicationType = args[1];
+			applicationType = args[0];
+			fileconfig = args[1];
 
 			InputStream in = Files.newInputStream(Paths.get(fileconfig));
 			Settings setting = yaml.loadAs(in, Settings.class);
