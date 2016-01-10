@@ -218,11 +218,11 @@ public class App {
 			    		}
 			        }
 			    }
-			    
-			    if(APPLICATION_TYPE.DB.toString().equals(settings.getApplicationType())) {
-			    	trx.commit();
-			    	trx = session.beginTransaction();
-				}
+			}
+			
+			if(APPLICATION_TYPE.DB.toString().equals(settings.getApplicationType())) {
+		    	trx.commit();
+		    	trx = session.beginTransaction();
 			}
 			
 			for(String dataTab : settings.getDatas().split(";")) {
@@ -289,11 +289,11 @@ public class App {
 			    		}
 			        }
 			    }
-			    
-			    if(APPLICATION_TYPE.DB.toString().equals(settings.getApplicationType())) {
-			    	trx.commit();
-					session.close();
-				}
+			}
+			
+			if(APPLICATION_TYPE.DB.toString().equals(settings.getApplicationType())) {
+		    	trx.commit();
+				session.close();
 			}
 		    
 		    if(DATA_TYPE.EXCEL.toString().equals(settings.getDataType())) {
