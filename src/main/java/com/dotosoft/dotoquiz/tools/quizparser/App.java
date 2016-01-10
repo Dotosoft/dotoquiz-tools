@@ -186,6 +186,12 @@ public class App {
 			// --------------------------------------------------------------------------
 			// Extract Achievement ------------------------------------------------------
 			// --------------------------------------------------------------------------
+			
+			// parent folder
+			DataTopicsParser topicAchievement = new DataTopicsParser("-1", "", "", "", "achievement", "achievementDescription", "topic.png", DotoQuizConstant.NO, new java.util.Date(), DotoQuizConstant.SYSTEM_USER, DotoQuizConstant.NO, type);
+			topicAchievement = syncTopicToPicasa(topicAchievement);
+			topicMapByTopicId.put(topicAchievement.getId(), topicAchievement);
+			
 			List listRow = null;
 			for(String achievementTab : settings.getAchievements().split(";")) {
 				if(DATA_TYPE.EXCEL.toString().equals(settings.getDataType())) {			 
@@ -195,10 +201,6 @@ public class App {
 				    fullSheet = googlesheetClient.getWorksheet(Integer.parseInt(achievementTab));
 				    listRow = googlesheetClient.getListRows(fullSheet);
 				}
-				
-				DataTopicsParser topicAchievement = new DataTopicsParser("-1", "", "", "", "achievement", "achievementDescription", "topic.png", DotoQuizConstant.NO, new java.util.Date(), DotoQuizConstant.SYSTEM_USER, DotoQuizConstant.NO, type);
-				topicAchievement = syncTopicToPicasa(topicAchievement);
-				topicMapByTopicId.put(topicAchievement.getId(), topicAchievement);
 				
 			    for(Object row : listRow) {
 			    	ParameterAchievementParser achievement = DotoQuizStructure.convertDataToAchievement(row, settings);
