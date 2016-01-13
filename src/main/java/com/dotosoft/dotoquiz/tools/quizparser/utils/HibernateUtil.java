@@ -11,7 +11,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
 
-import com.dotosoft.dotoquiz.common.DotoQuizConstant;
+import com.dotosoft.dotoquiz.common.QuizConstant;
 import com.dotosoft.dotoquiz.model.data.DataQuestions;
 import com.dotosoft.dotoquiz.model.data.DataTopics;
 import com.dotosoft.dotoquiz.model.data.DataTopicsQuestions;
@@ -82,7 +82,7 @@ public class HibernateUtil {
 			for(DataTopicsQuestions topicQuestion : dataTopicQuestions) {
 				topicQuestion.setDatQuestions(questionAnswer);
 				topicQuestion.setDatTopics(topic);
-				topicQuestion.setIsDelete(DotoQuizConstant.NO);
+				topicQuestion.setIsDelete(QuizConstant.NO);
 				session.update(topicQuestion);
 			}
 		} else {
@@ -90,8 +90,8 @@ public class HibernateUtil {
 			topicQuestion.setId(UUID.randomUUID().toString());
 			topicQuestion.setDatQuestions(questionAnswer);
 			topicQuestion.setDatTopics(topic);
-			topicQuestion.setIsDelete(DotoQuizConstant.NO);
-			topicQuestion.setCreatedBy(DotoQuizConstant.SYSTEM_USER);
+			topicQuestion.setIsDelete(QuizConstant.NO);
+			topicQuestion.setCreatedBy(QuizConstant.SYSTEM_USER);
 			topicQuestion.setCreatedDt(new Date());
 			session.save(topicQuestion);
 		}

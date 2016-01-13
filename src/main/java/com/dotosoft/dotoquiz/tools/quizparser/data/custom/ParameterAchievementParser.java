@@ -7,7 +7,7 @@ import javax.persistence.Transient;
 
 import org.apache.commons.beanutils.BeanUtils;
 
-import com.dotosoft.dotoquiz.common.DotoQuizConstant;
+import com.dotosoft.dotoquiz.common.QuizConstant;
 import com.dotosoft.dotoquiz.model.parameter.ParameterAchievements;
 import com.dotosoft.dotoquiz.tools.quizparser.common.QuizParserConstant.APPLICATION_TYPE;
 

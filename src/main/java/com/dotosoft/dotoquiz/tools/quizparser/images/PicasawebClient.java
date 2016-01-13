@@ -36,7 +36,7 @@ import java.util.List;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 
-import com.dotosoft.dotoquiz.common.DotoQuizConstant;
+import com.dotosoft.dotoquiz.common.QuizConstant;
 import com.dotosoft.dotoquiz.tools.quizparser.common.QuizParserConstant;
 import com.dotosoft.dotoquiz.tools.quizparser.helper.TimeUtils;
 import com.dotosoft.dotoquiz.tools.quizparser.images.metadata.ImageInformation;

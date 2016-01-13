@@ -22,7 +22,7 @@ import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 
-import com.dotosoft.dotoquiz.common.DotoQuizConstant;
+import com.dotosoft.dotoquiz.common.QuizConstant;
 import com.dotosoft.dotoquiz.tools.quizparser.common.QuizParserConstant;
 import com.dotosoft.dotoquiz.tools.quizparser.common.QuizParserConstant.APPLICATION_TYPE;
 import com.dotosoft.dotoquiz.tools.quizparser.common.QuizParserConstant.DATA_TYPE;
@@ -49,7 +49,7 @@ public class DotoQuizStructure {
 		String isProcessed = getValueFromRowData(QuizParserConstant.PARSE_TOPIC, setting, "iIsProcessed", data);
 		
 		APPLICATION_TYPE type = APPLICATION_TYPE.valueOf(setting.getApplicationType());
-		DataTopicsParser result = new DataTopicsParser(topicId, picasaId, imagePicasaURL, topicParent, topicName, topicDescription, imageURL, DotoQuizConstant.NO, new java.util.Date(), DotoQuizConstant.SYSTEM_USER, isProcessed, type);
+		DataTopicsParser result = new DataTopicsParser(topicId, picasaId, imagePicasaURL, topicParent, topicName, topicDescription, imageURL, QuizConstant.NO, new java.util.Date(), QuizConstant.SYSTEM_USER, isProcessed, type);
 		return result;
 	}
 	
@@ -72,7 +72,7 @@ public class DotoQuizStructure {
 		String isProcessed = getValueFromRowData(QuizParserConstant.PARSE_QUESTION_ANSWER, setting, "iIsProcessed", data);
 		
 		APPLICATION_TYPE type = APPLICATION_TYPE.valueOf(setting.getApplicationType());
-		DataQuestionsParser result = new DataQuestionsParser(pertanyaanId, questionType, picasaId, imagePicasaURL, additionalData, questionType, DotoQuizConstant.NO, correctAnswer, wrongAnswer1, wrongAnswer2, wrongAnswer3, new java.util.Date(), "system", topics, isProcessed, type);
+		DataQuestionsParser result = new DataQuestionsParser(pertanyaanId, questionType, picasaId, imagePicasaURL, additionalData, questionType, QuizConstant.NO, correctAnswer, wrongAnswer1, wrongAnswer2, wrongAnswer3, new java.util.Date(), "system", topics, isProcessed, type);
 		return result;
 	}
 	
@@ -89,7 +89,7 @@ public class DotoQuizStructure {
 		String isProcessed = getValueFromRowData(QuizParserConstant.PARSE_ACHIEVEMENT, setting, "iIsProcessed", data);
 		
 		APPLICATION_TYPE type = APPLICATION_TYPE.valueOf(setting.getApplicationType());
-		ParameterAchievementParser result = new ParameterAchievementParser(achievementId, picasaId, imagePicasaURL, achievementName, achievementDescription, imageURL, DotoQuizConstant.NO, new java.util.Date(), DotoQuizConstant.SYSTEM_USER, isProcessed, type);
+		ParameterAchievementParser result = new ParameterAchievementParser(achievementId, picasaId, imagePicasaURL, achievementName, achievementDescription, imageURL, QuizConstant.NO, new java.util.Date(), QuizConstant.SYSTEM_USER, isProcessed, type);
 		return result;
 	}
 	

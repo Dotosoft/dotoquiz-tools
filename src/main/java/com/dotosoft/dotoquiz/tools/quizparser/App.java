@@ -31,7 +31,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
-import com.dotosoft.dotoquiz.common.DotoQuizConstant;
+import com.dotosoft.dotoquiz.common.QuizConstant;
 import com.dotosoft.dotoquiz.tools.quizparser.auth.GoogleOAuth;
 import com.dotosoft.dotoquiz.tools.quizparser.common.QuizParserConstant;
 import com.dotosoft.dotoquiz.tools.quizparser.common.QuizParserConstant.APPLICATION_TYPE;
@@ -188,7 +188,7 @@ public class App {
 			// --------------------------------------------------------------------------
 			
 			// parent folder
-			DataTopicsParser topicAchievement = new DataTopicsParser("-1", "", "", "", "achievement", "achievementDescription", "topic.png", DotoQuizConstant.NO, new java.util.Date(), DotoQuizConstant.SYSTEM_USER, DotoQuizConstant.NO, type);
+			DataTopicsParser topicAchievement = new DataTopicsParser("-1", "", "", "", "achievement", "achievementDescription", "topic.png", QuizConstant.NO, new java.util.Date(), QuizConstant.SYSTEM_USER, QuizConstant.NO, type);
 			topicAchievement = syncTopicToPicasa(topicAchievement);
 			topicMapByTopicId.put(topicAchievement.getId(), topicAchievement);
 			
@@ -212,8 +212,8 @@ public class App {
 			    		} else if(type == APPLICATION_TYPE.SYNC) {
 			    			achievement = syncAchievementToPicasa(achievement);
 			    			
-			    			if(!DotoQuizConstant.YES.equals(achievement.getIsProcessed())) {
-			    				updateSyncPicasa(QuizParserConstant.PARSE_ACHIEVEMENT, row, achievement.getPicasaId(), achievement.getImagePicasaUrl(), DotoQuizConstant.YES);
+			    			if(!QuizConstant.YES.equals(achievement.getIsProcessed())) {
+			    				updateSyncPicasa(QuizParserConstant.PARSE_ACHIEVEMENT, row, achievement.getPicasaId(), achievement.getImagePicasaUrl(), QuizConstant.YES);
 			    			}
 			    		}
 			        }
@@ -251,8 +251,8 @@ public class App {
 			    		} else if(type == APPLICATION_TYPE.SYNC) {
 			    			topic = syncTopicToPicasa(topic);
 			    			
-			    			if(!DotoQuizConstant.YES.equals(topic.getIsProcessed())) {
-			    				updateSyncPicasa(QuizParserConstant.PARSE_TOPIC, row, topic.getPicasaId(), topic.getImagePicasaUrl(), DotoQuizConstant.YES);
+			    			if(!QuizConstant.YES.equals(topic.getIsProcessed())) {
+			    				updateSyncPicasa(QuizParserConstant.PARSE_TOPIC, row, topic.getPicasaId(), topic.getImagePicasaUrl(), QuizConstant.YES);
 			    			}
 			    		}
 			        	
@@ -283,8 +283,8 @@ public class App {
 			        		}
 			    		} else if(type == APPLICATION_TYPE.SYNC) {
 			    			questionAnswer = syncQuestionAnswersToPicasa(questionAnswer);		    	
-			    			if(!DotoQuizConstant.YES.equals(questionAnswer.getIsProcessed())) {
-			    				updateSyncPicasa(QuizParserConstant.PARSE_QUESTION_ANSWER, row, questionAnswer.getPicasaId(), questionAnswer.getImagePicasaUrl(), DotoQuizConstant.YES);
+			    			if(!QuizConstant.YES.equals(questionAnswer.getIsProcessed())) {
+			    				updateSyncPicasa(QuizParserConstant.PARSE_QUESTION_ANSWER, row, questionAnswer.getPicasaId(), questionAnswer.getImagePicasaUrl(), QuizConstant.YES);
 			    			}
 			    		}
 			        }
@@ -367,7 +367,7 @@ public class App {
 	public ParameterAchievementParser syncAchievementToPicasa(ParameterAchievementParser achievement) {
 		log.info("Sync achievement '" + achievement.getId() + "'");
 		
-		if(!DotoQuizConstant.YES.equals(achievement.getIsProcessed())) {
+		if(!QuizConstant.YES.equals(achievement.getIsProcessed())) {
 			try {
 				GphotoEntry achievementTopic = albumMapByTopicId.get("-1");
 				
@@ -413,7 +413,7 @@ public class App {
 				albumEntry = webClient.insertAlbum(myAlbum);
 			}
 			
-			if(!DotoQuizConstant.YES.equals(topic.getIsProcessed())) {
+			if(!QuizConstant.YES.equals(topic.getIsProcessed())) {
 				Map<String, GphotoEntry> photoEntryCollections = (Map<String, GphotoEntry>) photoMapByAlbumId.get(albumEntry.getId());
 				GphotoEntry photoEntry = photoEntryCollections != null ? photoEntryCollections.get(topic.getImageUrl()) : null;
 				if(photoEntryCollections == null) photoEntryCollections = new HashMap<String, GphotoEntry>();
@@ -443,7 +443,7 @@ public class App {
 	public DataQuestionsParser syncQuestionAnswersToPicasa(DataQuestionsParser answer) {
 		log.info("Sync QuestionAnswers '" + answer.getId() + "'");
 		
-		if(!DotoQuizConstant.YES.equals(answer.getIsProcessed())) {
+		if(!QuizConstant.YES.equals(answer.getIsProcessed())) {
 			try {
 				if("image".equalsIgnoreCase(answer.getQuestionTypeData()) && StringUtils.hasValue(answer.getAdditionalData())) {
 					GphotoEntry firstTopic = albumMapByTopicId.get(answer.getTopics()[0]);
