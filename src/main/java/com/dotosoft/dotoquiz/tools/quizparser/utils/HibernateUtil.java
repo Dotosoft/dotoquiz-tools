@@ -25,22 +25,22 @@ public class HibernateUtil {
     public static SessionFactory buildSessionFactory(Settings setting) {
         try {
         	Properties prop= new Properties();
-        	prop.setProperty("hibernate.connection.driver_class", setting.getConnection().getDriverClass());
-        	prop.setProperty("hibernate.connection.url", setting.getConnection().getUrl());                                
-        	prop.setProperty("hibernate.connection.username", setting.getConnection().getUser());     
-        	prop.setProperty("hibernate.connection.password", setting.getConnection().getPassword());
-        	prop.setProperty("hibernate.connection.pool_size", String.valueOf(setting.getConnection().getPoolSize()));
-	        prop.setProperty("hibernate.dialect", setting.getDialect());
-	        prop.setProperty("hibernate.hbm2ddl.auto", setting.getHbm2ddl());
-	        prop.setProperty("hibernate.show_sql", setting.getShowSQL());
+        	prop.setProperty("hibernate.connection.driver_class", setting.getConfiguration().getConnection().getDriverClass());
+        	prop.setProperty("hibernate.connection.url", setting.getConfiguration().getConnection().getUrl());                                
+        	prop.setProperty("hibernate.connection.username", setting.getConfiguration().getConnection().getUser());     
+        	prop.setProperty("hibernate.connection.password", setting.getConfiguration().getConnection().getPassword());
+        	prop.setProperty("hibernate.connection.pool_size", String.valueOf(setting.getConfiguration().getConnection().getPoolSize()));
+	        prop.setProperty("hibernate.dialect", setting.getConfiguration().getDialect());
+	        prop.setProperty("hibernate.hbm2ddl.auto", setting.getConfiguration().getHbm2ddl());
+	        prop.setProperty("hibernate.show_sql", setting.getConfiguration().getShowSQL());
 			
 	        Configuration annotationConfig = new Configuration().addProperties(prop);
 	        
-	        for(String packageMap : setting.getMappingPackages()) {
+	        for(String packageMap : setting.getConfiguration().getMappingPackages()) {
 	        	annotationConfig.addPackage( packageMap ); 
 	        }
 	        
-	        for(String classMap : setting.getMappingClasses()) {
+	        for(String classMap : setting.getConfiguration().getMappingClasses()) {
 	        	annotationConfig.addAnnotatedClass( Class.forName(classMap) ); 
 	        }
 	        

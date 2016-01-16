@@ -18,11 +18,13 @@ import com.dotosoft.dotoquiz.tools.quizparser.config.model.AuthenticationServer;
 import com.dotosoft.dotoquiz.tools.quizparser.config.model.ClientSecret;
 import com.dotosoft.dotoquiz.tools.quizparser.config.model.TopicStructure;
 
-public class Settings extends Configuration {
+public class Settings {
 
 	private static final Logger log = Logger.getLogger(Settings.class);
 	private Yaml yaml = new Yaml();
 
+	private Configuration configuration;
+	
 	private String fileconfig;
 
 	private String applicationType;
@@ -33,8 +35,10 @@ public class Settings extends Configuration {
 	private String syncDataFolder;
 	
 	private String dataStoreDir;
-	private String achievements;
-	private String datas;
+	
+	private String tabAchievements;
+	private String tabQuestions;
+	private String tabTopics;
 
 	private ClientSecret clientSecret;
 	private AuthenticationServer authenticationServer;
@@ -43,20 +47,36 @@ public class Settings extends Configuration {
 	private AnswerQuestionStructure answerQuestionStructure;
 	private AchievementStructure achievementStructure;
 
-	public String getAchievements() {
-		return achievements;
+	public Configuration getConfiguration() {
+		return configuration;
 	}
 
-	public void setAchievements(String achievements) {
-		this.achievements = achievements;
+	public void setConfiguration(Configuration configuration) {
+		this.configuration = configuration;
 	}
 
-	public String getDatas() {
-		return datas;
+	public String getTabAchievements() {
+		return tabAchievements;
 	}
 
-	public void setDatas(String datas) {
-		this.datas = datas;
+	public void setTabAchievements(String tabAchievements) {
+		this.tabAchievements = tabAchievements;
+	}
+
+	public String getTabQuestions() {
+		return tabQuestions;
+	}
+
+	public void setTabQuestions(String tabQuestions) {
+		this.tabQuestions = tabQuestions;
+	}
+
+	public String getTabTopics() {
+		return tabTopics;
+	}
+
+	public void setTabTopics(String tabTopics) {
+		this.tabTopics = tabTopics;
 	}
 
 	public String getDataStoreDir() {
@@ -166,7 +186,7 @@ public class Settings extends Configuration {
 				return false;
 			}
 
-			applicationType = args[0];
+			applicationType = args[0].toUpperCase();
 			fileconfig = args[1];
 
 			InputStream in = Files.newInputStream(Paths.get(fileconfig));

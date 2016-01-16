@@ -20,11 +20,13 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -127,8 +129,7 @@ public class App {
 				
 				if(APPLICATION_TYPE.CLEAR.toString().equals(settings.getApplicationType())) {
 					clearPicasa();
-				} else if(APPLICATION_TYPE.SYNC.toString().equals(settings.getApplicationType())
-						|| APPLICATION_TYPE.DB.toString().equals(settings.getApplicationType())) {
+				} else {
 					processPicasa();
 				}
 			}
@@ -193,7 +194,7 @@ public class App {
 			topicMapByTopicId.put(topicAchievement.getId(), topicAchievement);
 			
 			List listRow = null;
-			for(String achievementTab : settings.getAchievements().split(";")) {
+			for(String achievementTab : settings.getTabAchievements().split(";")) {
 				if(DATA_TYPE.EXCEL.toString().equals(settings.getDataType())) {			 
 				    sheet = workbook.getSheetAt(Integer.parseInt(achievementTab));
 				    listRow = Lists.newArrayList(sheet.iterator());
@@ -203,6 +204,8 @@ public class App {
 				}
 				
 			    for(Object row : listRow) {
+			    	if(showColumnHeader(row)) break;
+			    	
 			    	ParameterAchievementParser achievement = DotoQuizStructure.convertDataToAchievement(row, settings);
 			    	
 			        if(achievement != null) {
@@ -220,12 +223,9 @@ public class App {
 			    }
 			}
 			
-			if(APPLICATION_TYPE.DB.toString().equals(settings.getApplicationType())) {
-		    	trx.commit();
-		    	trx = session.beginTransaction();
-			}
+			trx = CommitDB(trx, session, true);
 			
-			for(String dataTab : settings.getDatas().split(";")) {
+			for(String dataTab : settings.getTabTopics().split(";")) {
 				// --------------------------------------------------------------------------
 			    // Extract Topic
 			    // --------------------------------------------------------------------------
@@ -239,6 +239,8 @@ public class App {
 				}
 				
 			    for(Object row : listRow) {
+			    	if(showColumnHeader(row)) break;
+			    	
 			    	DataTopicsParser topic = DotoQuizStructure.convertDataToTopics(row, settings);
 			    	
 			        if(topic != null) {
@@ -259,17 +261,18 @@ public class App {
 			        	topicMapByTopicId.put(topic.getId(), topic);
 			        }
 			    }
+			}
+			
+			trx = CommitDB(trx, session, true);
 			    
-			    if(APPLICATION_TYPE.DB.toString().equals(settings.getApplicationType())) {
-			    	trx.commit();
-			    	trx = session.beginTransaction();
-				}
-			    
+			for(String dataTab : settings.getTabQuestions().split(";")) {
 			    // --------------------------------------------------------------------------
 			    // Extract QuestionAnswers
 			    // --------------------------------------------------------------------------
 			    index = 0;
 			    for(Object row : listRow) {
+			    	if(showColumnHeader(row)) break;
+			    	
 			    	DataQuestionsParser questionAnswer = DotoQuizStructure.convertDataToAnswerQuestion(row, settings);
 			    	
 	    			if(questionAnswer != null) {
@@ -291,10 +294,7 @@ public class App {
 			    }
 			}
 			
-			if(APPLICATION_TYPE.DB.toString().equals(settings.getApplicationType())) {
-		    	trx.commit();
-				session.close();
-			}
+			trx = CommitDB(trx, session, false);
 		    
 		    if(DATA_TYPE.EXCEL.toString().equals(settings.getDataType())) {
 		    	file.close();
@@ -313,6 +313,42 @@ public class App {
 		}
 		
 		System.exit(0);
+	}
+	
+	private boolean showColumnHeader(Object data) {
+		if(settings.getApplicationType().equals(APPLICATION_TYPE.SHOW_COLUMN_HEADER)) {
+			if(DATA_TYPE.EXCEL.toString().equals(settings.getDataType())) {
+				Row rowData = (Row) data;
+				Iterator<Cell> cellIterator = rowData.iterator();
+				int columnCount = rowData.getRowNum();
+				for(int i=0;i<columnCount;i++) {
+					Cell cell = rowData.getCell(i);
+					log.info("Column("+i+"): " + cell.getStringCellValue());
+				}
+			} else if(DATA_TYPE.GOOGLESHEET.toString().equals(settings.getDataType())) {
+				ListEntry listEntry = (ListEntry) data;
+				for (String tag : listEntry.getCustomElements().getTags()) {
+					log.info("Column('" + tag + "'): " + listEntry.getCustomElements().getValue(tag));
+				}
+			}
+			return true;
+		}
+		
+		return false;
+	}
+	
+	private Transaction CommitDB(Transaction trx, Session session, boolean isReopened) {
+		if(APPLICATION_TYPE.DB.toString().equals(settings.getApplicationType())) {
+	    	trx.commit();
+	    	
+	    	if(isReopened) {
+	    		return session.beginTransaction();
+	    	} else {
+		    	session.close();
+	    	}
+		}
+		
+		return null;
 	}
 	
 	private void updateSyncPicasa(String parseType, Object data, String picasaId, String imagePicasaURL, String isProcessed) throws IOException, ServiceException {

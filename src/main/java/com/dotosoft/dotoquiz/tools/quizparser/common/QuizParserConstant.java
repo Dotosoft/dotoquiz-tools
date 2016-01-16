@@ -2,7 +2,7 @@ package com.dotosoft.dotoquiz.tools.quizparser.common;
 
 public class QuizParserConstant {
 	public enum APPLICATION_TYPE {
-		CLEAR, DB, SYNC
+		CLEAR, DB, SYNC, SHOW_COLUMN_HEADER
 	}
 
 	public enum DATA_TYPE {
