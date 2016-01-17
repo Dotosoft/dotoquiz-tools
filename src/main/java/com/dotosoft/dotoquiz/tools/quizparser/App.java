@@ -195,16 +195,19 @@ public class App {
 			
 			List listRow = null;
 			for(String achievementTab : settings.getTabAchievements().split(";")) {
+				String sheetName = "";
 				if(DATA_TYPE.EXCEL.toString().equals(settings.getDataType())) {			 
 				    sheet = workbook.getSheetAt(Integer.parseInt(achievementTab));
 				    listRow = Lists.newArrayList(sheet.iterator());
+				    sheetName = sheet.getSheetName();
 				} else if(DATA_TYPE.GOOGLESHEET.toString().equals(settings.getDataType())) {
 				    fullSheet = googlesheetClient.getWorksheet(Integer.parseInt(achievementTab));
 				    listRow = googlesheetClient.getListRows(fullSheet);
+				    sheetName = fullSheet.getTitle().getPlainText();
 				}
 				
 			    for(Object row : listRow) {
-			    	if(showColumnHeader(row)) break;
+			    	if(showColumnHeader(row, sheetName)) break;
 			    	
 			    	ParameterAchievementParser achievement = DotoQuizStructure.convertDataToAchievement(row, settings);
 			    	
@@ -230,16 +233,19 @@ public class App {
 			    // Extract Topic
 			    // --------------------------------------------------------------------------
 				index = 0;
+				String sheetName = "";
 				if(DATA_TYPE.EXCEL.toString().equals(settings.getDataType())) { 
 				    sheet = workbook.getSheetAt(Integer.parseInt(dataTab));
 				    listRow = Lists.newArrayList(sheet.iterator());
+				    sheetName = sheet.getSheetName();
 				} else if(DATA_TYPE.GOOGLESHEET.toString().equals(settings.getDataType())) {
 				    fullSheet = googlesheetClient.getWorksheet(Integer.parseInt(dataTab));
 				    listRow = googlesheetClient.getListRows(fullSheet);
+				    sheetName = fullSheet.getTitle().getPlainText();
 				}
 				
 			    for(Object row : listRow) {
-			    	if(showColumnHeader(row)) break;
+			    	if(showColumnHeader(row, sheetName)) break;
 			    	
 			    	DataTopicsParser topic = DotoQuizStructure.convertDataToTopics(row, settings);
 			    	
@@ -270,8 +276,19 @@ public class App {
 			    // Extract QuestionAnswers
 			    // --------------------------------------------------------------------------
 			    index = 0;
+				String sheetName = "";
+				if(DATA_TYPE.EXCEL.toString().equals(settings.getDataType())) { 
+				    sheet = workbook.getSheetAt(Integer.parseInt(dataTab));
+				    listRow = Lists.newArrayList(sheet.iterator());
+				    sheetName = sheet.getSheetName();
+				} else if(DATA_TYPE.GOOGLESHEET.toString().equals(settings.getDataType())) {
+				    fullSheet = googlesheetClient.getWorksheet(Integer.parseInt(dataTab));
+				    listRow = googlesheetClient.getListRows(fullSheet);
+				    sheetName = fullSheet.getTitle().getPlainText();
+				}
+			    
 			    for(Object row : listRow) {
-			    	if(showColumnHeader(row)) break;
+			    	if(showColumnHeader(row, sheetName)) break;
 			    	
 			    	DataQuestionsParser questionAnswer = DotoQuizStructure.convertDataToAnswerQuestion(row, settings);
 			    	
@@ -315,20 +332,22 @@ public class App {
 		System.exit(0);
 	}
 	
-	private boolean showColumnHeader(Object data) {
-		if(settings.getApplicationType().equals(APPLICATION_TYPE.SHOW_COLUMN_HEADER)) {
+	private boolean showColumnHeader(Object data, String sheetName) {
+		if(APPLICATION_TYPE.SHOW_COLUMN_HEADER.toString().equals(settings.getApplicationType())) {
+			log.info("Show column header for \"" + sheetName + "\"");
 			if(DATA_TYPE.EXCEL.toString().equals(settings.getDataType())) {
 				Row rowData = (Row) data;
 				Iterator<Cell> cellIterator = rowData.iterator();
 				int columnCount = rowData.getRowNum();
 				for(int i=0;i<columnCount;i++) {
 					Cell cell = rowData.getCell(i);
-					log.info("Column("+i+"): " + cell.getStringCellValue());
+					log.info("\tColumn("+i+"): " + cell.getStringCellValue());
 				}
 			} else if(DATA_TYPE.GOOGLESHEET.toString().equals(settings.getDataType())) {
 				ListEntry listEntry = (ListEntry) data;
+				int index = 0;
 				for (String tag : listEntry.getCustomElements().getTags()) {
-					log.info("Column('" + tag + "'): " + listEntry.getCustomElements().getValue(tag));
+					log.info("\tColumn" + (index++) + ": " + tag);
 				}
 			}
 			return true;
