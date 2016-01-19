@@ -39,8 +39,8 @@ public class DotoQuizStructure {
 		String topicId = getValueFromRowData(QuizParserConstant.PARSE_TOPIC, setting, "iTopicId", data);
 		if(!StringUtils.hasValue(topicId)) return null;
 		
-		String picasaId = getValueFromRowData(QuizParserConstant.PARSE_TOPIC, setting, "iPicasaId", data);
-		String imagePicasaURL = getValueFromRowData(QuizParserConstant.PARSE_TOPIC, setting, "iImagePicasaURL", data);
+		String picasaId = getValueFromRowData(QuizParserConstant.PARSE_TOPIC, setting, "iAlbumIdPicasa", data);
+		String imagePicasaURL = getValueFromRowData(QuizParserConstant.PARSE_TOPIC, setting, "iImageURLPicasa", data);
 		
 		String imageURL = getValueFromRowData(QuizParserConstant.PARSE_TOPIC, setting, "iImageURL", data);
 		String topicName = getValueFromRowData(QuizParserConstant.PARSE_TOPIC, setting, "iTopicName", data);
@@ -59,8 +59,8 @@ public class DotoQuizStructure {
 		
 		String[] topics = getValueFromRowData(QuizParserConstant.PARSE_QUESTION_ANSWER, setting, "iTopics", data).split(";");
 		
-		String picasaId = getValueFromRowData(QuizParserConstant.PARSE_QUESTION_ANSWER, setting, "iPicasaId", data);
-		String imagePicasaURL = getValueFromRowData(QuizParserConstant.PARSE_QUESTION_ANSWER, setting, "iImagePicasaURL", data);
+		String picasaId = getValueFromRowData(QuizParserConstant.PARSE_QUESTION_ANSWER, setting, "iAlbumIdPicasa", data);
+		String imagePicasaURL = getValueFromRowData(QuizParserConstant.PARSE_QUESTION_ANSWER, setting, "iImageURLPicasa", data);
 		
 		String question = getValueFromRowData(QuizParserConstant.PARSE_QUESTION_ANSWER, setting, "iQuestion", data);
 		String questionType = getValueFromRowData(QuizParserConstant.PARSE_QUESTION_ANSWER, setting, "iQuestionType", data);
@@ -112,11 +112,11 @@ public class DotoQuizStructure {
 		try {
 			String data = "";
 			if(QuizParserConstant.PARSE_TOPIC.equals(parseType)) {
-				data = (String) PropertyUtils.getProperty(setting.getTopicStructure(), key);
+				data = (String) PropertyUtils.getProperty(setting.getStructure().getTopicStructure(), key);
 			} else if(QuizParserConstant.PARSE_QUESTION_ANSWER.equals(parseType)) {
-				data = (String) PropertyUtils.getProperty(setting.getAnswerQuestionStructure(), key);
+				data = (String) PropertyUtils.getProperty(setting.getStructure().getAnswerQuestionStructure(), key);
 			} else if(QuizParserConstant.PARSE_ACHIEVEMENT.equals(parseType)) {
-				data = (String) PropertyUtils.getProperty(setting.getAchievementStructure(), key);
+				data = (String) PropertyUtils.getProperty(setting.getStructure().getAchievementStructure(), key);
 			}
 			
 			if(DATA_TYPE.EXCEL.toString().equals(setting.getDataType())) {

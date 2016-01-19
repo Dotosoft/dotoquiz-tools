@@ -2,8 +2,8 @@ package com.dotosoft.dotoquiz.tools.quizparser.config.model;
 
 public class TopicStructure {
 	private String iTopicId;
-	private String iPicasaId;
-	private String iImagePicasaURL;
+	private String iAlbumIdPicasa;
+	private String iImageURLPicasa;
 	private String iImageURL;
 	private String iTopicName;
 	private String iTopicDescription;
@@ -18,20 +18,20 @@ public class TopicStructure {
 		this.iTopicId = iTopicId;
 	}
 
-	public String getiPicasaId() {
-		return iPicasaId;
+	public String getiAlbumIdPicasa() {
+		return iAlbumIdPicasa;
 	}
 
-	public void setiPicasaId(String iPicasaId) {
-		this.iPicasaId = iPicasaId;
+	public void setiAlbumIdPicasa(String iAlbumIdPicasa) {
+		this.iAlbumIdPicasa = iAlbumIdPicasa;
 	}
 
-	public String getiImagePicasaURL() {
-		return iImagePicasaURL;
+	public String getiImageURLPicasa() {
+		return iImageURLPicasa;
 	}
 
-	public void setiImagePicasaURL(String iImagePicasaURL) {
-		this.iImagePicasaURL = iImagePicasaURL;
+	public void setiImageURLPicasa(String iImageURLPicasa) {
+		this.iImageURLPicasa = iImageURLPicasa;
 	}
 
 	public String getiImageURL() {
@@ -76,8 +76,8 @@ public class TopicStructure {
 
 	@Override
 	public String toString() {
-		return "TopicStructure [iTopicId=" + iTopicId + ", iPicasaId="
-				+ iPicasaId + ", iImagePicasaURL=" + iImagePicasaURL
+		return "TopicStructure [iTopicId=" + iTopicId + ", iAlbumIdPicasa="
+				+ iAlbumIdPicasa + ", iImageURLPicasa=" + iImageURLPicasa
 				+ ", iImageURL=" + iImageURL + ", iTopicName=" + iTopicName
 				+ ", iTopicDescription=" + iTopicDescription
 				+ ", iTopicParent=" + iTopicParent + ", iIsProcessed="

@@ -19,6 +19,7 @@ package com.dotosoft.dotoquiz.tools.quizparser;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -194,7 +195,7 @@ public class App {
 			topicMapByTopicId.put(topicAchievement.getId(), topicAchievement);
 			
 			List listRow = null;
-			for(String achievementTab : settings.getTabAchievements().split(";")) {
+			for(String achievementTab : settings.getStructure().getTabAchievements().split(";")) {
 				String sheetName = "";
 				if(DATA_TYPE.EXCEL.toString().equals(settings.getDataType())) {			 
 				    sheet = workbook.getSheetAt(Integer.parseInt(achievementTab));
@@ -228,7 +229,7 @@ public class App {
 			
 			trx = CommitDB(trx, session, true);
 			
-			for(String dataTab : settings.getTabTopics().split(";")) {
+			for(String dataTab : settings.getStructure().getTabTopics().split(";")) {
 				// --------------------------------------------------------------------------
 			    // Extract Topic
 			    // --------------------------------------------------------------------------
@@ -271,7 +272,7 @@ public class App {
 			
 			trx = CommitDB(trx, session, true);
 			    
-			for(String dataTab : settings.getTabQuestions().split(";")) {
+			for(String dataTab : settings.getStructure().getTabQuestions().split(";")) {
 			    // --------------------------------------------------------------------------
 			    // Extract QuestionAnswers
 			    // --------------------------------------------------------------------------
@@ -448,6 +449,10 @@ public class App {
 			} catch (IOException | ServiceException e) {
 				e.printStackTrace();
 			}
+		} else {
+			if(StringUtils.hasValue(achievement.getImagePicasaUrl())) {
+				FileUtils.downloadFileToLocal(achievement.getImagePicasaUrl(), Paths.get(settings.getSyncDataFolder(), "achievement", achievement.getImageUrl()).toString(), settings.getReplaced());
+			}
 		}
 		
 		return achievement;
@@ -487,6 +492,10 @@ public class App {
 				
 				topic.setImagePicasaUrl( ((MediaContent)photoEntry.getContent()).getUri() );
 				topic.setPicasaId(albumEntry.getGphotoId());
+			} else {
+				if(StringUtils.hasValue(topic.getImagePicasaUrl())) {
+					FileUtils.downloadFileToLocal(topic.getImagePicasaUrl(), Paths.get(settings.getSyncDataFolder(), topic.getName(), topic.getImageUrl()).toString(), settings.getReplaced());
+				}
 			}
 			albumMapByTopicId.put(topic.getId(), albumEntry);
 		} catch (IOException | ServiceException e) {
@@ -530,6 +539,11 @@ public class App {
 				}
 			} catch (IOException | ServiceException e) {
 				e.printStackTrace();
+			}
+		} else {
+			if("image".equalsIgnoreCase(answer.getQuestionTypeData()) && StringUtils.hasValue(answer.getAdditionalData())) {
+				GphotoEntry firstTopic = albumMapByTopicId.get(answer.getTopics()[0]);
+				FileUtils.downloadFileToLocal(answer.getImagePicasaUrl(), Paths.get(settings.getSyncDataFolder(), firstTopic.getTitle().getPlainText(), answer.getAdditionalData()).toString(), settings.getReplaced());
 			}
 		}
 		

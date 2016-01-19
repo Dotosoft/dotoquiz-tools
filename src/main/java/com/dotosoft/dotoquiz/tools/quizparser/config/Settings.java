@@ -5,18 +5,12 @@ import java.io.InputStream;
 import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.List;
 
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.log4j.Logger;
 import org.yaml.snakeyaml.Yaml;
 
 import com.dotosoft.dotoquiz.config.Configuration;
-import com.dotosoft.dotoquiz.tools.quizparser.config.model.AchievementStructure;
-import com.dotosoft.dotoquiz.tools.quizparser.config.model.AnswerQuestionStructure;
-import com.dotosoft.dotoquiz.tools.quizparser.config.model.AuthenticationServer;
-import com.dotosoft.dotoquiz.tools.quizparser.config.model.ClientSecret;
-import com.dotosoft.dotoquiz.tools.quizparser.config.model.TopicStructure;
 
 public class Settings {
 
@@ -24,28 +18,55 @@ public class Settings {
 	private Yaml yaml = new Yaml();
 
 	private Configuration configuration;
-	
+	private StructureConfig structure;
+	private APIConfig api;
+
 	private String fileconfig;
 
 	private String applicationType;
 	private String dataType;
 	private String imageHostingType;
-	private String refreshToken;
+
 	private String syncDataFile;
 	private String syncDataFolder;
-	
-	private String dataStoreDir;
-	
-	private String tabAchievements;
-	private String tabQuestions;
-	private String tabTopics;
 
-	private ClientSecret clientSecret;
-	private AuthenticationServer authenticationServer;
+	private boolean replaced;
 
-	private TopicStructure topicStructure;
-	private AnswerQuestionStructure answerQuestionStructure;
-	private AchievementStructure achievementStructure;
+	public String getFileconfig() {
+		return fileconfig;
+	}
+
+	public void setFileconfig(String fileconfig) {
+		this.fileconfig = fileconfig;
+	}
+
+	public boolean getReplaced() {
+		return replaced;
+	}
+
+	public void setReplaced(boolean replaced) {
+		this.replaced = replaced;
+	}
+
+	public void setApplicationType(String applicationType) {
+		this.applicationType = applicationType;
+	}
+
+	public StructureConfig getStructure() {
+		return structure;
+	}
+
+	public void setStructure(StructureConfig structure) {
+		this.structure = structure;
+	}
+
+	public APIConfig getApi() {
+		return api;
+	}
+
+	public void setApi(APIConfig api) {
+		this.api = api;
+	}
 
 	public Configuration getConfiguration() {
 		return configuration;
@@ -53,81 +74,6 @@ public class Settings {
 
 	public void setConfiguration(Configuration configuration) {
 		this.configuration = configuration;
-	}
-
-	public String getTabAchievements() {
-		return tabAchievements;
-	}
-
-	public void setTabAchievements(String tabAchievements) {
-		this.tabAchievements = tabAchievements;
-	}
-
-	public String getTabQuestions() {
-		return tabQuestions;
-	}
-
-	public void setTabQuestions(String tabQuestions) {
-		this.tabQuestions = tabQuestions;
-	}
-
-	public String getTabTopics() {
-		return tabTopics;
-	}
-
-	public void setTabTopics(String tabTopics) {
-		this.tabTopics = tabTopics;
-	}
-
-	public String getDataStoreDir() {
-		return dataStoreDir;
-	}
-
-	public void setDataStoreDir(String dataStoreDir) {
-		this.dataStoreDir = dataStoreDir;
-	}
-
-	public ClientSecret getClientSecret() {
-		return clientSecret;
-	}
-
-	public void setClientSecret(ClientSecret clientSecret) {
-		this.clientSecret = clientSecret;
-	}
-
-	public AuthenticationServer getAuthenticationServer() {
-		return authenticationServer;
-	}
-
-	public void setAuthenticationServer(
-			AuthenticationServer authenticationServer) {
-		this.authenticationServer = authenticationServer;
-	}
-
-	public AchievementStructure getAchievementStructure() {
-		return achievementStructure;
-	}
-
-	public void setAchievementStructure(
-			AchievementStructure achievementStructure) {
-		this.achievementStructure = achievementStructure;
-	}
-
-	public TopicStructure getTopicStructure() {
-		return topicStructure;
-	}
-
-	public void setTopicStructure(TopicStructure topicStructure) {
-		this.topicStructure = topicStructure;
-	}
-
-	public AnswerQuestionStructure getAnswerQuestionStructure() {
-		return answerQuestionStructure;
-	}
-
-	public void setAnswerQuestionStructure(
-			AnswerQuestionStructure answerQuestionStructure) {
-		this.answerQuestionStructure = answerQuestionStructure;
 	}
 
 	public String getApplicationType() {
@@ -148,14 +94,6 @@ public class Settings {
 
 	public void setImageHostingType(String imageHostingType) {
 		this.imageHostingType = imageHostingType;
-	}
-
-	public String getRefreshToken() {
-		return refreshToken;
-	}
-
-	public void setRefreshToken(String refreshToken) {
-		this.refreshToken = refreshToken;
 	}
 
 	public String getSyncDataFile() {
@@ -185,13 +123,14 @@ public class Settings {
 				showError();
 				return false;
 			}
-
-			applicationType = args[0].toUpperCase();
+			
 			fileconfig = args[1];
 
 			InputStream in = Files.newInputStream(Paths.get(fileconfig));
 			Settings setting = yaml.loadAs(in, Settings.class);
 			BeanUtils.copyProperties(this, setting);
+			
+			applicationType = args[0].toUpperCase();
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			showError();

@@ -17,9 +17,7 @@
 package com.dotosoft.dotoquiz.tools.quizparser.auth;
 
 import java.awt.Dimension;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.UnknownHostException;
 import java.security.GeneralSecurityException;
 import java.util.Arrays;
@@ -36,7 +34,6 @@ import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
 import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
-import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.google.api.client.googleapis.auth.oauth2.GoogleRefreshTokenRequest;
 import com.google.api.client.googleapis.auth.oauth2.GoogleTokenResponse;
@@ -101,7 +98,7 @@ public class GoogleOAuth {
     {
     	try {
     		this.setting = settings;
-    		DATA_STORE_DIR = new java.io.File( setting.getDataStoreDir() );
+    		DATA_STORE_DIR = new java.io.File( setting.getApi().getDataStoreDir() );
     		
 			httpTransport = GoogleNetHttpTransport.newTrustedTransport();
 			dataStoreFactory = new FileDataStoreFactory(DATA_STORE_DIR);
@@ -143,7 +140,7 @@ public class GoogleOAuth {
     	log.info("Preparing to authenticate via OAuth...");
         Credential cred = null;
 
-        String refreshToken = setting.getRefreshToken();
+        String refreshToken = setting.getApi().getRefreshToken();
         if( refreshToken != null )
         {
             // We have a refresh token - so get some refreshed credentials
@@ -169,7 +166,7 @@ public class GoogleOAuth {
     		
     		// set up authorization code flow
     		// GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(httpTransport, JSON_FACTORY, clientSecrets, SCOPES).setDataStoreFactory(dataStoreFactory).build();
-            GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(httpTransport, JSON_FACTORY, setting.getClientSecret().getClientId(), setting.getClientSecret().getClientSecret(), SCOPES).setDataStoreFactory(dataStoreFactory).build();
+            GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(httpTransport, JSON_FACTORY, setting.getApi().getClientSecret().getClientId(), setting.getApi().getClientSecret().getClientSecret(), SCOPES).setDataStoreFactory(dataStoreFactory).build();
     		
     		if(allowInteractive) {
 //    			String redirectUrl = clientSecrets.getDetails().getRedirectUris().get(0);
@@ -196,7 +193,7 @@ public class GoogleOAuth {
 			
     		} else {
 	            // Retrieve the credential from the request response
-	    		LocalServerReceiver receiver = new LocalServerReceiver.Builder().setHost(setting.getAuthenticationServer().getIp()).setPort(setting.getAuthenticationServer().getPort()).build();
+	    		LocalServerReceiver receiver = new LocalServerReceiver.Builder().setHost(setting.getApi().getAuthenticationServer().getIp()).setPort(setting.getApi().getAuthenticationServer().getPort()).build();
 	    		cred = new AuthorizationCodeInstalledApp(flow, receiver).authorize("user");
     		}
     		
@@ -204,7 +201,7 @@ public class GoogleOAuth {
             log.info("Credentials received - storing refresh token...");
 
             // Squirrel this away for next time
-            setting.setRefreshToken( cred.getRefreshToken() );
+            setting.getApi().setRefreshToken( cred.getRefreshToken() );
             setting.saveSettings();
         }
         
@@ -230,7 +227,7 @@ public class GoogleOAuth {
 //                    httpTransport, JSON_FACTORY, refreshCode, clientSecrets.getDetails().getClientId(), clientSecrets.getDetails().getClientSecret() )
 //                    .execute();
             GoogleTokenResponse response = new GoogleRefreshTokenRequest(
-            		httpTransport, JSON_FACTORY, refreshCode, setting.getClientSecret().getClientId(), setting.getClientSecret().getClientSecret() )
+            		httpTransport, JSON_FACTORY, refreshCode, setting.getApi().getClientSecret().getClientId(), setting.getApi().getClientSecret().getClientSecret() )
             .execute();
 
             return new GoogleCredential().setAccessToken(response.getAccessToken());
