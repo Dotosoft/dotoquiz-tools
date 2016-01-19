@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.net.ConnectException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -33,6 +34,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 
@@ -250,47 +252,46 @@ public class PicasawebClient {
     }
 
 
-    public GphotoEntry uploadImageToAlbum(File imageFile, PhotoEntry remotePhoto, GphotoEntry albumEntry, String localMd5CheckSum ) throws IOException, ServiceException {
+    public GphotoEntry uploadImageToAlbum(File imageFile, GphotoEntry remotePhoto, GphotoEntry albumEntry, String localMd5CheckSum ) throws IOException, ServiceException, IllegalAccessException, InvocationTargetException {
 
         boolean newPhoto = false;
         String albumName = albumEntry.getTitle().getPlainText();
-        PhotoEntry myPhoto = remotePhoto;
+        PhotoEntry  myPhoto = new PhotoEntry();
         
-        if( myPhoto == null )
+        if( remotePhoto == null )
         {
             newPhoto = true;
             log.info( "Uploading new image to album " + albumName + ": " + imageFile);
-
-            myPhoto = new PhotoEntry();
         }
         else{
+        	// BeanUtils.copyProperties(myPhoto, remotePhoto);
+        	remotePhoto.delete();
             log.info( "Uploading updated image in album " + albumName + ": " + imageFile);
-            List<MediaContent> media = myPhoto.getMediaContents();
-            media.remove(0);
         }
 
 
         try{
-            MediaFileSource myMedia = new MediaFileSource(imageFile, "image/jpeg");
-            myPhoto.setMediaSource(myMedia);
-            myPhoto.setChecksum( localMd5CheckSum );
-            myPhoto.setAlbumAccess(GphotoAccess.Value.PUBLIC);
-            myPhoto.setClient( QuizParserConstant.SYNC_CLIENT_NAME );
-
+        	MediaFileSource myMedia = new MediaFileSource(imageFile, "image/jpeg");
+        	myPhoto.setMediaSource(myMedia);
+			myPhoto.setChecksum( localMd5CheckSum );
+			myPhoto.setAlbumAccess(GphotoAccess.Value.PUBLIC);
+			myPhoto.setClient( QuizParserConstant.SYNC_CLIENT_NAME );
+			
             if( newPhoto)
             {
                 myPhoto.setTitle(new PlainTextConstruct(imageFile.getName()));
-                myPhoto = insert(albumEntry, myPhoto);
             }
             else
             {
-                myPhoto = myPhoto.updateMedia(true);
+            	myPhoto.setTitle(remotePhoto.getTitle());
             }
+            
+            myPhoto = insert(albumEntry, myPhoto);
         } catch (Exception ex) {
             log.error("Unable to add media: " + imageFile + ": " + ex);
+        } finally {
+        	 setUpdatedDate( albumEntry, myPhoto, imageFile );
         }
-
-        setUpdatedDate( albumEntry, myPhoto, imageFile );
         
         return myPhoto;
     }
@@ -324,7 +325,6 @@ public class PicasawebClient {
             if( newestDate != null )
             {
                 log.info("Setting remote album date based on newest photo in " + folder + ": " + newestDate );
-
 
                 try
                 {

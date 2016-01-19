@@ -58,6 +58,7 @@ import com.google.gdata.data.PlainTextConstruct;
 import com.google.gdata.data.photos.AlbumEntry;
 import com.google.gdata.data.photos.GphotoAccess;
 import com.google.gdata.data.photos.GphotoEntry;
+import com.google.gdata.data.photos.PhotoEntry;
 import com.google.gdata.data.spreadsheet.ListEntry;
 import com.google.gdata.data.spreadsheet.WorksheetEntry;
 import com.google.gdata.util.ServiceException;
@@ -438,15 +439,14 @@ public class App {
 				Map<String, GphotoEntry> photoEntryCollections = photoMapByAlbumId.get(achievementTopic.getId());
 				GphotoEntry photoEntry = photoEntryCollections != null ? photoEntryCollections.get(achievement.getImageUrl()) : null;
 				if(photoEntryCollections == null) photoEntryCollections = new HashMap<String, GphotoEntry>();
-				if(photoEntry == null) {
-					photoEntry = webClient.uploadImageToAlbum(achievementImagePath.toFile(), null, achievementTopic, MD5Checksum.getMD5Checksum(achievementImagePath.toString()));
-					photoEntryCollections.put(((MediaContent)photoEntry.getContent()).getUri(), photoEntry);
-					photoMapByAlbumId.put(achievementTopic.getId(), photoEntryCollections);
-				}
+				
+				photoEntry = webClient.uploadImageToAlbum(achievementImagePath.toFile(), photoEntry, achievementTopic, MD5Checksum.getMD5Checksum(achievementImagePath.toString()));
+				photoEntryCollections.put(((MediaContent)photoEntry.getContent()).getUri(), photoEntry);
+				photoMapByAlbumId.put(achievementTopic.getId(), photoEntryCollections);
 				
 				achievement.setImagePicasaUrl( ((MediaContent)photoEntry.getContent()).getUri() );
 				achievement.setPicasaId( photoEntry.getGphotoId() );
-			} catch (IOException | ServiceException e) {
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		} else {
@@ -477,18 +477,17 @@ public class App {
 				Map<String, GphotoEntry> photoEntryCollections = (Map<String, GphotoEntry>) photoMapByAlbumId.get(albumEntry.getId());
 				GphotoEntry photoEntry = photoEntryCollections != null ? photoEntryCollections.get(topic.getImageUrl()) : null;
 				if(photoEntryCollections == null) photoEntryCollections = new HashMap<String, GphotoEntry>();
-				if(photoEntry == null) {
-					// Upload album as topic
-					log.info("there is no image '"+ topic.getImageUrl() +"' at '" + topic.getName() + "'. Wait for uploading...");
-					java.nio.file.Path topicImagePath = FileUtils.getPath(settings.getSyncDataFolder(), topic.getName(), topic.getImageUrl());
-					if(!topicImagePath.toFile().exists()) {
-						log.error("File is not found at '" + topicImagePath.toString() + "'. Please put the file and start this app again.");
-						System.exit(1);
-					}
-					photoEntry = webClient.uploadImageToAlbum(topicImagePath.toFile(), null, albumEntry, MD5Checksum.getMD5Checksum(topicImagePath.toString()));
-					photoEntryCollections.put(((MediaContent)photoEntry.getContent()).getUri(), photoEntry);
-					photoMapByAlbumId.put(albumEntry.getId(), photoEntryCollections);
+				
+				// Upload album as topic
+				// log.info("there is no image '"+ topic.getImageUrl() +"' at '" + topic.getName() + "'. Wait for uploading...");
+				java.nio.file.Path topicImagePath = FileUtils.getPath(settings.getSyncDataFolder(), topic.getName(), topic.getImageUrl());
+				if(!topicImagePath.toFile().exists()) {
+					log.error("File is not found at '" + topicImagePath.toString() + "'. Please put the file and start this app again.");
+					System.exit(1);
 				}
+				photoEntry = webClient.uploadImageToAlbum(topicImagePath.toFile(), photoEntry, albumEntry, MD5Checksum.getMD5Checksum(topicImagePath.toString()));
+				photoEntryCollections.put(((MediaContent)photoEntry.getContent()).getUri(), photoEntry);
+				photoMapByAlbumId.put(albumEntry.getId(), photoEntryCollections);
 				
 				topic.setImagePicasaUrl( ((MediaContent)photoEntry.getContent()).getUri() );
 				topic.setPicasaId(albumEntry.getGphotoId());
@@ -498,7 +497,7 @@ public class App {
 				}
 			}
 			albumMapByTopicId.put(topic.getId(), albumEntry);
-		} catch (IOException | ServiceException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return topic;
@@ -528,16 +527,15 @@ public class App {
 					Map<String, GphotoEntry> photoEntryCollections = photoMapByAlbumId.get(firstTopic.getId());
 					GphotoEntry photoEntry = photoEntryCollections != null ? photoEntryCollections.get(answer.getAdditionalData()) : null;
 					if(photoEntryCollections == null) photoEntryCollections = new HashMap<String, GphotoEntry>();
-					if(photoEntry == null) {
-						photoEntry = webClient.uploadImageToAlbum(questionAnswerImagePath.toFile(), null, firstTopic, MD5Checksum.getMD5Checksum(questionAnswerImagePath.toString()));
-						photoEntryCollections.put(((MediaContent)photoEntry.getContent()).getUri(), photoEntry);
-						photoMapByAlbumId.put(firstTopic.getId(), photoEntryCollections);
-					}
+					
+					photoEntry = webClient.uploadImageToAlbum(questionAnswerImagePath.toFile(), photoEntry, firstTopic, MD5Checksum.getMD5Checksum(questionAnswerImagePath.toString()));
+					photoEntryCollections.put(((MediaContent)photoEntry.getContent()).getUri(), photoEntry);
+					photoMapByAlbumId.put(firstTopic.getId(), photoEntryCollections);
 					
 					answer.setImagePicasaUrl( ((MediaContent)photoEntry.getContent()).getUri() );
 					answer.setPicasaId( photoEntry.getGphotoId() );
 				}
-			} catch (IOException | ServiceException e) {
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		} else {
