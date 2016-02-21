@@ -5,12 +5,15 @@ import java.io.InputStream;
 import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Arrays;
 
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.log4j.Logger;
 import org.yaml.snakeyaml.Yaml;
 
 import com.dotosoft.dotoquiz.config.Configuration;
+import com.dotosoft.dotoquiz.tools.quizparser.common.QuizParserConstant.APPLICATION_TYPE;
+import com.google.api.client.repackaged.com.google.common.base.Strings;
 
 public class Settings {
 
@@ -113,8 +116,8 @@ public class Settings {
 	}
 
 	public void showError() {
-		log.error("Error: Could not run DataQuizParser.");
-		log.info("Run: java -jar DataQuizParser.jar [CLEAR|DB|SYNC] [file config]");
+		System.err.println("Error: Could not run DataQuizParser.");
+		System.err.println("Run: java -jar DataQuizParser.jar "+Arrays.toString(APPLICATION_TYPE.values())+" [file config]");
 	}
 
 	public boolean loadSettings(String args[]) {

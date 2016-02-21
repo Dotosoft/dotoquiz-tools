@@ -27,6 +27,12 @@ public class QuizParserConstant {
 	// LocalServer Oauth Parameter
 	public static final String LISTEN_OAUTH_IP = "127.0.0.1";
 	public static final int LISTEN_OAUTH_PORT = 8080;
+	
+	public static final String EMPTY_STRING = "";
+	
+	public static final String ACHIEVEMENT_NAME = "achievement";
+	public static final String ACHIEVEMENT_DESCRIPTION = "achievementDescription";
+	public static final String ACHIEVEMENT_IMAGE_URL = "topic.png";
 
 	// Setting Constant
 	public static final String REFRESH_TOKEN = "RefreshToken";

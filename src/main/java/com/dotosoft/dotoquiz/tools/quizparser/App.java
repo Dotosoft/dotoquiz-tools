@@ -82,7 +82,6 @@ public class App {
 	}
 	
 	public App(String args[]) {
-		log.info("Starting and setup Doto Parser...");
 		
 		photoMapByAlbumId = new HashMap<String, Map<String, GphotoEntry>>();
 		albumMapByTopicId = new HashMap<String, GphotoEntry>();
@@ -93,6 +92,8 @@ public class App {
 		syncState = new SyncState();
 		
 		if( settings.loadSettings(args) ) {
+			log.info("Starting and setup Doto Parser...");
+			
 			auth = new GoogleOAuth(settings);
 			
 			if(APPLICATION_TYPE.DB.toString().equals(settings.getApplicationType())) {
@@ -191,9 +192,11 @@ public class App {
 			// --------------------------------------------------------------------------
 			
 			// parent folder
-			DataTopicsParser topicAchievement = new DataTopicsParser("-1", "", "", "", "achievement", "achievementDescription", "topic.png", QuizConstant.NO, new java.util.Date(), QuizConstant.SYSTEM_USER, QuizConstant.NO, type);
-			topicAchievement = syncTopicToPicasa(topicAchievement);
-			topicMapByTopicId.put(topicAchievement.getId(), topicAchievement);
+			if(!APPLICATION_TYPE.SHOW_COLUMN_HEADER.toString().equals(settings.getApplicationType())) {
+				DataTopicsParser topicAchievement = new DataTopicsParser("-1", QuizParserConstant.EMPTY_STRING, QuizParserConstant.EMPTY_STRING, QuizParserConstant.EMPTY_STRING, QuizParserConstant.ACHIEVEMENT_NAME, QuizParserConstant.ACHIEVEMENT_DESCRIPTION, QuizParserConstant.ACHIEVEMENT_IMAGE_URL, QuizConstant.NO, new java.util.Date(), QuizConstant.SYSTEM_USER, QuizConstant.NO, type);
+				topicAchievement = syncTopicToPicasa(topicAchievement);
+				topicMapByTopicId.put(topicAchievement.getId(), topicAchievement);
+			}
 			
 			List listRow = null;
 			for(String achievementTab : settings.getStructure().getTabAchievements().split(";")) {
