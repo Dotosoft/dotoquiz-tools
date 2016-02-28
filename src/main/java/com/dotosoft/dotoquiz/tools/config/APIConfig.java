@@ -2,8 +2,8 @@ package com.dotosoft.dotoquiz.tools.config;
 
 import static java.lang.String.format;
 
-import com.dotosoft.dotoquiz.tools.config.model.AuthenticationServer;
-import com.dotosoft.dotoquiz.tools.config.model.ClientSecret;
+import com.dotosoft.dotoquiz.tools.config.metadata.AuthenticationServer;
+import com.dotosoft.dotoquiz.tools.config.metadata.ClientSecret;
 
 public class APIConfig {
 	private ClientSecret clientSecret;

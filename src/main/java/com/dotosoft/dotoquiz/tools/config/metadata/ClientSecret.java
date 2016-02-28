@@ -1,4 +1,4 @@
-package com.dotosoft.dotoquiz.tools.config.model;
+package com.dotosoft.dotoquiz.tools.config.metadata;
 
 import java.util.List;
 
