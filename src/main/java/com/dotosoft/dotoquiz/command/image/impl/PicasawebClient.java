@@ -62,7 +62,7 @@ import com.google.gdata.util.ParseException;
 import com.google.gdata.util.ServiceException;
 import com.google.gdata.util.XmlBlob;
 
-public class PicasawebClient {
+public class PicasawebClient implements ImageWebClient {
     Logger log = Logger.getLogger(PicasawebClient.class);
     
     public static final String AUTO_BACKUP_FOLDER = "Auto Backup";
