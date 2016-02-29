@@ -20,6 +20,7 @@ import org.apache.commons.chain.Command;
 import org.apache.commons.chain.Context;
 
 import com.dotosoft.dotoquiz.command.auth.impl.IAuth;
+import com.dotosoft.dotoquiz.tools.util.SingletonTools;
 
 public class AuthCommand implements Command {
 	
@@ -54,8 +55,8 @@ public class AuthCommand implements Command {
 	@Override
 	public boolean execute(Context context) throws Exception {
 		Class authClazz = Class.forName(authClassName);
-		IAuth authInstance = (IAuth) authClazz.newInstance();
-
+		IAuth authInstance = SingletonTools.getInstance(authClazz);
+		
 		Object credential = authInstance.authenticate( context );
 		if (credential != null) {
 			Class<?> returnClazz = Class.forName(returnClassName);

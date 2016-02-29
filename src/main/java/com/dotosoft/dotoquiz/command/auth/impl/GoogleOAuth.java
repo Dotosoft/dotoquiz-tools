@@ -64,6 +64,7 @@ import com.google.gdata.util.ServiceException;
  * token in prefs for next time.
  */
 public class GoogleOAuth implements IAuth {
+	
     private static final Logger log = Logger.getLogger(GoogleOAuth.class);
     
 //    private static final Object lock = new Object();
@@ -92,8 +93,8 @@ public class GoogleOAuth implements IAuth {
 	private static final List<String> SCOPES = Arrays.asList(
 			QuizParserConstant.SCOPE_PICASA, 
 			QuizParserConstant.SCOPE_GOOGLESHEET);
-
-    public GoogleOAuth()
+	
+	public GoogleOAuth()
     {
     	try {
 			httpTransport = GoogleNetHttpTransport.newTrustedTransport();
