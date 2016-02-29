@@ -416,7 +416,7 @@ public class OldApp {
 				}
 				photoMapByAlbumId.put(albumEntry.getId(), photoEntriesCollections);
 			}
-		} catch (IOException | ServiceException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
@@ -444,7 +444,7 @@ public class OldApp {
 				GphotoEntry photoEntry = photoEntryCollections != null ? photoEntryCollections.get(achievement.getImageUrl()) : null;
 				if(photoEntryCollections == null) photoEntryCollections = new HashMap<String, GphotoEntry>();
 				
-				photoEntry = webClient.uploadImageToAlbum(achievementImagePath.toFile(), photoEntry, achievementTopic, MD5Checksum.getMD5Checksum(achievementImagePath.toString()));
+				photoEntry = (GphotoEntry) webClient.uploadImageToAlbum(achievementImagePath.toFile(), photoEntry, achievementTopic, MD5Checksum.getMD5Checksum(achievementImagePath.toString()));
 				photoEntryCollections.put(((MediaContent)photoEntry.getContent()).getUri(), photoEntry);
 				photoMapByAlbumId.put(achievementTopic.getId(), photoEntryCollections);
 				
@@ -474,7 +474,7 @@ public class OldApp {
 				myAlbum.setAccess(GphotoAccess.Value.PUBLIC);
 				myAlbum.setTitle(new PlainTextConstruct(topic.getId()));
 				myAlbum.setDescription(new PlainTextConstruct(topic.getDescription()));
-				albumEntry = webClient.insertAlbum(myAlbum);
+				albumEntry = (GphotoEntry) webClient.insertAlbum(myAlbum);
 			}
 			
 			if(!QuizConstant.YES.equals(topic.getIsProcessed())) {
@@ -490,7 +490,7 @@ public class OldApp {
 						log.error("File is not found at '" + topicImagePath.toString() + "'. Please put the file and start this app again.");
 						System.exit(1);
 					}
-					photoEntry = webClient.uploadImageToAlbum(topicImagePath.toFile(), photoEntry, albumEntry, MD5Checksum.getMD5Checksum(topicImagePath.toString()));
+					photoEntry = (GphotoEntry) webClient.uploadImageToAlbum(topicImagePath.toFile(), photoEntry, albumEntry, MD5Checksum.getMD5Checksum(topicImagePath.toString()));
 					photoEntryCollections.put(((MediaContent)photoEntry.getContent()).getUri(), photoEntry);
 					photoMapByAlbumId.put(albumEntry.getId(), photoEntryCollections);
 					
@@ -535,7 +535,7 @@ public class OldApp {
 					GphotoEntry photoEntry = photoEntryCollections != null ? photoEntryCollections.get(answer.getAdditionalData()) : null;
 					if(photoEntryCollections == null) photoEntryCollections = new HashMap<String, GphotoEntry>();
 					
-					photoEntry = webClient.uploadImageToAlbum(questionAnswerImagePath.toFile(), photoEntry, firstTopic, MD5Checksum.getMD5Checksum(questionAnswerImagePath.toString()));
+					photoEntry = (GphotoEntry) webClient.uploadImageToAlbum(questionAnswerImagePath.toFile(), photoEntry, firstTopic, MD5Checksum.getMD5Checksum(questionAnswerImagePath.toString()));
 					photoEntryCollections.put(((MediaContent)photoEntry.getContent()).getUri(), photoEntry);
 					photoMapByAlbumId.put(firstTopic.getId(), photoEntryCollections);
 					

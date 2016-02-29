@@ -18,9 +18,9 @@ package com.dotosoft.dotoquiz.tools.config;
 
 import static java.lang.String.format;
 
-import com.dotosoft.dotoquiz.tools.config.metadata.AchievementStructure;
-import com.dotosoft.dotoquiz.tools.config.metadata.AnswerQuestionStructure;
-import com.dotosoft.dotoquiz.tools.config.metadata.TopicStructure;
+import com.dotosoft.dotoquiz.tools.metadata.AchievementStructure;
+import com.dotosoft.dotoquiz.tools.metadata.AnswerQuestionStructure;
+import com.dotosoft.dotoquiz.tools.metadata.TopicStructure;
 
 public class StructureConfig {
 	private TopicStructure topicStructure;

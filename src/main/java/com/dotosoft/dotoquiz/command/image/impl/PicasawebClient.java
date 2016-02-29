@@ -41,6 +41,7 @@ import com.dotosoft.dotoquiz.command.image.metadata.ImageInformation;
 import com.dotosoft.dotoquiz.tools.common.QuizParserConstant;
 import com.dotosoft.dotoquiz.tools.util.TimeUtils;
 import com.google.api.client.auth.oauth2.Credential;
+import com.google.gdata.client.Query;
 import com.google.gdata.client.photos.PicasawebService;
 import com.google.gdata.data.DateTime;
 import com.google.gdata.data.Link;
@@ -181,13 +182,13 @@ public class PicasawebClient implements ImageWebClient {
         return downloadSuccess;
     }
 
-    public AlbumEntry prepareRemoteAlbum(AlbumEntry albumEntry) throws IOException, ServiceException {
+    public AlbumEntry prepareRemoteAlbum(AlbumEntry albumEntry) throws Exception {
 
         // See if the AlbumEntry was valid remotely (i.e., it has an ID). If not, create it
         if ( albumEntry.getId() == null )
         {
                 albumEntry.setDescription(new PlainTextConstruct("Automatically created by Picasync"));
-                albumEntry = insertAlbum(albumEntry);
+                albumEntry = (AlbumEntry) insertAlbum(albumEntry);
 
             if( albumEntry.getId() == null || albumEntry.getId().isEmpty()) {
                 log.error("Unable to create new album: " + albumEntry.getTitle().getPlainText() );
@@ -250,10 +251,10 @@ public class PicasawebClient implements ImageWebClient {
     }
 
 
-    public GphotoEntry uploadImageToAlbum(File imageFile, GphotoEntry remotePhoto, GphotoEntry albumEntry, String localMd5CheckSum ) throws IOException, ServiceException, IllegalAccessException, InvocationTargetException {
+    public Object uploadImageToAlbum(File imageFile, Object remotePhoto, Object albumEntry, String localMd5CheckSum ) throws Exception {
 
         boolean newPhoto = false;
-        String albumName = albumEntry.getTitle().getPlainText();
+        String albumName = ((GphotoEntry) albumEntry).getTitle().getPlainText();
         PhotoEntry  myPhoto = new PhotoEntry();
         
         if( remotePhoto == null )
@@ -263,7 +264,7 @@ public class PicasawebClient implements ImageWebClient {
         }
         else{
         	// BeanUtils.copyProperties(myPhoto, remotePhoto);
-        	remotePhoto.delete();
+        	((GphotoEntry) remotePhoto).delete();
             log.info( "Uploading updated image in album " + albumName + ": " + imageFile);
         }
 
@@ -281,14 +282,14 @@ public class PicasawebClient implements ImageWebClient {
             }
             else
             {
-            	myPhoto.setTitle(remotePhoto.getTitle());
+            	myPhoto.setTitle(((GphotoEntry) remotePhoto).getTitle());
             }
             
-            myPhoto = insert(albumEntry, myPhoto);
+            myPhoto = insert((GphotoEntry) albumEntry, myPhoto);
         } catch (Exception ex) {
             log.error("Unable to add media: " + imageFile + ": " + ex);
         } finally {
-        	 setUpdatedDate( albumEntry, myPhoto, imageFile );
+        	 setUpdatedDate( (GphotoEntry) albumEntry, myPhoto, imageFile );
         }
         
         return myPhoto;
@@ -387,51 +388,47 @@ public class PicasawebClient implements ImageWebClient {
         }
     }
     
-//    /**
-//	 * Demonstrates use of partial query to retrieve album title and location
-//	 * information for user's albums.
-//	 */
-//	private void printAlbumLocation(String uname) throws IOException, ServiceException {
-//		String albumsUrl = API_PREFIX + uname;
-//		String fields = "entry(title,gphoto:id,gphoto:location)";
-//
-//		Query albumQuery = new Query(new URL(albumsUrl));
-//		albumQuery.setFields(fields);
-//
-//		AlbumFeed feed = service.query(albumQuery, AlbumFeed.class);
-//		for (GphotoEntry entry : feed.getEntries()) {
-//			if (entry instanceof AlbumEntry) {
-//				AlbumEntry albumEntry = (AlbumEntry) entry;
-//				OUT.println(albumEntry.getGphotoId() + ":" + albumEntry.getTitle().getPlainText() + " ("
-//						+ albumEntry.getLocation() + ")");
-//			}
-//		}
-//	}
-//    
-//    /**
-//	 * Demonstrates update operation using partial patch to update location
-//	 * string for specified album.
-//	 */
-//	public void updateAlbumLocation(String uname, String albumId) throws IOException, ServiceException {
-//		OUT.println("Enter album id to update:");
-//		String albumId = IN.readLine();
-//
-//		// Get the current album entry
-//		String albumEntryUrl = API_PREFIX + uname + "/" + albumId;
-//		String fields = "@gd:etag,gphoto:location";
-//		Query patchQuery = new Query(new URL(albumEntryUrl));
-//		patchQuery.setFields(fields);
-//		AlbumEntry entry = service.getEntry(patchQuery.getUrl(), AlbumEntry.class);
-//		OUT.println("Current location: " + entry.getLocation());
-//
-//		// Update the location in the album entry
-//		OUT.println("Specify new location: ");
-//		String newLocation = IN.readLine();
-//		entry.setLocation(newLocation);
-//		entry.setSelectedFields("gphoto:location");
-//		AlbumEntry updated = service.patch(new URL(albumEntryUrl), fields, entry);
-//		OUT.println("Location set to: " + updated.getLocation());
-//	}
+    /**
+	 * Demonstrates use of partial query to retrieve album title and location
+	 * information for user's albums.
+	 */
+	private void printAlbumLocation(String uname) throws IOException, ServiceException {
+		String albumsUrl = API_PREFIX + uname;
+		String fields = "entry(title,gphoto:id,gphoto:location)";
+
+		Query albumQuery = new Query(new URL(albumsUrl));
+		albumQuery.setFields(fields);
+
+		AlbumFeed feed = service.query(albumQuery, AlbumFeed.class);
+		for (GphotoEntry entry : feed.getEntries()) {
+			if (entry instanceof AlbumEntry) {
+				AlbumEntry albumEntry = (AlbumEntry) entry;
+				log.info(albumEntry.getGphotoId() + ":" + albumEntry.getTitle().getPlainText() + " ("
+						+ albumEntry.getLocation() + ")");
+			}
+		}
+	}
+    
+    /**
+	 * Demonstrates update operation using partial patch to update location
+	 * string for specified album.
+	 */
+	public void updateAlbumLocation(String uname, String albumId, String newLocation) throws IOException, ServiceException {
+		
+		// Get the current album entry
+		String albumEntryUrl = API_PREFIX + uname + "/" + albumId;
+		String fields = "@gd:etag,gphoto:location";
+		Query patchQuery = new Query(new URL(albumEntryUrl));
+		patchQuery.setFields(fields);
+		AlbumEntry entry = service.getEntry(patchQuery.getUrl(), AlbumEntry.class);
+		log.info("Current location: " + entry.getLocation());
+
+		// Update the location in the album entry
+		entry.setLocation(newLocation);
+		entry.setSelectedFields("gphoto:location");
+		AlbumEntry updated = service.patch(new URL(albumEntryUrl), fields, entry);
+		log.info("Location set to: " + updated.getLocation());
+	}
 
     public static String getPhotoId( PhotoEntry photo )
     {
@@ -458,7 +455,7 @@ public class PicasawebClient implements ImageWebClient {
      * Retrieves the albums for the given user.
      * albumUrl = addParameter(albumUrl, "hidestreamid", "photos_from_posts" );
      */
-    public List<GphotoEntry> getAlbums(String username, boolean showall ) throws IOException, ServiceException {
+    public List getAlbums(String username, boolean showall ) throws IOException, ServiceException {
         
         String albumUrl = API_PREFIX + username;
 
@@ -474,15 +471,7 @@ public class PicasawebClient implements ImageWebClient {
 
             List<GphotoEntry> entries = userFeed.getEntries();
 
-            for (GphotoEntry entry : entries) {
-
-//                GphotoEntry adapted = entry.getAdaptedEntry();
-//
-//                if (adapted instanceof AlbumEntry) {
-//                    AlbumEntry album = (AlbumEntry)adapted;
-//                    albums.add(album);
-//                }
-            	
+            for (GphotoEntry entry : entries) {            	
             	albums.add(entry);
             }
 
@@ -501,9 +490,8 @@ public class PicasawebClient implements ImageWebClient {
      * Retrieves the albums for the currently logged-in user.  This is equivalent
      * to calling {@link #getAlbums(String, boolean)} with "default" as the username.
      */
-    public List<GphotoEntry> getAlbums( boolean showall ) throws IOException, ServiceException {
+    public List getAlbums( boolean showall ) throws Exception {
         return getAlbums("default", showall);
-        // return getAlbums("113922249877693412534", showall);
     }
 
     /**
@@ -578,14 +566,14 @@ public class PicasawebClient implements ImageWebClient {
     /**
      * Retrieves the photos for the given album.
      */
-    public List<GphotoEntry> getPhotos(GphotoEntry photoEntry) throws IOException,
+    public List getPhotos(Object photoEntry) throws IOException,
             ServiceException {
 
         List<GphotoEntry> photos = new ArrayList<GphotoEntry>();
 
         // If it doesn't have an ID, it's an album we haven't created yet!
-        if( photoEntry.getLinks().size() != 0 ) {
-            String feedHref = getLinkByRel(photoEntry.getLinks(), Link.Rel.FEED);
+        if( ((GphotoEntry) photoEntry).getLinks().size() != 0 ) {
+            String feedHref = getLinkByRel( ((GphotoEntry) photoEntry).getLinks(), Link.Rel.FEED);
 
             feedHref = addParameter(feedHref, "imgmax", "d");
             feedHref = addParameter(feedHref, "max-results", "1000");
@@ -595,11 +583,6 @@ public class PicasawebClient implements ImageWebClient {
 
                 List<GphotoEntry> entries = albumFeed.getEntries();
                 for (GphotoEntry entry : entries) {
-//                    GphotoEntry adapted = entry.getAdaptedEntry();
-//                    if (adapted instanceof PhotoEntry) {
-//                        photos.add((PhotoEntry) adapted);
-//                    }
-                	
                 	photos.add(entry);
                 }
 
@@ -663,12 +646,11 @@ public class PicasawebClient implements ImageWebClient {
      * Album-specific insert method to insert into the gallery of the current
      * user, this bypasses the need to have a top-level entry object for parent.
      */
-    public AlbumEntry insertAlbum(AlbumEntry album)
-            throws IOException, ServiceException {
-        log.info( "Adding new album: " + album.getTitle().getPlainText() );
+    public Object insertAlbum(Object album) throws Exception {
+        log.info( "Adding new album: " + ((AlbumEntry) album).getTitle().getPlainText() );
 
         String feedUrl = API_PREFIX + "default";
-        return service.insert(new URL(feedUrl), album);
+        return service.insert(new URL(feedUrl), (AlbumEntry) album);
     }
 
     /**

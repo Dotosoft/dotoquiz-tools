@@ -14,7 +14,7 @@
 	limitations under the License.
 */
 
-package com.dotosoft.dotoquiz.tools.config.metadata;
+package com.dotosoft.dotoquiz.tools.metadata;
 
 public class AuthenticationServer {
 	private String ip;
