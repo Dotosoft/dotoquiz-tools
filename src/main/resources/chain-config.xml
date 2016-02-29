@@ -7,7 +7,9 @@
 		<command className="org.apache.commons.chain.generic.LookupCommand" catalogName="auto-sales" name="arrange-financing" optional="true" />
 		<command id="CloseSale" className="com.dotosoft.chain.exercise.sample.CloseSale" />
 	</chain> -->
-	<chain name="auth-google">
-		<command id="AuthenticateAPI" className="com.dotosoft.dotoquiz.commands.GoogleAuthCommand" />
+	<chain name="AUTH">
+		<command id="AuthenticateAPI" className="com.dotosoft.dotoquiz.command.auth.AuthCommand" 
+			key="credential" authClassName="com.dotosoft.dotoquiz.command.auth.impl.GoogleOAuth"
+			returnClassName="com.google.api.client.auth.oauth2.Credential" />
 	</chain>
 </catalog>

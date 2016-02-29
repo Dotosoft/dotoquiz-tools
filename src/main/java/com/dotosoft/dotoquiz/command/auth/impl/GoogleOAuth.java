@@ -23,6 +23,8 @@ import java.security.GeneralSecurityException;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.chain.Context;
+import org.apache.commons.chain.impl.ContextBase;
 import org.apache.log4j.Logger;
 
 import com.dotosoft.dotoquiz.command.data.impl.GooglesheetClient;
@@ -44,8 +46,6 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.store.DataStoreFactory;
 import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.gdata.util.ServiceException;
-//import javafx.application.Platform;
-//import javafx.beans.value.ChangeListener;
 //import javafx.beans.value.ObservableValue;
 //import javafx.concurrent.Worker;
 //import javafx.concurrent.Worker.State;
@@ -56,26 +56,27 @@ import com.google.gdata.util.ServiceException;
 //import javafx.scene.web.WebView;
 
 /**
- * Utility class to authenticate using Oauth 2.0.
+ * Utility class to authenticate using Oauth
+2.0.
  *
  * Displays a browser window if no credentials are available in the
  * prefs storage. Once the user has logged in, stores the refresh
  * token in prefs for next time.
  */
-public class GoogleOAuth {
+public class GoogleOAuth implements IAuth {
     private static final Logger log = Logger.getLogger(GoogleOAuth.class);
     
-    private static final Object lock = new Object();
-    private static final Dimension frameSize = new Dimension( 650, 500 );
-    private static volatile String token;
-    private static final String SUCCESS_CODE = "Success code=";
+//    private static final Object lock = new Object();
+//    private static final Dimension frameSize = new Dimension( 650, 500 );
+//    private static volatile String token;
+//    private static final String SUCCESS_CODE = "Success code=";
 
 //    private static GoogleClientSecrets clientSecrets;
     /** Global instance of the JSON factory. */
 	private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
 	
 	/** Directory to store user credentials. */
-	private static java.io.File DATA_STORE_DIR;
+	private static java.io.File dataStoreFile;
 	
 	/**
 	 * Global instance of the {@link DataStoreFactory}. The best practice is to
@@ -85,63 +86,69 @@ public class GoogleOAuth {
 
 	/** Global instance of the HTTP transport. */
 	private static HttpTransport httpTransport;
-	private Settings setting;
+//	private Settings setting;
 	
 	/** OAuth 2.0 scopes. */
 	private static final List<String> SCOPES = Arrays.asList(
 			QuizParserConstant.SCOPE_PICASA, 
 			QuizParserConstant.SCOPE_GOOGLESHEET);
 
-    public GoogleOAuth( Settings settings )
+    public GoogleOAuth()
     {
     	try {
-    		this.setting = settings;
-    		DATA_STORE_DIR = new java.io.File( setting.getApi().getDataStoreDir() );
-    		
 			httpTransport = GoogleNetHttpTransport.newTrustedTransport();
-			dataStoreFactory = new FileDataStoreFactory(DATA_STORE_DIR);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
     }
 
     public PicasawebClient authenticatePicasa( boolean allowInteractive, SyncState state ) throws IOException, GeneralSecurityException {
-    	Credential cred = authenticateOauth( allowInteractive, state );
-
-        if( cred != null ){
-
-            log.info("Building PicasaWeb Client...");
-
-            // Build a web client using the credentials we created
-            return new PicasawebClient( cred );
-        }
+//    	Credential cred = (Credential) authenticate( allowInteractive, state );
+//
+//        if( cred != null ){
+//
+//            log.info("Building PicasaWeb Client...");
+//
+//            // Build a web client using the credentials we created
+//            return new PicasawebClient( cred );
+//        }
 
         return null;
     }
     
     public GooglesheetClient authenticateGooglesheet(String googlesheetFileName, Settings settings, boolean allowInteractive, SyncState state) throws IOException, GeneralSecurityException, IOException, ServiceException  {
-    	Credential cred = authenticateOauth(allowInteractive, state);
-
-        if( cred != null ){
-
-            log.info("Building Googlesheet Client...");
-
-            // Build a web client using the credentials we created
-            return new GooglesheetClient( cred , googlesheetFileName);
-        }
+//    	Credential cred = (Credential) authenticate(allowInteractive, state);
+//
+//        if( cred != null ){
+//
+//            log.info("Building Googlesheet Client...");
+//
+//            // Build a web client using the credentials we created
+//            return new GooglesheetClient( cred , googlesheetFileName);
+//        }
 
         return null;
     }
     
-    public Credential authenticateOauth( boolean allowInteractive, SyncState state )  throws IOException, GeneralSecurityException {
+    @Override
+    public Object authenticate( Context context )  throws IOException, GeneralSecurityException {
+    	
+    	Settings setting =  (Settings) context.get("settings");
+    	SyncState state =  (SyncState) context.get("syncState");
+    	
     	log.info("Preparing to authenticate via OAuth...");
-        Credential cred = null;
+    	
+    	Credential cred = null;
+    	if(this.dataStoreFile != null) {
+    		this.dataStoreFile = new java.io.File( setting.getApi().getDataStoreDir() );
+    		dataStoreFactory = new FileDataStoreFactory(dataStoreFile);
+    	}
 
         String refreshToken = setting.getApi().getRefreshToken();
         if( refreshToken != null )
         {
             // We have a refresh token - so get some refreshed credentials
-            cred = getRefreshedCredentials( refreshToken );
+            cred = getRefreshedCredentials( setting, refreshToken );
         }
 
         if( cred == null ) {
@@ -161,7 +168,7 @@ public class GoogleOAuth {
     		// set up authorization code flow
             GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(httpTransport, JSON_FACTORY, setting.getApi().getClientSecret().getClientId(), setting.getApi().getClientSecret().getClientSecret(), SCOPES).setDataStoreFactory(dataStoreFactory).build();
     		
-    		if(allowInteractive) {
+    		if( setting.getApi().isAllowInteractive() ) {
 //    			String redirectUrl = clientSecrets.getDetails().getRedirectUris().get(0);
 //    			String authorizationUrl = flow.newAuthorizationUrl()
 //                        .setRedirectUri(redirectUrl)
@@ -201,7 +208,7 @@ public class GoogleOAuth {
         return cred;
     }
 
-    public Credential getRefreshedCredentials(String refreshCode) throws IOException, GeneralSecurityException {
+    private Credential getRefreshedCredentials(Settings setting, String refreshCode) throws IOException, GeneralSecurityException {
         // HttpTransport httpTransport = GoogleNetHttpTransport.newTrustedTransport();
 
         log.info("Getting access token for refresh token..");

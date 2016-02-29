@@ -25,19 +25,10 @@ public class DotoQuizContext extends ContextBase {
 
 	private SyncState syncState;
 	private Settings settings;
-	private Credential credential;
 
 	public DotoQuizContext() {
 		syncState = new SyncState();
 		settings = new Settings();
-	}
-
-	public Credential getCredential() {
-		return credential;
-	}
-
-	public void setCredential(Credential credential) {
-		this.credential = credential;
 	}
 
 	public SyncState getSyncState() {

@@ -95,7 +95,7 @@ public class OldApp {
 		if( settings.loadSettings(args) ) {
 			log.info("Starting and setup Doto Parser...");
 			
-			auth = new GoogleOAuth(settings);
+			auth = new GoogleOAuth();
 			
 			if(APPLICATION_TYPE.DB.toString().equals(settings.getApplicationType())) {
 				log.info("Building hibernate...");

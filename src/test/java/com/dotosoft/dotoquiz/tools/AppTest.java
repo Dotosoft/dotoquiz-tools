@@ -77,7 +77,7 @@ public class AppTest  extends TestCase
 		syncState = new SyncState();
 		
 		if( settings.loadSettings(args) ) {
-			auth = new GoogleOAuth(settings);
+			auth = new GoogleOAuth();
 			
 			log.info("Initialising Web client and authenticating...");
 	        if( webClient == null ) {
