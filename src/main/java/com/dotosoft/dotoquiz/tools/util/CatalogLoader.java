@@ -26,10 +26,26 @@ public class CatalogLoader {
 	private static final String CONFIG_FILE = "/chain-config.xml";
 
 	private ConfigParser parser;
-	private Catalog catalog;
+	private static CatalogLoader catalogLoader;
 
-	public CatalogLoader() {
+	private CatalogLoader() {
 		parser = new ConfigParser();
+	}
+	
+	public static CatalogLoader getInstance() {
+		if(catalogLoader == null) {
+			catalogLoader = new CatalogLoader();
+			catalogLoader.parseCatalog();
+		}
+		return catalogLoader;
+	}
+	
+	private void parseCatalog() {
+		try {
+			parser.parse(this.getClass().getResource(CONFIG_FILE));
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
 	}
 
 	public Catalog getCatalog() throws Exception {
@@ -37,16 +53,10 @@ public class CatalogLoader {
 	}
 
 	public Catalog getCatalog(String name) throws Exception {
-		if (catalog == null) {
-			parser.parse(this.getClass().getResource(CONFIG_FILE));
-		}
-
 		if (name.equals("")) {
-			catalog = CatalogFactoryBase.getInstance().getCatalog();
+			return CatalogFactoryBase.getInstance().getCatalog();
 		} else {
-			catalog = CatalogFactoryBase.getInstance().getCatalog(name);
+			return CatalogFactoryBase.getInstance().getCatalog(name);
 		}
-
-		return catalog;
 	}
 }

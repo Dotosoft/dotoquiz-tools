@@ -1,17 +1,19 @@
 package com.dotosoft.dotoquiz.command.loop;
 
+import org.apache.commons.chain.Command;
 import org.apache.commons.chain.Context;
-import org.apache.commons.chain.Filter;
 
-public class StartLoopCommand implements Filter {
+public class StartLoopCommand implements Command {
 
-	@Override
-	public boolean execute(Context context) throws Exception {
-		return false;
+	private String keyCommand;
+
+	public void setKeyCommand(String keyCommand) {
+		this.keyCommand = keyCommand;
 	}
 
 	@Override
-	public boolean postprocess(Context context, Exception exception) {
+	public boolean execute(Context context) throws Exception {
+		context.put(keyCommand, this);
 		return false;
 	}
 
