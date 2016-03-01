@@ -1,15 +1,15 @@
 <catalog>
-	<!-- <chain name="sell-vehicle">
-		<command id="ExceptionHandler" className="com.dotosoft.chain.exercise.sample.SellVehicleExceptionHandler"/>
-		<command id="GetCustomerInfo" className="com.dotosoft.chain.exercise.sample.GetCustomerInfo" />
-		<command id="TestDriveVehicle" className="com.dotosoft.chain.exercise.sample.TestDriveVehicle" />
-		<command id="NegotiateSale" className="com.dotosoft.chain.exercise.sample.NegotiateSale" />
-		<command className="org.apache.commons.chain.generic.LookupCommand" catalogName="auto-sales" name="arrange-financing" optional="true" />
-		<command id="CloseSale" className="com.dotosoft.chain.exercise.sample.CloseSale" />
-	</chain> -->
 	<chain name="AUTH">
 		<command id="AuthenticateAPI" className="com.dotosoft.dotoquiz.command.auth.AuthCommand" 
 			key="credential" authClassName="com.dotosoft.dotoquiz.command.auth.impl.GoogleOAuth"
 			returnClassName="com.google.api.client.auth.oauth2.Credential" />
+		
+		<command id="QueryPicasaAPI" className="com.dotosoft.dotoquiz.command.image.QueryImageCommand" 
+			showAll="true" imageClassName="com.dotosoft.dotoquiz.command.image.impl.PicasawebClient"
+			authKey="credential" resultKey="photoCollection"/>
+			
+		<command id="ClearPicasaAPI" className="com.dotosoft.dotoquiz.command.image.ClearImageCommand" 
+			showAll="true" imageClassName="com.dotosoft.dotoquiz.command.image.impl.PicasawebClient"
+			authKey="credential" imageKey="photoCollection"/>
 	</chain>
 </catalog>

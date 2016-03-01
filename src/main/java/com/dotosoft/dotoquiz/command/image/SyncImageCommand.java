@@ -19,19 +19,10 @@ package com.dotosoft.dotoquiz.command.image;
 import org.apache.commons.chain.Command;
 import org.apache.commons.chain.Context;
 
-import com.dotosoft.dotoquiz.command.image.impl.ImageWebClient;
-import com.dotosoft.dotoquiz.tools.config.DotoQuizContext;
+public class SyncImageCommand implements Command {
 
-public class ImageClearCommand implements Command {
-
-	private ImageWebClient imageClient;
-	
 	@Override
 	public boolean execute(Context context) throws Exception {
-		DotoQuizContext ctx = (DotoQuizContext) context;
-		
-		
-		
 		return false;
 	}
 

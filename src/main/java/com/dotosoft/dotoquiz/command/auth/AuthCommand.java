@@ -20,7 +20,7 @@ import org.apache.commons.chain.Command;
 import org.apache.commons.chain.Context;
 
 import com.dotosoft.dotoquiz.command.auth.impl.IAuth;
-import com.dotosoft.dotoquiz.tools.util.SingletonTools;
+import com.dotosoft.dotoquiz.tools.util.SingletonFactory;
 
 public class AuthCommand implements Command {
 	
@@ -28,24 +28,12 @@ public class AuthCommand implements Command {
 	private String authClassName;
 	private String returnClassName;
 
-	public String getKey() {
-		return key;
-	}
-
 	public void setKey(String key) {
 		this.key = key;
 	}
 
-	public String getAuthClassName() {
-		return authClassName;
-	}
-
 	public void setAuthClassName(String authClassName) {
 		this.authClassName = authClassName;
-	}
-
-	public String getReturnClassName() {
-		return returnClassName;
 	}
 
 	public void setReturnClassName(String returnClassName) {
@@ -54,10 +42,14 @@ public class AuthCommand implements Command {
 
 	@Override
 	public boolean execute(Context context) throws Exception {
-		Class authClazz = Class.forName(authClassName);
-		IAuth authInstance = SingletonTools.getInstance(authClazz);
+		if(context.containsKey(key)) {
+			return false;
+		}
 		
-		Object credential = authInstance.authenticate( context );
+		Class authClazz = Class.forName(authClassName);
+		IAuth authInstance = SingletonFactory.getInstance(authClazz, context);
+		
+		Object credential = authInstance.authenticate();
 		if (credential != null) {
 			Class<?> returnClazz = Class.forName(returnClassName);
 			context.put(key, returnClazz.cast(credential));

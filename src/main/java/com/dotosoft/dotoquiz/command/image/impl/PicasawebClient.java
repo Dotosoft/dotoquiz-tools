@@ -22,7 +22,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.InvocationTargetException;
 import java.net.ConnectException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -34,13 +33,18 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.chain.Context;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 
 import com.dotosoft.dotoquiz.command.image.metadata.ImageInformation;
 import com.dotosoft.dotoquiz.tools.common.QuizParserConstant;
+import com.dotosoft.dotoquiz.tools.config.DotoQuizContext;
+import com.dotosoft.dotoquiz.tools.metadata.Predicate;
+import com.dotosoft.dotoquiz.tools.util.FilterUtil;
 import com.dotosoft.dotoquiz.tools.util.TimeUtils;
 import com.google.api.client.auth.oauth2.Credential;
+import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.google.gdata.client.Query;
 import com.google.gdata.client.photos.PicasawebService;
 import com.google.gdata.data.DateTime;
@@ -74,7 +78,14 @@ public class PicasawebClient implements ImageWebClient {
     private static final String API_PREFIX = "https://picasaweb.google.com/data/feed/api/user/";
 
     private final PicasawebService service = new PicasawebService( QuizParserConstant.SYNC_CLIENT_NAME );
-
+    
+    /**
+     * Constructs a new un-authenticated client.
+     */
+    public PicasawebClient(GoogleCredential credential ) {
+        this((Credential) credential);
+    }
+    
     /**
      * Constructs a new un-authenticated client.
      */
@@ -95,8 +106,7 @@ public class PicasawebClient implements ImageWebClient {
             try {
                 service.setUserCredentials(uname, passwd);
             } catch (AuthenticationException e) {
-                throw new IllegalArgumentException(
-                        "Authentication failed. Illegal username/password combination.");
+                throw new IllegalArgumentException("Authentication failed. Illegal username/password combination.");
             }
         }
         else {
@@ -249,7 +259,24 @@ public class PicasawebClient implements ImageWebClient {
         }
         return false;
     }
+    
+    public List filterPhoto( List photoCollection, final String query ) throws Exception {
+    	return (List) FilterUtil.filter(photoCollection, new Predicate<GphotoEntry>() {
+			@Override
+			public boolean apply(GphotoEntry photo) {
+				if(query.equalsIgnoreCase(photo.getTitle().getPlainText())) {
+					return true;
+				}
+				return false;
+			}
+		});
+    }
 
+    public void deletePhoto(Object param) throws Exception {
+    	GphotoEntry photoEntry = (GphotoEntry) param;
+    	// photoEntry.delete();
+    	log.info( "Delete photo " + photoEntry.getTitle().getPlainText() );
+    }
 
     public Object uploadImageToAlbum(File imageFile, Object remotePhoto, Object albumEntry, String localMd5CheckSum ) throws Exception {
 

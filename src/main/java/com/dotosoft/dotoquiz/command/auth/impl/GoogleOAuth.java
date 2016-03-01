@@ -16,7 +16,6 @@
 
 package com.dotosoft.dotoquiz.command.auth.impl;
 
-import java.awt.Dimension;
 import java.io.IOException;
 import java.net.UnknownHostException;
 import java.security.GeneralSecurityException;
@@ -24,12 +23,12 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.chain.Context;
-import org.apache.commons.chain.impl.ContextBase;
 import org.apache.log4j.Logger;
 
 import com.dotosoft.dotoquiz.command.data.impl.GooglesheetClient;
 import com.dotosoft.dotoquiz.command.image.impl.PicasawebClient;
 import com.dotosoft.dotoquiz.tools.common.QuizParserConstant;
+import com.dotosoft.dotoquiz.tools.config.DotoQuizContext;
 import com.dotosoft.dotoquiz.tools.config.Settings;
 import com.dotosoft.dotoquiz.tools.util.SyncState;
 import com.google.api.client.auth.oauth2.Credential;
@@ -87,17 +86,43 @@ public class GoogleOAuth implements IAuth {
 
 	/** Global instance of the HTTP transport. */
 	private static HttpTransport httpTransport;
-//	private Settings setting;
+	private Settings setting;
+	private SyncState state;
 	
 	/** OAuth 2.0 scopes. */
-	private static final List<String> SCOPES = Arrays.asList(
+	private static final List<String> SCOPES = Arrays.asList( 
 			QuizParserConstant.SCOPE_PICASA, 
-			QuizParserConstant.SCOPE_GOOGLESHEET);
+			QuizParserConstant.SCOPE_GOOGLESHEET
+		);
+	
+	public GoogleOAuth(DotoQuizContext context)
+    {
+		this((Context) context);
+    }
+	
+	public GoogleOAuth(Context context)
+    {
+    	try {
+    		setting =  (Settings) context.get("settings");
+			httpTransport = GoogleNetHttpTransport.newTrustedTransport();
+	    	SyncState state =  (SyncState) context.get("syncState");
+	    	
+	    	dataStoreFile = new java.io.File( setting.getApi().getDataStoreDir() );
+    		dataStoreFactory = new FileDataStoreFactory(dataStoreFile);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+    }
 	
 	public GoogleOAuth()
     {
     	try {
+//    		setting =  (Settings) context.get("settings");
 			httpTransport = GoogleNetHttpTransport.newTrustedTransport();
+//	    	SyncState state =  (SyncState) context.get("syncState");
+	    	
+	    	dataStoreFile = new java.io.File( setting.getApi().getDataStoreDir() );
+    		dataStoreFactory = new FileDataStoreFactory(dataStoreFile);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -132,24 +157,16 @@ public class GoogleOAuth implements IAuth {
     }
     
     @Override
-    public Object authenticate( Context context )  throws IOException, GeneralSecurityException {
-    	
-    	Settings setting =  (Settings) context.get("settings");
-    	SyncState state =  (SyncState) context.get("syncState");
+    public Object authenticate()  throws Exception {
     	
     	log.info("Preparing to authenticate via OAuth...");
     	
     	Credential cred = null;
-    	if(this.dataStoreFile != null) {
-    		this.dataStoreFile = new java.io.File( setting.getApi().getDataStoreDir() );
-    		dataStoreFactory = new FileDataStoreFactory(dataStoreFile);
-    	}
-
         String refreshToken = setting.getApi().getRefreshToken();
         if( refreshToken != null )
         {
             // We have a refresh token - so get some refreshed credentials
-            cred = getRefreshedCredentials( setting, refreshToken );
+            cred = getRefreshedCredentials( refreshToken );
         }
 
         if( cred == null ) {
@@ -209,7 +226,7 @@ public class GoogleOAuth implements IAuth {
         return cred;
     }
 
-    private Credential getRefreshedCredentials(Settings setting, String refreshCode) throws IOException, GeneralSecurityException {
+    private Credential getRefreshedCredentials(String refreshCode) throws IOException, GeneralSecurityException {
         // HttpTransport httpTransport = GoogleNetHttpTransport.newTrustedTransport();
 
         log.info("Getting access token for refresh token..");
