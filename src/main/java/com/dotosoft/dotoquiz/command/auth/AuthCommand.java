@@ -42,10 +42,6 @@ public class AuthCommand implements Command {
 
 	@Override
 	public boolean execute(Context context) throws Exception {
-		if(context.containsKey(key)) {
-			return false;
-		}
-		
 		Class authClazz = Class.forName(authClassName);
 		IAuth authInstance = SingletonFactory.getInstance(authClazz, context);
 		

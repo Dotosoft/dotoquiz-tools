@@ -45,10 +45,6 @@ public class QueryImageCommand implements Filter {
 		}
 
 		List albumEntries = webClient.getAlbums(showAll);
-		/* for (Object albumEntry : albumEntries) {
-			System.out.println("album::: " + albumEntry);
-		} */
-		
 		context.put(resultKey, albumEntries);
 
 		return false;
