@@ -1,15 +1,27 @@
 <catalog>
 	<chain name="AUTH">
 		<command id="AuthenticateAPI" className="com.dotosoft.dotoquiz.command.auth.AuthCommand" 
-			key="credential" authClassName="com.dotosoft.dotoquiz.command.auth.impl.GoogleOAuth"
+			toKey="credential" authClassName="com.dotosoft.dotoquiz.command.auth.impl.GoogleOAuth"
 			returnClassName="com.google.api.client.auth.oauth2.Credential" />
 		
 		<command id="QueryPicasaAPI" className="com.dotosoft.dotoquiz.command.image.QueryImageCommand" 
 			showAll="true" imageClassName="com.dotosoft.dotoquiz.command.image.impl.PicasawebClient"
-			authKey="credential" resultKey="photoCollection"/>
+			authKey="credential" toKey="photoCollection"/>
 			
-		<command id="ClearPicasaAPI" className="com.dotosoft.dotoquiz.command.image.ClearImageCommand" 
-			showAll="true" imageClassName="com.dotosoft.dotoquiz.command.image.impl.PicasawebClient"
-			authKey="credential" imageKey="photoCollection"/>
+		<command className="com.dotosoft.dotoquiz.command.generic.IterateCollectionCommand" collectionKey="photoCollection"
+			incrementKey="indexPhoto" toKey="photo"/>
+			
+		<command className="com.dotosoft.dotoquiz.command.generic.LoopCommand" name="LoopingTest" checkKey="photo"/>
+	</chain>
+	
+	<chain name="LoopingTest">
+		<!-- <command className="com.dotosoft.dotoquiz.command.generic.PrintCommand" printKey="photo"/> -->
+		
+		<command id="ClearPicasaAPI" className="com.dotosoft.dotoquiz.command.image.DeleteImageCommand" 
+			imageClassName="com.dotosoft.dotoquiz.command.image.impl.PicasawebClient"
+			authKey="credential" fromKey="photo"/>
+		
+		<command className="com.dotosoft.dotoquiz.command.generic.IterateCollectionCommand" collectionKey="photoCollection"
+			incrementKey="indexPhoto" toKey="photo"/>
 	</chain>
 </catalog>

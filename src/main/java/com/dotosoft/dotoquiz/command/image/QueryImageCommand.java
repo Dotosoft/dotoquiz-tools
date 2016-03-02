@@ -13,11 +13,11 @@ public class QueryImageCommand implements Filter {
 
 	private String authKey;
 	private String imageClassName;
-	private String resultKey;
+	private String toKey;
 	private boolean showAll;
 
-	public void setResultKey(String resultKey) {
-		this.resultKey = resultKey;
+	public void setToKey(String toKey) {
+		this.toKey = toKey;
 	}
 
 	public void setAuthKey(String authKey) {
@@ -45,7 +45,7 @@ public class QueryImageCommand implements Filter {
 		}
 
 		List albumEntries = webClient.getAlbums(showAll);
-		context.put(resultKey, albumEntries);
+		context.put(toKey, albumEntries);
 
 		return false;
 	}

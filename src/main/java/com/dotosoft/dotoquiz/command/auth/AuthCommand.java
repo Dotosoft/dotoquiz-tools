@@ -23,13 +23,13 @@ import com.dotosoft.dotoquiz.command.auth.impl.IAuth;
 import com.dotosoft.dotoquiz.tools.util.SingletonFactory;
 
 public class AuthCommand implements Command {
-	
-	private String key;
+
+	private String toKey;
 	private String authClassName;
 	private String returnClassName;
 
-	public void setKey(String key) {
-		this.key = key;
+	public void setToKey(String toKey) {
+		this.toKey = toKey;
 	}
 
 	public void setAuthClassName(String authClassName) {
@@ -44,12 +44,11 @@ public class AuthCommand implements Command {
 	public boolean execute(Context context) throws Exception {
 		Class authClazz = Class.forName(authClassName);
 		IAuth authInstance = SingletonFactory.getInstance(authClazz, context);
-		
+
 		Object credential = authInstance.authenticate();
 		if (credential != null) {
 			Class<?> returnClazz = Class.forName(returnClassName);
-			context.put(key, returnClazz.cast(credential));
-			
+			context.put(toKey, returnClazz.cast(credential));
 			return false;
 		}
 

@@ -16,8 +16,6 @@
 
 package com.dotosoft.dotoquiz.command.image;
 
-import java.util.List;
-
 import org.apache.commons.chain.Context;
 import org.apache.commons.chain.Filter;
 
@@ -25,19 +23,14 @@ import com.dotosoft.dotoquiz.command.image.impl.ImageWebClient;
 import com.dotosoft.dotoquiz.tools.util.SingletonFactory;
 import com.dotosoft.dotoquiz.utils.StringUtils;
 
-public class ClearImageCommand implements Filter {
+public class DeleteImageCommand implements Filter {
 
 	private String authKey;
 	private String imageClassName;
-	private String imageKey;
-	private String deletePhoto;
+	private String fromKey;
 
-	public void setImageKey(String imageKey) {
-		this.imageKey = imageKey;
-	}
-
-	public void setDeletePhoto(String deletePhoto) {
-		this.deletePhoto = deletePhoto;
+	public void setFromKey(String fromKey) {
+		this.fromKey = fromKey;
 	}
 
 	public void setAuthKey(String authKey) {
@@ -60,14 +53,18 @@ public class ClearImageCommand implements Filter {
 			webClient = SingletonFactory.getInstance(imageClazz, context);
 		}
 
-		List photoCollection = (List) context.get(imageKey);
-		if(StringUtils.hasValue(deletePhoto)) {
-			photoCollection = webClient.filterPhoto(photoCollection, deletePhoto);
-		}
+//		List photoCollection = (List) context.get(fromKey);
+//		if (StringUtils.hasValue(deletePhoto)) {
+//			photoCollection = webClient.filterPhoto(photoCollection,
+//					deletePhoto);
+//		}
+//
+//		for (Object photo : photoCollection) {
+//			webClient.deletePhoto(photo);
+//		}
 		
-		for (Object photo : photoCollection) {
-			webClient.deletePhoto(photo);
-		}
+		Object photo = context.get(fromKey);
+		webClient.deletePhoto(photo);
 
 		return false;
 	}
