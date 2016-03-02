@@ -34,14 +34,15 @@ public class App {
 			DotoQuizContext ctx = new DotoQuizContext();
 			if( ctx.getSettings().loadSettings(args) ) {
 				Command command = CatalogLoader.getInstance().getCatalog().getCommand(ctx.getSettings().getApplicationType());
-				command.execute(ctx);
-			} else {
-				showError();
-			}
+				if(command != null) {
+					command.execute(ctx);
+					return;
+				}
+			} 
 		} catch (Exception ex) {
 			ex.printStackTrace();
-			showError();
 		}
+		showError();
 	}
 	
 	public void showError() 
@@ -56,7 +57,9 @@ public class App {
 			Iterator<String> keyCommand = CatalogLoader.getInstance().getCatalog().getNames();
 			List<String> commands = new ArrayList<String>();
 			while(keyCommand.hasNext()) {
-				commands.add(keyCommand.next());
+				String command = keyCommand.next();
+				if(command.indexOf("do") == 0) continue;
+				commands.add(command);
 			}
 			return commands.toArray();
 		} catch (Exception ex) {

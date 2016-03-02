@@ -1,3 +1,19 @@
+/*
+	Copyright 2015 Denis Prasetio
+	
+	Licensed under the Apache License, Version 2.0 (the "License");
+	you may not use this file except in compliance with the License.
+	You may obtain a copy of the License at
+	
+	http://www.apache.org/licenses/LICENSE-2.0
+	
+	Unless required by applicable law or agreed to in writing, software
+	distributed under the License is distributed on an "AS IS" BASIS,
+	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+	See the License for the specific language governing permissions and
+	limitations under the License.
+*/
+
 package com.dotosoft.dotoquiz.command.generic;
 
 import org.apache.commons.chain.Command;
@@ -7,28 +23,28 @@ import com.dotosoft.dotoquiz.utils.StringUtils;
 
 public class PrintCommand implements Command {
 
-	private String printMessage;
-	private String printKey;
+	private String message;
+	private String key;
 
-	public void setPrintMessage(String printMessage) {
-		this.printMessage = printMessage;
+	public void setMessage(String message) {
+		this.message = message;
 	}
 
-	public void setPrintKey(String printKey) {
-		this.printKey = printKey;
+	public void setKey(String key) {
+		this.key = key;
 	}
 
 	@Override
 	public boolean execute(Context context) throws Exception {
 
-		if(StringUtils.hasValue(printMessage)) {
-			System.out.println(printMessage);
+		if (StringUtils.hasValue(message)) {
+			System.out.println(message);
 		}
-		
-		if(context.containsKey(printKey)) {
-			System.out.println(context.get(printKey));
+
+		if (context.containsKey(key)) {
+			System.out.println(context.get(key));
 		}
-		
+
 		return false;
 	}
 

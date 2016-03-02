@@ -1,27 +1,40 @@
 <catalog>
-	<chain name="AUTH">
-		<command id="AuthenticateAPI" className="com.dotosoft.dotoquiz.command.auth.AuthCommand" 
+	<chain name="CLEAR">
+		<command id="doAuthenticateGoogleAPI" className="com.dotosoft.dotoquiz.command.auth.AuthCommand" 
 			toKey="credential" authClassName="com.dotosoft.dotoquiz.command.auth.impl.GoogleOAuth"
 			returnClassName="com.google.api.client.auth.oauth2.Credential" />
 		
-		<command id="QueryPicasaAPI" className="com.dotosoft.dotoquiz.command.image.QueryImageCommand" 
+		<command id="doQueryImageFromPicasa" className="com.dotosoft.dotoquiz.command.image.QueryImageCommand" 
 			showAll="true" imageClassName="com.dotosoft.dotoquiz.command.image.impl.PicasawebClient"
-			authKey="credential" toKey="photoCollection"/>
+			authKey="credential" toAlbumCollectionKey="albumCollection" toPhotoCollectionKey="photoCollection"/>
 			
-		<command className="com.dotosoft.dotoquiz.command.generic.IterateCollectionCommand" collectionKey="photoCollection"
-			incrementKey="indexPhoto" toKey="photo"/>
-			
-		<command className="com.dotosoft.dotoquiz.command.generic.LoopCommand" name="LoopingTest" checkKey="photo"/>
+		<command name="doIterateAlbum" className="org.apache.commons.chain.generic.LookupCommand" />
+		<command name="doClearAllImagePicasa" className="com.dotosoft.dotoquiz.command.generic.LoopCommand" checkKey="album"/>
 	</chain>
 	
-	<chain name="LoopingTest">
-		<!-- <command className="com.dotosoft.dotoquiz.command.generic.PrintCommand" printKey="photo"/> -->
-		
-		<command id="ClearPicasaAPI" className="com.dotosoft.dotoquiz.command.image.DeleteImageCommand" 
-			imageClassName="com.dotosoft.dotoquiz.command.image.impl.PicasawebClient"
-			authKey="credential" fromKey="photo"/>
-		
-		<command className="com.dotosoft.dotoquiz.command.generic.IterateCollectionCommand" collectionKey="photoCollection"
-			incrementKey="indexPhoto" toKey="photo"/>
+	<chain name="SHOW_COLUMN_HEADER">
+		<command className="com.dotosoft.dotoquiz.command.generic.PrintCommand" message="DO SHOW_COLUMN_HEADER"/>
 	</chain>
+	
+	<chain name="SYNC">
+		<command className="com.dotosoft.dotoquiz.command.generic.PrintCommand" message="DO SYNC"/>
+	</chain>
+	
+	<chain name="DB">
+		<command className="com.dotosoft.dotoquiz.command.generic.PrintCommand" message="DO DB"/>
+	</chain>
+	
+	<chain name="doClearAllImagePicasa">
+		<command id="doDeletePicasaImage" className="com.dotosoft.dotoquiz.command.image.DeleteImageCommand" 
+			imageClassName="com.dotosoft.dotoquiz.command.image.impl.PicasawebClient"
+			authKey="credential" fromKey="album"/>
+		
+		<command name="doIterateAlbum" className="org.apache.commons.chain.generic.LookupCommand" />
+	</chain>
+	
+	<command name="doIterateAlbum" collectionKey="albumCollection" incrementKey="indexAlbum" 
+		className="com.dotosoft.dotoquiz.command.generic.IterateCollectionCommand" toKey="album"/>
+		
+	<command name="doIteratePhoto" collectionKey="photoCollection" incrementKey="indexPhoto" 
+		className="com.dotosoft.dotoquiz.command.generic.IterateCollectionCommand" toKey="photo"/>
 </catalog>
