@@ -665,11 +665,25 @@ public class PicasawebClient implements ImageWebClient {
      * Album-specific insert method to insert into the gallery of the current
      * user, this bypasses the need to have a top-level entry object for parent.
      */
-    public Object insertAlbum(Object album) throws Exception {
+    public Object insertAlbum(AlbumEntry album) throws Exception {
         log.info( "Adding new album: " + ((AlbumEntry) album).getTitle().getPlainText() );
 
         String feedUrl = API_PREFIX + "default";
         return service.insert(new URL(feedUrl), (AlbumEntry) album);
+    }
+    
+    public Object insertAlbum(String title, String description, boolean isPublic) throws Exception {
+        
+        AlbumEntry album = new AlbumEntry();
+        if(isPublic) {
+        	album.setAccess(GphotoAccess.Value.PUBLIC);
+        } else {
+        	album.setAccess(GphotoAccess.Value.PRIVATE);
+        }
+        album.setTitle(new PlainTextConstruct(title));
+        album.setDescription(new PlainTextConstruct(description));
+
+        return insertAlbum(album);
     }
 
     /**

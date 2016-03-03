@@ -18,12 +18,19 @@ package com.dotosoft.dotoquiz.command.image;
 
 import org.apache.commons.chain.Command;
 import org.apache.commons.chain.Context;
+import org.apache.commons.chain.Filter;
 
-public class UploadImageCommand implements Command {
+public class UploadImageCommand implements Filter {
 
 	@Override
 	public boolean execute(Context context) throws Exception {
 		return false;
 	}
 
+	public boolean postprocess(Context context, Exception exception) {
+		if (exception == null) return false;
+		exception.printStackTrace();
+		System.err.println("Exception " + exception.getMessage() + " occurred.");
+		return true;
+	}
 }

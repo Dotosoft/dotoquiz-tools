@@ -23,6 +23,6 @@ public interface ImageWebClient {
 	List getAlbums( boolean showall ) throws Exception;
 	List getPhotos(Object albumEntry) throws Exception;
 	Object uploadImageToAlbum(File imageFile, Object remotePhoto, Object albumEntry, String localMd5CheckSum ) throws Exception;
-	Object insertAlbum(Object album) throws Exception;
+	Object insertAlbum(String title, String description, boolean isPublic) throws Exception;
 	void deletePhoto(Object param) throws Exception;
 }
