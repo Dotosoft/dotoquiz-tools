@@ -19,6 +19,7 @@ package com.dotosoft.dotoquiz.command.generic;
 import org.apache.commons.chain.Command;
 import org.apache.commons.chain.Context;
 
+import com.dotosoft.dotoquiz.tools.util.BeanUtils;
 import com.dotosoft.dotoquiz.utils.StringUtils;
 
 public class PrintCommand implements Command {
@@ -41,8 +42,8 @@ public class PrintCommand implements Command {
 			System.out.println(message);
 		}
 
-		if (context.containsKey(key)) {
-			System.out.println(context.get(key));
+		if (BeanUtils.getProperty(context, key) != null) {
+			System.out.println( BeanUtils.getProperty(context, key) );
 		}
 
 		return false;

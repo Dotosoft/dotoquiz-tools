@@ -26,7 +26,6 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 
 import com.dotosoft.dotoquiz.model.parameter.ParameterQuestionType;
-import com.dotosoft.dotoquiz.tools.util.HibernateUtil;
 
 public class HibernateTest extends TestCase {
 

@@ -33,15 +33,13 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.commons.chain.Context;
+import org.apache.commons.beanutils.BeanPropertyValueEqualsPredicate;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 
 import com.dotosoft.dotoquiz.command.image.metadata.ImageInformation;
 import com.dotosoft.dotoquiz.tools.common.QuizParserConstant;
-import com.dotosoft.dotoquiz.tools.config.DotoQuizContext;
-import com.dotosoft.dotoquiz.tools.metadata.Predicate;
-import com.dotosoft.dotoquiz.tools.util.FilterUtil;
 import com.dotosoft.dotoquiz.tools.util.TimeUtils;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
@@ -260,16 +258,10 @@ public class PicasawebClient implements ImageWebClient {
         return false;
     }
     
-    public List filterPhoto( List photoCollection, final String query ) throws Exception {
-    	return (List) FilterUtil.filter(photoCollection, new Predicate<GphotoEntry>() {
-			@Override
-			public boolean apply(GphotoEntry photo) {
-				if(query.equalsIgnoreCase(photo.getTitle().getPlainText())) {
-					return true;
-				}
-				return false;
-			}
-		});
+    public List filterPhoto( List photoCollection, String filterExpression, Object filterValue ) throws Exception {
+    	BeanPropertyValueEqualsPredicate predicate = new BeanPropertyValueEqualsPredicate( filterExpression, filterValue );
+    	CollectionUtils.filter(photoCollection, predicate);
+    	return photoCollection;
     }
 
     public void deletePhoto(Object param) throws Exception {

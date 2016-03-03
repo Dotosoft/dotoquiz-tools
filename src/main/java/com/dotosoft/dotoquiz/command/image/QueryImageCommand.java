@@ -23,9 +23,9 @@ import org.apache.commons.chain.Context;
 import org.apache.commons.chain.Filter;
 
 import com.dotosoft.dotoquiz.command.image.impl.ImageWebClient;
+import com.dotosoft.dotoquiz.tools.util.BeanUtils;
 import com.dotosoft.dotoquiz.tools.util.SingletonFactory;
 import com.dotosoft.dotoquiz.utils.StringUtils;
-import com.google.gdata.data.photos.GphotoEntry;
 
 public class QueryImageCommand implements Filter {
 
@@ -61,20 +61,27 @@ public class QueryImageCommand implements Filter {
 
 		ImageWebClient webClient;
 		if (StringUtils.hasValue(authKey)) {
-			Object credential = context.get(authKey);
-			webClient = SingletonFactory.getInstance(imageClazz, credential);
+			Object credential = BeanUtils.getProperty(context, authKey);
+			if(credential != null) {
+				webClient = SingletonFactory.getInstance(imageClazz, credential);
+			} else {
+				webClient = SingletonFactory.getInstance(imageClazz, context);
+			}
 		} else {
 			webClient = SingletonFactory.getInstance(imageClazz, context);
 		}
 
 		List albumCollections = webClient.getAlbums(showAll);
-		List photoCollections = new ArrayList();
-		for(Object album : albumCollections) {
-			photoCollections.add(webClient.getPhotos(album));
+		
+		if(StringUtils.hasValue(toPhotoCollectionKey)) {
+			List photoCollections = new ArrayList();
+			for(Object album : albumCollections) {
+				photoCollections.add(webClient.getPhotos(album));
+			}
+			context.put(toPhotoCollectionKey, photoCollections);
 		}
 		
 		context.put(toAlbumCollectionKey, albumCollections);
-		context.put(toPhotoCollectionKey, photoCollections);
 
 		return false;
 	}

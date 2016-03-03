@@ -19,7 +19,6 @@ package com.dotosoft.dotoquiz.tools.config;
 import org.apache.commons.chain.impl.ContextBase;
 
 import com.dotosoft.dotoquiz.tools.util.SyncState;
-import com.google.api.client.auth.oauth2.Credential;
 
 public class DotoQuizContext extends ContextBase {
 

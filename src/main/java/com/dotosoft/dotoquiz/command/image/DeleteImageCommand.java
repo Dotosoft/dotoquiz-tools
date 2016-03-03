@@ -20,6 +20,7 @@ import org.apache.commons.chain.Context;
 import org.apache.commons.chain.Filter;
 
 import com.dotosoft.dotoquiz.command.image.impl.ImageWebClient;
+import com.dotosoft.dotoquiz.tools.util.BeanUtils;
 import com.dotosoft.dotoquiz.tools.util.SingletonFactory;
 import com.dotosoft.dotoquiz.utils.StringUtils;
 
@@ -47,24 +48,21 @@ public class DeleteImageCommand implements Filter {
 
 		ImageWebClient webClient;
 		if (StringUtils.hasValue(authKey)) {
-			Object credential = context.get(authKey);
-			webClient = SingletonFactory.getInstance(imageClazz, credential);
+			Object credential = BeanUtils.getProperty(context, authKey);
+			if(credential != null)
+			{			
+				webClient = SingletonFactory.getInstance(imageClazz, credential);
+			} else {
+				webClient = SingletonFactory.getInstance(imageClazz, context);
+			}
 		} else {
 			webClient = SingletonFactory.getInstance(imageClazz, context);
 		}
-
-//		List photoCollection = (List) context.get(fromKey);
-//		if (StringUtils.hasValue(deletePhoto)) {
-//			photoCollection = webClient.filterPhoto(photoCollection,
-//					deletePhoto);
-//		}
-//
-//		for (Object photo : photoCollection) {
-//			webClient.deletePhoto(photo);
-//		}
 		
-		Object photo = context.get(fromKey);
-		webClient.deletePhoto(photo);
+		Object photo = BeanUtils.getProperty(context, fromKey);
+		if(photo != null) {
+			webClient.deletePhoto(photo);
+		}
 
 		return false;
 	}

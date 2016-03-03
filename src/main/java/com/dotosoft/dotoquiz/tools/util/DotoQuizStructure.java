@@ -16,7 +16,6 @@
 
 package com.dotosoft.dotoquiz.tools.util;
 
-import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 
@@ -110,11 +109,11 @@ public class DotoQuizStructure {
 		try {
 			String data = "";
 			if(QuizParserConstant.PARSE_TOPIC.equals(parseType)) {
-				data = (String) PropertyUtils.getProperty(setting.getStructure().getTopicStructure(), key);
+				data = (String) BeanUtils.getProperty(setting.getStructure().getTopicStructure(), key);
 			} else if(QuizParserConstant.PARSE_QUESTION_ANSWER.equals(parseType)) {
-				data = (String) PropertyUtils.getProperty(setting.getStructure().getAnswerQuestionStructure(), key);
+				data = (String) BeanUtils.getProperty(setting.getStructure().getAnswerQuestionStructure(), key);
 			} else if(QuizParserConstant.PARSE_ACHIEVEMENT.equals(parseType)) {
-				data = (String) PropertyUtils.getProperty(setting.getStructure().getAchievementStructure(), key);
+				data = (String) BeanUtils.getProperty(setting.getStructure().getAchievementStructure(), key);
 			}
 			
 			if(DATA_TYPE.EXCEL.toString().equals(setting.getDataType())) {

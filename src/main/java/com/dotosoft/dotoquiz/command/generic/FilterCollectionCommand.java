@@ -16,15 +16,28 @@
 
 package com.dotosoft.dotoquiz.command.generic;
 
+import java.util.Collection;
+
+import org.apache.commons.beanutils.BeanPropertyValueEqualsPredicate;
 import org.apache.commons.chain.Command;
 import org.apache.commons.chain.Context;
+import org.apache.commons.collections.CollectionUtils;
 
 public class FilterCollectionCommand implements Command {
 
+	private String fromKey;
+	private String filterExpression;
+	private String filterValue;
+	
 	@Override
 	public boolean execute(Context context) throws Exception {
-		// TODO Auto-generated method stub
-		return false;
+		
+		Collection dataCollection = (Collection) context.get(fromKey);
+		BeanPropertyValueEqualsPredicate predicate = new BeanPropertyValueEqualsPredicate( filterExpression, filterValue );
+    	CollectionUtils.filter(dataCollection, predicate);
+    	context.put(fromKey, dataCollection);
+    	
+    	return false;
 	}
 
 }

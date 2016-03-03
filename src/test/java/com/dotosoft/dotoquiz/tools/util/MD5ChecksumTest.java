@@ -16,12 +16,11 @@
 
 package com.dotosoft.dotoquiz.tools.util;
 
-import com.dotosoft.dotoquiz.utils.MD5Checksum;
-import com.google.gdata.data.docs.Md5Checksum;
-
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
+
+import com.dotosoft.dotoquiz.utils.MD5Checksum;
 
 public class MD5ChecksumTest extends TestCase {
 	/**

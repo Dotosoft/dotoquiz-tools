@@ -21,6 +21,8 @@ import java.util.List;
 import org.apache.commons.chain.Command;
 import org.apache.commons.chain.Context;
 
+import com.dotosoft.dotoquiz.tools.util.BeanUtils;
+
 public class IterateCollectionCommand implements Command {
 	private String collectionKey;
 	private String incrementKey;
@@ -40,13 +42,13 @@ public class IterateCollectionCommand implements Command {
 
 	@Override
 	public boolean execute(Context context) throws Exception {
-		if(context.containsKey(collectionKey)) {
+		List coll = (List) BeanUtils.getProperty(context, collectionKey); 
+		if(coll != null && !coll.isEmpty()) {
 			Integer index = (Integer) context.get(incrementKey);
 			if(index == null) {
 				index = 0;
 			}
 			
-			List coll = (List) context.get(collectionKey);
 			if(index >= coll.size()) {
 				context.remove(toKey);
 				context.remove(incrementKey);

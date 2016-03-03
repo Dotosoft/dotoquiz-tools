@@ -76,6 +76,10 @@ public class Settings {
 		this.command = command;
 	}
 
+	public String getCommand() {
+		return command;
+	}
+
 	public StructureConfig getStructure() {
 		return structure;
 	}

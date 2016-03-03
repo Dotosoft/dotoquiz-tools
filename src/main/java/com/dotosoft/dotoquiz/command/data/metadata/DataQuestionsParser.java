@@ -27,7 +27,6 @@ import org.apache.commons.beanutils.BeanUtils;
 import com.dotosoft.dotoquiz.model.data.DataQuestions;
 import com.dotosoft.dotoquiz.tools.common.QuizParserConstant.APPLICATION_TYPE;
 
-
 public class DataQuestionsParser extends DataQuestions {
 	
 	public DataQuestionsParser(String id, String mtQuestionType,
