@@ -41,6 +41,7 @@ import org.apache.log4j.Logger;
 import com.dotosoft.dotoquiz.command.image.metadata.ImageInformation;
 import com.dotosoft.dotoquiz.tools.common.QuizParserConstant;
 import com.dotosoft.dotoquiz.tools.util.TimeUtils;
+import com.dotosoft.dotoquiz.utils.MD5Checksum;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.google.gdata.client.Query;
@@ -268,6 +269,20 @@ public class PicasawebClient implements ImageWebClient {
     	GphotoEntry photoEntry = (GphotoEntry) param;
     	// photoEntry.delete();
     	log.info( "Delete photo " + photoEntry.getTitle().getPlainText() );
+    }
+    
+    public Object uploadImageToAlbum(String imageFilePath, Object remotePhoto, Object albumEntry ) throws Exception {
+//    	java.nio.file.Path topicImagePath = FileUtils.getPath(settings.getSyncDataFolder(), topic.getId(), topic.getImageUrl());
+//    	// java.nio.file.Path topicImagePath = FileUtils.getPath(settings.getSyncDataFolder(), topic.getId(), topic.getImageUrl());
+//		if(topicImagePath.getParent().toFile().exists()) {
+//			if(!topicImagePath.toFile().exists()) {
+//				log.error("File is not found at '" + topicImagePath.toString() + "'. Please put the file and start this app again.");
+//				System.exit(1);
+//			}
+//			GphotoEntry photoEntry = (GphotoEntry) webClient.uploadImageToAlbum(topicImagePath.toFile(), photoEntry, albumEntry, MD5Checksum.getMD5Checksum(topicImagePath.toString()));
+//		}
+//    	return uploadImageToAlbum(imageFilePath, remotePhoto, albumEntry);
+    	return null;
     }
 
     public Object uploadImageToAlbum(File imageFile, Object remotePhoto, Object albumEntry, String localMd5CheckSum ) throws Exception {

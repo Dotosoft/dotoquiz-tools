@@ -16,7 +16,6 @@
 
 package com.dotosoft.dotoquiz.command.image;
 
-import org.apache.commons.chain.Command;
 import org.apache.commons.chain.Context;
 import org.apache.commons.chain.Filter;
 
