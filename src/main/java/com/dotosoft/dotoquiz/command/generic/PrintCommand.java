@@ -16,14 +16,21 @@
 
 package com.dotosoft.dotoquiz.command.generic;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.commons.chain.Command;
 import org.apache.commons.chain.Context;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 
 import com.dotosoft.dotoquiz.tools.util.BeanUtils;
 import com.dotosoft.dotoquiz.utils.StringUtils;
 
 public class PrintCommand implements Command {
 
+	private static final Logger log = LogManager.getLogger(Command.class.getName());
+	
 	private String message;
 	private String key;
 
@@ -38,13 +45,20 @@ public class PrintCommand implements Command {
 	@Override
 	public boolean execute(Context context) throws Exception {
 
+		String messageInfo = "";
+		
 		if (StringUtils.hasValue(message)) {
-			System.out.println(message);
+			messageInfo = message;
 		}
-
-		if (BeanUtils.getProperty(context, key) != null) {
-			System.out.println( BeanUtils.getProperty(context, key) );
+		
+		List paramMessages = new ArrayList();
+		String[] splitKeys = key.split(",");
+		for(String splitKey : splitKeys) {
+			Object param = BeanUtils.getProperty(context, splitKey);
+			paramMessages.add(param);
 		}
+		
+		log.info ( String.format(messageInfo, paramMessages.toArray()) );
 
 		return false;
 	}

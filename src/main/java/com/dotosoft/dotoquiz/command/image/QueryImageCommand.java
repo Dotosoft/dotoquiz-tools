@@ -29,8 +29,7 @@ import com.dotosoft.dotoquiz.utils.StringUtils;
 
 public class QueryImageCommand implements Filter {
 
-	private String authKey;
-	private String imageClassName;
+	private String apiKey;
 	private String toAlbumCollectionKey;
 	private String toPhotoCollectionKey;
 	private boolean showAll;
@@ -39,16 +38,12 @@ public class QueryImageCommand implements Filter {
 		this.toAlbumCollectionKey = toAlbumCollectionKey;
 	}
 
+	public void setApiKey(String apiKey) {
+		this.apiKey = apiKey;
+	}
+
 	public void setToPhotoCollectionKey(String toPhotoCollectionKey) {
 		this.toPhotoCollectionKey = toPhotoCollectionKey;
-	}
-
-	public void setAuthKey(String authKey) {
-		this.authKey = authKey;
-	}
-
-	public void setImageClassName(String imageClassName) {
-		this.imageClassName = imageClassName;
 	}
 
 	public void setShowAll(boolean showAll) {
@@ -57,22 +52,12 @@ public class QueryImageCommand implements Filter {
 
 	@Override
 	public boolean execute(Context context) throws Exception {
-		Class imageClazz = Class.forName(imageClassName);
-
-		ImageWebClient webClient;
-		if (StringUtils.hasValue(authKey)) {
-			Object credential = BeanUtils.getProperty(context, authKey);
-			if(credential != null) {
-				webClient = SingletonFactory.getInstance(imageClazz, credential);
-			} else {
-				webClient = SingletonFactory.getInstance(imageClazz, context);
-			}
-		} else {
-			webClient = SingletonFactory.getInstance(imageClazz, context);
+		ImageWebClient webClient = (ImageWebClient) BeanUtils.getProperty(context, apiKey);
+		if(webClient == null) {
+			throw new Exception("Image API is not exist!");
 		}
 
 		List albumCollections = webClient.getAlbums(showAll);
-		
 		if(StringUtils.hasValue(toPhotoCollectionKey)) {
 			List photoCollections = new ArrayList();
 			for(Object album : albumCollections) {

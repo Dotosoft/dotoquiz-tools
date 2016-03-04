@@ -26,7 +26,7 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
 import com.dotosoft.dotoquiz.command.auth.impl.GoogleOAuth;
-import com.dotosoft.dotoquiz.command.data.impl.GooglesheetClient;
+import com.dotosoft.dotoquiz.command.datasheet.impl.GooglesheetClient;
 import com.dotosoft.dotoquiz.tools.config.Settings;
 import com.dotosoft.dotoquiz.tools.util.SyncState;
 import com.google.gdata.data.spreadsheet.WorksheetEntry;
@@ -71,7 +71,7 @@ public class OldAppTest  extends TestCase
      * @throws ServiceException 
      * @throws IOException 
      */
-    public void testOldApp() throws IOException, ServiceException
+    public void testOldApp() throws Exception
     {
     	settings = new Settings();
 		syncState = new SyncState();
@@ -99,7 +99,7 @@ public class OldAppTest  extends TestCase
 	                isError = true;
 	            }
 	            
-	            WorksheetEntry worksheetEntry = webClient.getWorksheet(0);
+	            WorksheetEntry worksheetEntry = (WorksheetEntry) webClient.getWorksheet(0);
 	            webClient.getListRows(worksheetEntry);
 	        }
 		} else {

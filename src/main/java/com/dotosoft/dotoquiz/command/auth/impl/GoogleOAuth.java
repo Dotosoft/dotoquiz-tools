@@ -25,7 +25,7 @@ import java.util.List;
 import org.apache.commons.chain.Context;
 import org.apache.log4j.Logger;
 
-import com.dotosoft.dotoquiz.command.data.impl.GooglesheetClient;
+import com.dotosoft.dotoquiz.command.datasheet.impl.GooglesheetClient;
 import com.dotosoft.dotoquiz.command.image.impl.PicasawebClient;
 import com.dotosoft.dotoquiz.tools.common.QuizParserConstant;
 import com.dotosoft.dotoquiz.tools.config.DotoQuizContext;

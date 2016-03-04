@@ -41,7 +41,6 @@ import org.apache.log4j.Logger;
 import com.dotosoft.dotoquiz.command.image.metadata.ImageInformation;
 import com.dotosoft.dotoquiz.tools.common.QuizParserConstant;
 import com.dotosoft.dotoquiz.tools.util.TimeUtils;
-import com.dotosoft.dotoquiz.utils.MD5Checksum;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.google.gdata.client.Query;

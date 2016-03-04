@@ -14,7 +14,7 @@
 	limitations under the License.
 */
 
-package com.dotosoft.dotoquiz.command.data.impl;
+package com.dotosoft.dotoquiz.command.datasheet.impl;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -24,8 +24,13 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
+
+import com.dotosoft.dotoquiz.tools.OldApp;
 import com.dotosoft.dotoquiz.tools.common.QuizParserConstant;
 import com.google.api.client.auth.oauth2.Credential;
+import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.google.gdata.client.spreadsheet.SpreadsheetService;
 import com.google.gdata.data.PlainTextConstruct;
 import com.google.gdata.data.spreadsheet.ListEntry;
@@ -36,7 +41,9 @@ import com.google.gdata.data.spreadsheet.WorksheetEntry;
 import com.google.gdata.util.ServiceException;
 
 
-public class GooglesheetClient {
+public class GooglesheetClient implements DatasheetClient {
+	
+	private static final Logger log = LogManager.getLogger(GooglesheetClient.class.getName());
 	
 	private final SpreadsheetService service = new SpreadsheetService(QuizParserConstant.SYNC_CLIENT_NAME);
 
@@ -44,6 +51,10 @@ public class GooglesheetClient {
     private final URL SPREADSHEET_FEED_URL;
     private String spreadsheetQuery;
     private SpreadsheetEntry spreadsheetEntry;
+    
+    public GooglesheetClient( GoogleCredential credential, String spreadsheetName) throws MalformedURLException, IOException, ServiceException {
+    	this((Credential) credential, spreadsheetName);
+    }
 	
 	public GooglesheetClient( Credential credential, String spreadsheetName) throws MalformedURLException, IOException, ServiceException {
 		SPREADSHEET_FEED_URL = new URL("https://spreadsheets.google.com/feeds/spreadsheets/private/full");
@@ -67,14 +78,14 @@ public class GooglesheetClient {
 	    }
 	}
 	
-	public WorksheetEntry getWorksheet(int index) throws IOException, ServiceException {
+	public Object getWorksheet(int index) throws Exception {
 		// Make a request to the API to fetch information about all worksheets in the spreadsheet.
 	    List<WorksheetEntry> worksheets = spreadsheetEntry.getWorksheets();
 
 	    return worksheets.get(index);
 	}
 	
-	public List<WorksheetEntry> getWorksheets() throws IOException, ServiceException {
+	public List getWorksheets() throws Exception {
 		List<WorksheetEntry> worksheetEntries = new ArrayList<WorksheetEntry>();
 		
 		// Make a request to the API to fetch information about all worksheets in the spreadsheet.
@@ -88,7 +99,7 @@ public class GooglesheetClient {
 		return worksheetEntries;
 	}
 	
-	public WorksheetEntry createNewSheet(String title, int col, int row) throws IOException, ServiceException {
+	public Object createNewSheet(String title, int col, int row) throws Exception {
 		// Create a local representation of the new worksheet.
 	    WorksheetEntry worksheet = new WorksheetEntry();
 	    worksheet.setTitle(new PlainTextConstruct("New Worksheet"));
@@ -98,17 +109,17 @@ public class GooglesheetClient {
 	    return service.insert(SPREADSHEET_FEED_URL, worksheet);
 	}
 	
-	public WorksheetEntry updateSheet(WorksheetEntry worksheetEntry) throws IOException, ServiceException {
-	    return worksheetEntry.update();
+	public Object updateSheet(Object worksheetEntry) throws Exception {
+	    return ((WorksheetEntry) worksheetEntry).update();
 	}
 	
-	public void deleteSheet(WorksheetEntry worksheetEntry) throws IOException, ServiceException {
-	    worksheetEntry.delete();
+	public void deleteSheet(Object worksheetEntry) throws Exception {
+		((WorksheetEntry) worksheetEntry).delete();
 	}
 	
-	public List<ListEntry> getListRows(WorksheetEntry worksheet) throws IOException, ServiceException {
+	public List getListRows(Object worksheet) throws Exception {
 		// Fetch the list feed of the worksheet.
-	    URL listFeedUrl = worksheet.getListFeedUrl();
+	    URL listFeedUrl = ((WorksheetEntry) worksheet).getListFeedUrl();
 	    ListFeed listFeed = service.getFeed(listFeedUrl, ListFeed.class);
 	    return listFeed.getEntries();
 	}
@@ -146,5 +157,14 @@ public class GooglesheetClient {
 	public void deleteRow(ListEntry rowEntry) throws IOException, ServiceException, URISyntaxException {
 	    // Send the new row to the API for insertion.
 	    rowEntry.delete();
+	}
+
+	@Override
+	public void showColumnHeader(Object rowEntry) {
+		ListEntry listEntry = (ListEntry) rowEntry;
+		int index = 0;
+		for (String tag : listEntry.getCustomElements().getTags()) {
+			log.info("\tColumn" + (index++) + ": " + tag);
+		}
 	}
 }

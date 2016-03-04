@@ -4,24 +4,44 @@
 		<command id="doAuthenticateGoogleAPI" className="com.dotosoft.dotoquiz.command.auth.AuthCommand" 
 			toKey="credential" authClassName="com.dotosoft.dotoquiz.command.auth.impl.GoogleOAuth"
 			returnClassName="com.google.api.client.auth.oauth2.Credential" />
+		<command id="" className="com.dotosoft.dotoquiz.command.image.CreateImageAPICommand" 
+			imageClassName="com.dotosoft.dotoquiz.command.image.impl.PicasawebClient" 
+			authKey="credential" toKey="imageAPI" />
 		<command id="doQueryImageFromPicasa" className="com.dotosoft.dotoquiz.command.image.QueryImageCommand" 
-			showAll="true" imageClassName="com.dotosoft.dotoquiz.command.image.impl.PicasawebClient"
-			authKey="credential" toAlbumCollectionKey="albumCollection"/>
-			
+			showAll="true" apiKey="imageAPI" toAlbumCollectionKey="albumCollection"/>
 		<chain name="doClearAllImagePicasa" className="com.dotosoft.dotoquiz.command.generic.LoopCommand"
-			checkKey="album" doWhile="true" indexKey="indexAlbum">
-			
+			checkCollectionKey="albumCollection" doWhile="true" indexKey="indexAlbum">
 			<command name="doGetAlbumByIndex" className="com.dotosoft.dotoquiz.command.generic.GetCollectionByIndexCommand" 
 				collectionKey="albumCollection" indexKey="indexAlbum" toKey="album"/>
 			<command id="doDeletePicasaImage" className="com.dotosoft.dotoquiz.command.image.DeleteImageCommand" 
-				imageClassName="com.dotosoft.dotoquiz.command.image.impl.PicasawebClient"
-				authKey="credential" fromKey="album"/>
-			
+				apiKey="imageAPI" fromKey="album"/>
 		</chain>
 	</chain>
 	
 	<chain name="SHOW_COLUMN_HEADER">
-		<command className="com.dotosoft.dotoquiz.command.generic.PrintCommand" message="DO SHOW_COLUMN_HEADER"/>
+		<command id="doAuthenticateGoogleAPI" className="com.dotosoft.dotoquiz.command.auth.AuthCommand" 
+			toKey="credential" authClassName="com.dotosoft.dotoquiz.command.auth.impl.GoogleOAuth"
+			returnClassName="com.google.api.client.auth.oauth2.Credential" />
+		<command className="com.dotosoft.dotoquiz.command.datasheet.CreateDatasheetAPICommand" 
+			dataClassName="com.dotosoft.dotoquiz.command.datasheet.impl.GooglesheetClient"  
+			authKey="credential" dataKey="settings.syncDataFile" toKey="datasheetAPI" />
+		<command className="com.dotosoft.dotoquiz.command.datasheet.GetWorksheetCommand" 
+			apiKey="datasheetAPI" toKey="datasheetCollection" />
+		<chain name="doIterateWorksheet" className="com.dotosoft.dotoquiz.command.generic.LoopCommand"
+			checkCollectionKey="datasheetCollection" doWhile="true" indexKey="indexWorksheet">			
+			<command name="doGetDatasheetByIndex" className="com.dotosoft.dotoquiz.command.generic.GetCollectionByIndexCommand" 
+				collectionKey="datasheetCollection" indexKey="indexWorksheet" toKey="datasheet"/>
+			<command name="doPrintWorksheetName" className="com.dotosoft.dotoquiz.command.generic.PrintCommand" message="Worksheet name: %s" key="datasheet.title.plainText" />
+			<command name="doGetRowEntryByIndex" className="com.dotosoft.dotoquiz.command.datasheet.ListEntrysheetCommand"
+				apiKey="datasheetAPI" dataKey="datasheet" toKey="rowEntryCollection" />
+			<chain name="doIterateListEntry" className="com.dotosoft.dotoquiz.command.generic.LoopCommand"
+				loopTime="1" indexKey="indexRowEntry">
+				<command name="doGetRowEntryByIndex" className="com.dotosoft.dotoquiz.command.generic.GetCollectionByIndexCommand" 
+					collectionKey="rowEntryCollection" indexKey="indexRowEntry" toKey="rowEntry"/>
+				<command name="doShowColumnHeader" className="com.dotosoft.dotoquiz.command.datasheet.ShowColumnHeaderCommand"
+					apiKey="datasheetAPI" dataKey="rowEntry" />
+			</chain>
+		</chain>
 	</chain>
 	
 	<chain name="SYNC">

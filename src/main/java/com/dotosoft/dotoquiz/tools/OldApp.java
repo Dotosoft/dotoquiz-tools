@@ -37,10 +37,10 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 
 import com.dotosoft.dotoquiz.command.auth.impl.GoogleOAuth;
-import com.dotosoft.dotoquiz.command.data.impl.GooglesheetClient;
 import com.dotosoft.dotoquiz.command.data.metadata.DataQuestionsParser;
 import com.dotosoft.dotoquiz.command.data.metadata.DataTopicsParser;
 import com.dotosoft.dotoquiz.command.data.metadata.ParameterAchievementParser;
+import com.dotosoft.dotoquiz.command.datasheet.impl.GooglesheetClient;
 import com.dotosoft.dotoquiz.command.image.impl.PicasawebClient;
 import com.dotosoft.dotoquiz.common.QuizConstant;
 import com.dotosoft.dotoquiz.tools.common.QuizParserConstant;
@@ -207,7 +207,7 @@ public class OldApp {
 				    listRow = Lists.newArrayList(sheet.iterator());
 				    sheetName = sheet.getSheetName();
 				} else if(DATA_TYPE.GOOGLESHEET.toString().equals(settings.getDataType())) {
-				    fullSheet = googlesheetClient.getWorksheet(Integer.parseInt(achievementTab));
+				    fullSheet = (WorksheetEntry) googlesheetClient.getWorksheet(Integer.parseInt(achievementTab));
 				    listRow = googlesheetClient.getListRows(fullSheet);
 				    sheetName = fullSheet.getTitle().getPlainText();
 				}
@@ -245,7 +245,7 @@ public class OldApp {
 				    listRow = Lists.newArrayList(sheet.iterator());
 				    sheetName = sheet.getSheetName();
 				} else if(DATA_TYPE.GOOGLESHEET.toString().equals(settings.getDataType())) {
-				    fullSheet = googlesheetClient.getWorksheet(Integer.parseInt(dataTab));
+				    fullSheet = (WorksheetEntry) googlesheetClient.getWorksheet(Integer.parseInt(dataTab));
 				    listRow = googlesheetClient.getListRows(fullSheet);
 				    sheetName = fullSheet.getTitle().getPlainText();
 				}
@@ -288,7 +288,7 @@ public class OldApp {
 				    listRow = Lists.newArrayList(sheet.iterator());
 				    sheetName = sheet.getSheetName();
 				} else if(DATA_TYPE.GOOGLESHEET.toString().equals(settings.getDataType())) {
-				    fullSheet = googlesheetClient.getWorksheet(Integer.parseInt(dataTab));
+				    fullSheet = (WorksheetEntry) googlesheetClient.getWorksheet(Integer.parseInt(dataTab));
 				    listRow = googlesheetClient.getListRows(fullSheet);
 				    sheetName = fullSheet.getTitle().getPlainText();
 				}

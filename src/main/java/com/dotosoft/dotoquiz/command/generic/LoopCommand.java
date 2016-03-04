@@ -16,17 +16,25 @@
 
 package com.dotosoft.dotoquiz.command.generic;
 
+import java.util.Collection;
+
 import org.apache.commons.chain.Context;
 import org.apache.commons.chain.impl.ChainBase;
 
 import com.dotosoft.dotoquiz.tools.util.BeanUtils;
+import com.dotosoft.dotoquiz.utils.StringUtils;
 
 public class LoopCommand extends ChainBase {
 
-	public boolean doWhile = false;
-	public String checkKey;
-	public int loopTime = 0;
-	public String indexKey;
+	private boolean doWhile = false;
+	private String checkKey;
+	private String checkCollectionKey;
+	private int loopTime = 0;
+	private String indexKey;
+
+	public void setCheckCollectionKey(String checkCollectionKey) {
+		this.checkCollectionKey = checkCollectionKey;
+	}
 
 	public void setIndexKey(String indexKey) {
 		this.indexKey = indexKey;
@@ -47,22 +55,32 @@ public class LoopCommand extends ChainBase {
 	@Override
 	public boolean execute(Context context) throws Exception {
 		
+		if(StringUtils.hasValue(checkCollectionKey)) {
+			Collection collection = (Collection) BeanUtils.getProperty(context, checkCollectionKey);
+			loopTime = collection.size();
+		}
+		
 		boolean result = false;
 		Integer index = (Integer) BeanUtils.getProperty(context, indexKey, 0);
 		context.put(indexKey, index);
 		
-		boolean isLoopTime = (loopTime > 0);
+		int loopTimeCheck = loopTime;
+		
+		boolean isLoopTime = (loopTimeCheck > 0);
 		if (doWhile) {
 			result = super.execute(context);
-			if(isLoopTime) loopTime -= 1;
+			if(isLoopTime) loopTimeCheck -= 1;
 			context.put(indexKey, ++index);
 		}
-		while((isLoopTime && loopTime > 0) || BeanUtils.getProperty(context, checkKey) != null) {
+		while((isLoopTime && loopTimeCheck > 0) || (StringUtils.hasValue(checkKey) && BeanUtils.getProperty(context, checkKey) != null)) {
 			result = super.execute(context);
-			if (isLoopTime) loopTime -= 1;
+			if (isLoopTime) loopTimeCheck -= 1;
 			if (result) break;
 			context.put(indexKey, ++index);
 		}
+		
+		context.remove(indexKey);
+		
 		return result;
 	}
 

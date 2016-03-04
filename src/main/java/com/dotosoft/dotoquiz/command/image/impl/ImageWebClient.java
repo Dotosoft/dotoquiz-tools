@@ -16,7 +16,6 @@
 
 package com.dotosoft.dotoquiz.command.image.impl;
 
-import java.io.File;
 import java.util.List;
 
 public interface ImageWebClient {

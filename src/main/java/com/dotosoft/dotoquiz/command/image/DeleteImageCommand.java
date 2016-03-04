@@ -26,41 +26,26 @@ import com.dotosoft.dotoquiz.utils.StringUtils;
 
 public class DeleteImageCommand implements Filter {
 
-	private String authKey;
-	private String imageClassName;
+	private String apiKey;
 	private String fromKey;
 
 	public void setFromKey(String fromKey) {
 		this.fromKey = fromKey;
 	}
 
-	public void setAuthKey(String authKey) {
-		this.authKey = authKey;
-	}
-
-	public void setImageClassName(String imageClassName) {
-		this.imageClassName = imageClassName;
+	public void setApiKey(String apiKey) {
+		this.apiKey = apiKey;
 	}
 
 	@Override
 	public boolean execute(Context context) throws Exception {
-		Class imageClazz = Class.forName(imageClassName);
-
-		ImageWebClient webClient;
-		if (StringUtils.hasValue(authKey)) {
-			Object credential = BeanUtils.getProperty(context, authKey);
-			if(credential != null)
-			{			
-				webClient = SingletonFactory.getInstance(imageClazz, credential);
-			} else {
-				webClient = SingletonFactory.getInstance(imageClazz, context);
-			}
-		} else {
-			webClient = SingletonFactory.getInstance(imageClazz, context);
-		}
 		
+		ImageWebClient webClient = (ImageWebClient) BeanUtils.getProperty(context, apiKey);
+		if(webClient == null) {
+			throw new Exception("Image API is not exist!");
+		}
 		Object photo = BeanUtils.getProperty(context, fromKey);
-		if(photo != null) {
+		if (photo != null) {
 			webClient.deletePhoto(photo);
 		}
 

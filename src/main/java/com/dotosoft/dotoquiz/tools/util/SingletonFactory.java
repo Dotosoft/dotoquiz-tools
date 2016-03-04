@@ -62,7 +62,7 @@ public class SingletonFactory {
 		}
 	}
 	
-	public static <T> T getInstance(Class<T> clazz, Object params) throws InstantiationException,
+	public static <T> T getInstance(Class<T> clazz, Object... params) throws InstantiationException,
 			IllegalAccessException, NoSuchMethodException, SecurityException,
 			IllegalArgumentException, InvocationTargetException {
 		if (INSTANCES.containsKey(clazz)) {

@@ -10,8 +10,7 @@ import com.dotosoft.dotoquiz.utils.StringUtils;
 
 public class AddAlbumCommand implements Filter {
 
-	private String imageClassName;
-	private String authKey;
+	private String apiKey;
 	private String title;
 	private String description;
 	private String checkKey;
@@ -20,15 +19,7 @@ public class AddAlbumCommand implements Filter {
 	public void setCheckKey(String checkKey) {
 		this.checkKey = checkKey;
 	}
-
-	public void setImageClassName(String imageClassName) {
-		this.imageClassName = imageClassName;
-	}
-
-	public void setAuthKey(String authKey) {
-		this.authKey = authKey;
-	}
-
+	
 	public void setTitle(String title) {
 		this.title = title;
 	}
@@ -43,20 +34,11 @@ public class AddAlbumCommand implements Filter {
 
 	@Override
 	public boolean execute(Context context) throws Exception {
-		Class imageClazz = Class.forName(imageClassName);
-
-		ImageWebClient webClient;
-		if (StringUtils.hasValue(authKey)) {
-			Object credential = BeanUtils.getProperty(context, authKey);
-			if (credential != null) {
-				webClient = SingletonFactory.getInstance(imageClazz, credential);
-			} else {
-				webClient = SingletonFactory.getInstance(imageClazz, context);
-			}
-		} else {
-			webClient = SingletonFactory.getInstance(imageClazz, context);
+		
+		ImageWebClient webClient = (ImageWebClient) BeanUtils.getProperty(context, apiKey);
+		if(webClient == null) {
+			throw new Exception("Image API is not exist!");
 		}
-
 		boolean isInsert = true;
 		if(StringUtils.hasValue(checkKey)) {
 			if(BeanUtils.getProperty(context, checkKey) == null) {
