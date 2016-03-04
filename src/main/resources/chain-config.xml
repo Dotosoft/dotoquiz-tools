@@ -7,7 +7,17 @@
 		<command id="doQueryImageFromPicasa" className="com.dotosoft.dotoquiz.command.image.QueryImageCommand" 
 			showAll="true" imageClassName="com.dotosoft.dotoquiz.command.image.impl.PicasawebClient"
 			authKey="credential" toAlbumCollectionKey="albumCollection"/>
-		<command name="doClearAllImagePicasa" className="com.dotosoft.dotoquiz.command.generic.LoopCommand" checkKey="album" doWhile="true"/>
+			
+		<chain name="doClearAllImagePicasa" className="com.dotosoft.dotoquiz.command.generic.LoopCommand"
+			checkKey="album" doWhile="true" indexKey="indexAlbum">
+			
+			<command name="doGetAlbumByIndex" className="com.dotosoft.dotoquiz.command.generic.GetCollectionByIndexCommand" 
+				collectionKey="albumCollection" indexKey="indexAlbum" toKey="album"/>
+			<command id="doDeletePicasaImage" className="com.dotosoft.dotoquiz.command.image.DeleteImageCommand" 
+				imageClassName="com.dotosoft.dotoquiz.command.image.impl.PicasawebClient"
+				authKey="credential" fromKey="album"/>
+			
+		</chain>
 	</chain>
 	
 	<chain name="SHOW_COLUMN_HEADER">
@@ -21,17 +31,4 @@
 	<chain name="DB">
 		<command className="com.dotosoft.dotoquiz.command.generic.PrintCommand" message="DO DB"/>
 	</chain>
-	
-	<chain name="doClearAllImagePicasa">
-		<command name="doIterateAlbum" className="org.apache.commons.chain.generic.LookupCommand" />
-		<command id="doDeletePicasaImage" className="com.dotosoft.dotoquiz.command.image.DeleteImageCommand" 
-			imageClassName="com.dotosoft.dotoquiz.command.image.impl.PicasawebClient"
-			authKey="credential" fromKey="album"/>
-	</chain>
-	
-	<command name="doIterateAlbum" collectionKey="albumCollection" incrementKey="indexAlbum" 
-		className="com.dotosoft.dotoquiz.command.generic.IterateCollectionCommand" toKey="album"/>
-		
-	<command name="doIteratePhoto" collectionKey="photoCollection" incrementKey="indexPhoto" 
-		className="com.dotosoft.dotoquiz.command.generic.IterateCollectionCommand" toKey="photo"/>
 </catalog>
