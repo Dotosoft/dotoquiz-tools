@@ -19,13 +19,13 @@ package com.dotosoft.dotoquiz.tools.config;
 import static java.lang.String.format;
 
 public class ImageConfig {
-	public String toDir;
-	public String fileSuffix;
-	public boolean removeGamma;
-	public int compressionLevel;
-	public String compressor;
-	public String logLevel;
-	public String resize;
+	private String toDir;
+	private String fileSuffix;
+	private boolean removeGamma;
+	private int compressionLevel;
+	private String compressor;
+	private String logLevel;
+	private String resize;
 
 	public String getToDir() {
 		return toDir;

@@ -68,9 +68,9 @@ import com.google.gdata.util.XmlBlob;
 public class PicasawebClient implements ImageWebClient {
     Logger log = Logger.getLogger(PicasawebClient.class);
     
-    public static final String AUTO_BACKUP_FOLDER = "Auto Backup";
-    public static final String AUTO_UPLOAD_TYPE = "InstantUploadAuto";
-    public static final String INSTANT_UPLOAD = "InstantUpload";
+    private static final String AUTO_BACKUP_FOLDER = "Auto Backup";
+    private static final String AUTO_UPLOAD_TYPE = "InstantUploadAuto";
+    private static final String INSTANT_UPLOAD = "InstantUpload";
     private static final String ALBUM_TYPE_PATTERN = "<gphoto:albumType>%s</gphoto:albumType>";
 
     private static final String API_PREFIX = "https://picasaweb.google.com/data/feed/api/user/";

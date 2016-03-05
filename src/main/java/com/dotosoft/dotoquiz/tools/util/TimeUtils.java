@@ -32,10 +32,6 @@ import com.google.gdata.data.photos.PhotoEntry;
  * Wrapper for useful time utilities...
  */
 public class TimeUtils {
-//    public static LocalDateTime getTimeFromMS( long milli ) {
-//        Instant instant = Instant.ofEpochMilli(milli);
-//        return LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
-//    }
 
     public static void sortPhotoEntriesNewestFirst( List<PhotoEntry> photos )
     {

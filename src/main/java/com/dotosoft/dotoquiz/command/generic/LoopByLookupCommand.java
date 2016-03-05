@@ -24,10 +24,10 @@ import com.dotosoft.dotoquiz.tools.util.BeanUtils;
 
 public class LoopByLookupCommand extends LookupCommand {
 
-	public boolean doWhile = false;
-	public String checkKey;
-	public int loopTime = 0;
-	public String indexKey;
+	private boolean doWhile = false;
+	private String checkKey;
+	private int loopTime = 0;
+	private String indexKey;
 
 	public void setIndexKey(String indexKey) {
 		this.indexKey = indexKey;
