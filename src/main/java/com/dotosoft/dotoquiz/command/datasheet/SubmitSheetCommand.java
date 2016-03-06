@@ -3,9 +3,6 @@ package com.dotosoft.dotoquiz.command.datasheet;
 import org.apache.commons.chain.Command;
 import org.apache.commons.chain.Context;
 
-import com.dotosoft.dotoquiz.command.datasheet.impl.DatasheetClient;
-import com.dotosoft.dotoquiz.tools.util.BeanUtils;
-
 public class SubmitSheetCommand implements Command {
 
 	public enum COMMAND_SHEET {
@@ -31,21 +28,21 @@ public class SubmitSheetCommand implements Command {
 	@Override
 	public boolean execute(Context context) throws Exception {
 
-		DatasheetClient webClient = (DatasheetClient) BeanUtils.getProperty(
-				context, apiKey);
-		if (webClient == null) {
-			throw new Exception("Image API is not exist!");
-		}
-
-		if (commandKey != COMMAND_SHEET.NONE) {
-			Object worksheet = BeanUtils.getProperty(context, dataKey);
-			if (commandKey != COMMAND_SHEET.UPDATE) {
-				context.put(dataKey, webClient.updateSheet(worksheet));
-			} else {
-				webClient.deleteSheet(worksheet);
-				context.remove(dataKey);
-			}
-		}
+//		DatasheetClient webClient = (DatasheetClient) BeanUtils.getProperty(
+//				context, apiKey);
+//		if (webClient == null) {
+//			throw new Exception("Image API is not exist!");
+//		}
+//
+//		if (commandKey != COMMAND_SHEET.NONE) {
+//			Object worksheet = BeanUtils.getProperty(context, dataKey);
+//			if (commandKey != COMMAND_SHEET.UPDATE) {
+//				context.put(dataKey, webClient.updateSheet(worksheet));
+//			} else {
+//				webClient.deleteSheet(worksheet);
+//				context.remove(dataKey);
+//			}
+//		}
 
 		return false;
 	}

@@ -14,7 +14,7 @@
 	limitations under the License.
 */
 
-package com.dotosoft.dotoquiz.command.datasheet.impl;
+package com.dotosoft.dotoquiz.tools.thirdparty;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -27,7 +27,6 @@ import java.util.List;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
-import com.dotosoft.dotoquiz.tools.OldApp;
 import com.dotosoft.dotoquiz.tools.common.QuizParserConstant;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
@@ -41,7 +40,7 @@ import com.google.gdata.data.spreadsheet.WorksheetEntry;
 import com.google.gdata.util.ServiceException;
 
 
-public class GooglesheetClient implements DatasheetClient {
+public class GooglesheetClient {
 	
 	private static final Logger log = LogManager.getLogger(GooglesheetClient.class.getName());
 	
@@ -78,14 +77,14 @@ public class GooglesheetClient implements DatasheetClient {
 	    }
 	}
 	
-	public Object getWorksheet(int index) throws Exception {
+	public WorksheetEntry getWorksheet(int index) throws Exception {
 		// Make a request to the API to fetch information about all worksheets in the spreadsheet.
 	    List<WorksheetEntry> worksheets = spreadsheetEntry.getWorksheets();
 
 	    return worksheets.get(index);
 	}
 	
-	public List getWorksheets() throws Exception {
+	public List<WorksheetEntry> getWorksheets() throws Exception {
 		List<WorksheetEntry> worksheetEntries = new ArrayList<WorksheetEntry>();
 		
 		// Make a request to the API to fetch information about all worksheets in the spreadsheet.
@@ -99,7 +98,7 @@ public class GooglesheetClient implements DatasheetClient {
 		return worksheetEntries;
 	}
 	
-	public Object createNewSheet(String title, int col, int row) throws Exception {
+	public WorksheetEntry createNewSheet(String title, int col, int row) throws Exception {
 		// Create a local representation of the new worksheet.
 	    WorksheetEntry worksheet = new WorksheetEntry();
 	    worksheet.setTitle(new PlainTextConstruct("New Worksheet"));
@@ -109,17 +108,17 @@ public class GooglesheetClient implements DatasheetClient {
 	    return service.insert(SPREADSHEET_FEED_URL, worksheet);
 	}
 	
-	public Object updateSheet(Object worksheetEntry) throws Exception {
-	    return ((WorksheetEntry) worksheetEntry).update();
+	public WorksheetEntry updateSheet(WorksheetEntry worksheetEntry) throws Exception {
+	    return worksheetEntry.update();
 	}
 	
-	public void deleteSheet(Object worksheetEntry) throws Exception {
-		((WorksheetEntry) worksheetEntry).delete();
+	public void deleteSheet(WorksheetEntry worksheetEntry) throws Exception {
+		worksheetEntry.delete();
 	}
 	
-	public List getListRows(Object worksheet) throws Exception {
+	public List getListRows(WorksheetEntry worksheet) throws Exception {
 		// Fetch the list feed of the worksheet.
-	    URL listFeedUrl = ((WorksheetEntry) worksheet).getListFeedUrl();
+	    URL listFeedUrl = worksheet.getListFeedUrl();
 	    ListFeed listFeed = service.getFeed(listFeedUrl, ListFeed.class);
 	    return listFeed.getEntries();
 	}
@@ -159,9 +158,7 @@ public class GooglesheetClient implements DatasheetClient {
 	    rowEntry.delete();
 	}
 
-	@Override
-	public void showColumnHeader(Object rowEntry) {
-		ListEntry listEntry = (ListEntry) rowEntry;
+	public void showColumnHeader(ListEntry listEntry) {
 		int index = 0;
 		for (String tag : listEntry.getCustomElements().getTags()) {
 			log.info("\tColumn" + (index++) + ": " + tag);

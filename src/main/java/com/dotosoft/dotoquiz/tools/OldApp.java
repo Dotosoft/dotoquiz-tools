@@ -36,18 +36,18 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
-import com.dotosoft.dotoquiz.command.auth.impl.GoogleOAuth;
-import com.dotosoft.dotoquiz.command.data.metadata.DataQuestionsParser;
-import com.dotosoft.dotoquiz.command.data.metadata.DataTopicsParser;
-import com.dotosoft.dotoquiz.command.data.metadata.ParameterAchievementParser;
-import com.dotosoft.dotoquiz.command.datasheet.impl.GooglesheetClient;
-import com.dotosoft.dotoquiz.command.image.impl.PicasawebClient;
 import com.dotosoft.dotoquiz.common.QuizConstant;
 import com.dotosoft.dotoquiz.tools.common.QuizParserConstant;
 import com.dotosoft.dotoquiz.tools.common.QuizParserConstant.APPLICATION_TYPE;
 import com.dotosoft.dotoquiz.tools.common.QuizParserConstant.DATA_TYPE;
 import com.dotosoft.dotoquiz.tools.common.QuizParserConstant.IMAGE_HOSTING_TYPE;
 import com.dotosoft.dotoquiz.tools.config.Settings;
+import com.dotosoft.dotoquiz.tools.thirdparty.GoogleOAuth;
+import com.dotosoft.dotoquiz.tools.thirdparty.GooglesheetClient;
+import com.dotosoft.dotoquiz.tools.thirdparty.PicasawebClient;
+import com.dotosoft.dotoquiz.tools.thirdparty.metadata.DataQuestionsParser;
+import com.dotosoft.dotoquiz.tools.thirdparty.metadata.DataTopicsParser;
+import com.dotosoft.dotoquiz.tools.thirdparty.metadata.ParameterAchievementParser;
 import com.dotosoft.dotoquiz.tools.util.DotoQuizStructure;
 import com.dotosoft.dotoquiz.tools.util.HibernateUtil;
 import com.dotosoft.dotoquiz.tools.util.SyncState;
@@ -95,7 +95,7 @@ public class OldApp {
 		if( settings.loadSettings(args) ) {
 			log.info("Starting and setup Doto Parser...");
 			
-			auth = new GoogleOAuth();
+//			auth = new GoogleOAuth();
 			
 			if(APPLICATION_TYPE.DB.toString().equals(settings.getApplicationType())) {
 				log.info("Building hibernate...");
@@ -105,7 +105,7 @@ public class OldApp {
 			log.info("Initialising Web client and authenticating...");
 	        if( webClient == null ) {
 	            try {
-	                webClient = auth.authenticatePicasa(false, syncState );
+//	                webClient = auth.authenticatePicasa(false, syncState );
 	            }
 	            catch( Exception _ex ) {
 	            	// settings.showError();
@@ -183,7 +183,7 @@ public class OldApp {
 			    file = new FileInputStream(settings.getSyncDataFile());
 			    workbook = new XSSFWorkbook(file);			 
 			} else if(DATA_TYPE.GOOGLESHEET.toString().equals(settings.getDataType())) {
-				googlesheetClient = auth.authenticateGooglesheet(settings.getSyncDataFile(), settings, false, syncState );
+//				googlesheetClient = auth.authenticateGooglesheet(settings.getSyncDataFile(), settings, false, syncState );
 			}
 			
 			int index = 0;

@@ -14,7 +14,7 @@
 	limitations under the License.
 */
 
-package com.dotosoft.dotoquiz.command.data.metadata;
+package com.dotosoft.dotoquiz.tools.thirdparty.metadata;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;

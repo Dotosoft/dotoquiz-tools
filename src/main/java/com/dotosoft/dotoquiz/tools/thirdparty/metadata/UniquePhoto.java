@@ -14,7 +14,7 @@
 	limitations under the License.
 */
 
-package com.dotosoft.dotoquiz.command.image.metadata;
+package com.dotosoft.dotoquiz.tools.thirdparty.metadata;
 
 import java.io.File;
 import java.io.IOException;

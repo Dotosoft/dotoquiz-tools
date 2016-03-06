@@ -14,9 +14,9 @@
 	limitations under the License.
 */
 
-package com.dotosoft.dotoquiz.command.image.impl;
+package com.dotosoft.dotoquiz.tools.thirdparty;
 
-import static com.dotosoft.dotoquiz.command.image.metadata.ImageInformation.safeReadImageInformation;
+import static com.dotosoft.dotoquiz.tools.thirdparty.metadata.ImageInformation.safeReadImageInformation;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -38,8 +38,8 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 
-import com.dotosoft.dotoquiz.command.image.metadata.ImageInformation;
 import com.dotosoft.dotoquiz.tools.common.QuizParserConstant;
+import com.dotosoft.dotoquiz.tools.thirdparty.metadata.ImageInformation;
 import com.dotosoft.dotoquiz.tools.util.TimeUtils;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
@@ -65,7 +65,7 @@ import com.google.gdata.util.ParseException;
 import com.google.gdata.util.ServiceException;
 import com.google.gdata.util.XmlBlob;
 
-public class PicasawebClient implements ImageWebClient {
+public class PicasawebClient {
     Logger log = Logger.getLogger(PicasawebClient.class);
     
     private static final String AUTO_BACKUP_FOLDER = "Auto Backup";
@@ -264,13 +264,12 @@ public class PicasawebClient implements ImageWebClient {
     	return photoCollection;
     }
 
-    public void deletePhoto(Object param) throws Exception {
-    	GphotoEntry photoEntry = (GphotoEntry) param;
+    public void deletePhoto(GphotoEntry photoEntry) throws Exception {
     	// photoEntry.delete();
     	log.info( "Delete photo " + photoEntry.getTitle().getPlainText() );
     }
     
-    public Object uploadImageToAlbum(String imageFilePath, Object remotePhoto, Object albumEntry ) throws Exception {
+    public GphotoEntry uploadImageToAlbum(String imageFilePath, GphotoEntry remotePhoto, GphotoEntry albumEntry ) throws Exception {
 //    	java.nio.file.Path topicImagePath = FileUtils.getPath(settings.getSyncDataFolder(), topic.getId(), topic.getImageUrl());
 //    	// java.nio.file.Path topicImagePath = FileUtils.getPath(settings.getSyncDataFolder(), topic.getId(), topic.getImageUrl());
 //		if(topicImagePath.getParent().toFile().exists()) {
@@ -284,10 +283,10 @@ public class PicasawebClient implements ImageWebClient {
     	return null;
     }
 
-    public Object uploadImageToAlbum(File imageFile, Object remotePhoto, Object albumEntry, String localMd5CheckSum ) throws Exception {
+    public GphotoEntry uploadImageToAlbum(File imageFile, GphotoEntry remotePhoto, GphotoEntry albumEntry, String localMd5CheckSum ) throws Exception {
 
         boolean newPhoto = false;
-        String albumName = ((GphotoEntry) albumEntry).getTitle().getPlainText();
+        String albumName = albumEntry.getTitle().getPlainText();
         PhotoEntry  myPhoto = new PhotoEntry();
         
         if( remotePhoto == null )
@@ -297,7 +296,7 @@ public class PicasawebClient implements ImageWebClient {
         }
         else{
         	// BeanUtils.copyProperties(myPhoto, remotePhoto);
-        	((GphotoEntry) remotePhoto).delete();
+        	remotePhoto.delete();
             log.info( "Uploading updated image in album " + albumName + ": " + imageFile);
         }
 
@@ -315,14 +314,14 @@ public class PicasawebClient implements ImageWebClient {
             }
             else
             {
-            	myPhoto.setTitle(((GphotoEntry) remotePhoto).getTitle());
+            	myPhoto.setTitle(remotePhoto.getTitle());
             }
             
-            myPhoto = insert((GphotoEntry) albumEntry, myPhoto);
+            myPhoto = insert(albumEntry, myPhoto);
         } catch (Exception ex) {
             log.error("Unable to add media: " + imageFile + ": " + ex);
         } finally {
-        	 setUpdatedDate( (GphotoEntry) albumEntry, myPhoto, imageFile );
+        	 setUpdatedDate( albumEntry, myPhoto, imageFile );
         }
         
         return myPhoto;
@@ -488,7 +487,7 @@ public class PicasawebClient implements ImageWebClient {
      * Retrieves the albums for the given user.
      * albumUrl = addParameter(albumUrl, "hidestreamid", "photos_from_posts" );
      */
-    public List getAlbums(String username, boolean showall ) throws IOException, ServiceException {
+    public List getAlbums(String username, Boolean showall ) throws IOException, ServiceException {
         
         String albumUrl = API_PREFIX + username;
 
@@ -523,7 +522,7 @@ public class PicasawebClient implements ImageWebClient {
      * Retrieves the albums for the currently logged-in user.  This is equivalent
      * to calling {@link #getAlbums(String, boolean)} with "default" as the username.
      */
-    public List getAlbums( boolean showall ) throws Exception {
+    public List getAlbums( Boolean showall ) throws Exception {
         return getAlbums("default", showall);
     }
 
@@ -599,7 +598,7 @@ public class PicasawebClient implements ImageWebClient {
     /**
      * Retrieves the photos for the given album.
      */
-    public List getPhotos(Object photoEntry) throws IOException,
+    public List getPhotos(GphotoEntry photoEntry) throws IOException,
             ServiceException {
 
         List<GphotoEntry> photos = new ArrayList<GphotoEntry>();
@@ -679,14 +678,14 @@ public class PicasawebClient implements ImageWebClient {
      * Album-specific insert method to insert into the gallery of the current
      * user, this bypasses the need to have a top-level entry object for parent.
      */
-    public Object insertAlbum(AlbumEntry album) throws Exception {
+    public GphotoEntry insertAlbum(AlbumEntry album) throws Exception {
         log.info( "Adding new album: " + ((AlbumEntry) album).getTitle().getPlainText() );
 
         String feedUrl = API_PREFIX + "default";
         return service.insert(new URL(feedUrl), (AlbumEntry) album);
     }
     
-    public Object insertAlbum(String title, String description, boolean isPublic) throws Exception {
+    public GphotoEntry insertAlbum(String title, String description, boolean isPublic) throws Exception {
         
         AlbumEntry album = new AlbumEntry();
         if(isPublic) {

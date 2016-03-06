@@ -19,14 +19,14 @@ package com.dotosoft.dotoquiz.tools.util;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 
-import com.dotosoft.dotoquiz.command.data.metadata.DataQuestionsParser;
-import com.dotosoft.dotoquiz.command.data.metadata.DataTopicsParser;
-import com.dotosoft.dotoquiz.command.data.metadata.ParameterAchievementParser;
 import com.dotosoft.dotoquiz.common.QuizConstant;
 import com.dotosoft.dotoquiz.tools.common.QuizParserConstant;
 import com.dotosoft.dotoquiz.tools.common.QuizParserConstant.APPLICATION_TYPE;
 import com.dotosoft.dotoquiz.tools.common.QuizParserConstant.DATA_TYPE;
 import com.dotosoft.dotoquiz.tools.config.Settings;
+import com.dotosoft.dotoquiz.tools.thirdparty.metadata.DataQuestionsParser;
+import com.dotosoft.dotoquiz.tools.thirdparty.metadata.DataTopicsParser;
+import com.dotosoft.dotoquiz.tools.thirdparty.metadata.ParameterAchievementParser;
 import com.dotosoft.dotoquiz.utils.StringUtils;
 import com.google.gdata.data.spreadsheet.ListEntry;
 

@@ -14,7 +14,7 @@
 	limitations under the License.
 */
 
-package com.dotosoft.dotoquiz.command.data.metadata;
+package com.dotosoft.dotoquiz.tools.thirdparty.metadata;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Date;
@@ -23,31 +23,39 @@ import javax.persistence.Transient;
 
 import org.apache.commons.beanutils.BeanUtils;
 
-import com.dotosoft.dotoquiz.model.parameter.ParameterAchievements;
+import com.dotosoft.dotoquiz.model.data.DataTopics;
 import com.dotosoft.dotoquiz.tools.common.QuizParserConstant.APPLICATION_TYPE;
 
-public class ParameterAchievementParser extends ParameterAchievements {
-	public ParameterAchievementParser(String id, String picasaId,
-			String imagePicasaURL, String name, String description,
-			String imageURL, String isDelete, Date createdDt, String createdBy,
-			String isProcessed, APPLICATION_TYPE type) {
-		super(id, name, description, isDelete, imageURL, imagePicasaURL,
-				picasaId, createdDt, createdBy);
+public class DataTopicsParser extends DataTopics {
+	
+	public DataTopicsParser(String id, String picasaId, String imagePicasaUrl,
+			String topicParentId, String name, String description,
+			String imageUrl, String isDelete, Date createdDt, String createdBy,
+			String isProcessed, APPLICATION_TYPE applicationType) {
+		this.id = id;
+		this.picasaId = picasaId;
+		this.imagePicasaUrl = imagePicasaUrl;
+		this.name = name;
+		this.topicParentId = topicParentId;
+		this.description = description;
+		this.imageUrl = imageUrl;
+		this.isDelete = isDelete;
+		this.createdDt = createdDt;
+		this.createdBy = createdBy;
 		this.isProcessed = isProcessed;
 		this.applicationType = applicationType;
-		this.topicParentId = topicParentId;
 	}
-
+	
 	// only need for batch
 	@Transient
 	protected String isProcessed;
-
+	
 	@Transient
 	protected APPLICATION_TYPE applicationType;
-
+	
 	@Transient
 	protected String topicParentId;
-
+	
 	public String getTopicParentId() {
 		return topicParentId;
 	}
@@ -55,7 +63,7 @@ public class ParameterAchievementParser extends ParameterAchievements {
 	public void setTopicParentId(String topicParentId) {
 		this.topicParentId = topicParentId;
 	}
-
+	
 	public String getIsProcessed() {
 		return isProcessed;
 	}
@@ -63,7 +71,7 @@ public class ParameterAchievementParser extends ParameterAchievements {
 	public void setIsProcessed(String isProcessed) {
 		this.isProcessed = isProcessed;
 	}
-
+	
 	public APPLICATION_TYPE getApplicationType() {
 		return applicationType;
 	}
@@ -72,17 +80,20 @@ public class ParameterAchievementParser extends ParameterAchievements {
 		this.applicationType = applicationType;
 	}
 	
-	public ParameterAchievements toParameterAchievements() throws IllegalAccessException, InvocationTargetException {
-		ParameterAchievements achievement = new ParameterAchievements();
-		BeanUtils.copyProperties(achievement, this);
-		return achievement;
+	public DataTopics toDataTopics() throws IllegalAccessException, InvocationTargetException {
+		DataTopics datTopics = new DataTopics();
+		BeanUtils.copyProperties(datTopics, this);
+		return datTopics;
 	}
-
+	
 	@Override
 	public String toString() {
-		return "ParameterAchievementParser [isProcessed=" + isProcessed
-				+ ", applicationType=" + applicationType + ", topicParentId="
-				+ topicParentId + "]";
+		return "DataTopics [id=" + id + ", picasaId=" + picasaId
+				+ ", imagePicasaUrl=" + imagePicasaUrl + ", datTopics="
+				+ datTopics + ", name=" + name + ", description=" + description
+				+ ", imageUrl=" + imageUrl + ", isDelete=" + isDelete
+				+ ", createdDt=" + createdDt + ", createdBy=" + createdBy
+				+ ", isProcessed=" + isProcessed + ", applicationType="
+				+ applicationType + "]";
 	}
-
 }

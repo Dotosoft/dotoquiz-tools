@@ -19,9 +19,6 @@ package com.dotosoft.dotoquiz.command.datasheet;
 import org.apache.commons.chain.Command;
 import org.apache.commons.chain.Context;
 
-import com.dotosoft.dotoquiz.command.datasheet.impl.DatasheetClient;
-import com.dotosoft.dotoquiz.tools.util.BeanUtils;
-
 public class ShowColumnHeaderCommand implements Command {
 
 	private String apiKey;
@@ -37,15 +34,15 @@ public class ShowColumnHeaderCommand implements Command {
 
 	@Override
 	public boolean execute(Context context) throws Exception {
-		DatasheetClient webClient = (DatasheetClient) BeanUtils.getProperty(context, apiKey);
-		if (webClient == null) {
-			throw new Exception("API is not exist!");
-		}
-
-		Object value = BeanUtils.getProperty(context, dataKey);
-		if(value != null) {
-			webClient.showColumnHeader(value);
-		}
+//		DatasheetClient webClient = (DatasheetClient) BeanUtils.getProperty(context, apiKey);
+//		if (webClient == null) {
+//			throw new Exception("API is not exist!");
+//		}
+//
+//		Object value = BeanUtils.getProperty(context, dataKey);
+//		if(value != null) {
+//			webClient.showColumnHeader(value);
+//		}
 
 		return false;
 	}

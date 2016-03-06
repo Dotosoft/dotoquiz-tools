@@ -25,9 +25,9 @@ import junit.framework.TestSuite;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
-import com.dotosoft.dotoquiz.command.auth.impl.GoogleOAuth;
-import com.dotosoft.dotoquiz.command.datasheet.impl.GooglesheetClient;
 import com.dotosoft.dotoquiz.tools.config.Settings;
+import com.dotosoft.dotoquiz.tools.thirdparty.GoogleOAuth;
+import com.dotosoft.dotoquiz.tools.thirdparty.GooglesheetClient;
 import com.dotosoft.dotoquiz.tools.util.SyncState;
 import com.google.gdata.data.spreadsheet.WorksheetEntry;
 import com.google.gdata.util.ServiceException;
@@ -77,12 +77,12 @@ public class OldAppTest  extends TestCase
 		syncState = new SyncState();
 		
 		if( settings.loadSettings(args) ) {
-			auth = new GoogleOAuth();
+//			auth = new GoogleOAuth();
 			
 			log.info("Initialising Web client and authenticating...");
 	        if( webClient == null ) {
 	            try {
-	                webClient = auth.authenticateGooglesheet("Pertanyaan", settings, false, syncState );
+	                // webClient = auth.authenticateGooglesheet("Pertanyaan", settings, false, syncState );
 	            }
 	            catch( Exception _ex ) {
 	            	isError = true;

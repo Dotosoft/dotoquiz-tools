@@ -3,11 +3,6 @@ package com.dotosoft.dotoquiz.command.datasheet;
 import org.apache.commons.chain.Context;
 import org.apache.commons.chain.Filter;
 
-import com.dotosoft.dotoquiz.command.datasheet.impl.DatasheetClient;
-import com.dotosoft.dotoquiz.tools.util.BeanUtils;
-import com.dotosoft.dotoquiz.tools.util.SingletonFactory;
-import com.dotosoft.dotoquiz.utils.StringUtils;
-
 public class CreateDatasheetAPICommand implements Filter {
 
 	private String dataClassName;
@@ -33,22 +28,22 @@ public class CreateDatasheetAPICommand implements Filter {
 
 	@Override
 	public boolean execute(Context context) throws Exception {
-		Class dataClazz = Class.forName(dataClassName);
-
-		DatasheetClient webClient;
-		if (StringUtils.hasValue(authKey)) {
-			Object credential = BeanUtils.getProperty(context, authKey);
-			Object data = BeanUtils.getProperty(context, dataKey);
-			if (credential != null && data != null) {
-				webClient = SingletonFactory.getInstance(dataClazz, credential, data);
-			} else {
-				webClient = SingletonFactory.getInstance(dataClazz, context);
-			}
-		} else {
-			webClient = SingletonFactory.getInstance(dataClazz, context);
-		}
-
-		context.put(toKey, webClient);
+//		Class dataClazz = Class.forName(dataClassName);
+//
+//		DatasheetClient webClient;
+//		if (StringUtils.hasValue(authKey)) {
+//			Object credential = BeanUtils.getProperty(context, authKey);
+//			Object data = BeanUtils.getProperty(context, dataKey);
+//			if (credential != null && data != null) {
+//				webClient = SingletonFactory.getInstance(dataClazz, credential, data);
+//			} else {
+//				webClient = SingletonFactory.getInstance(dataClazz, context);
+//			}
+//		} else {
+//			webClient = SingletonFactory.getInstance(dataClazz, context);
+//		}
+//
+//		context.put(toKey, webClient);
 
 		return false;
 	}

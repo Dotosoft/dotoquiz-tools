@@ -18,24 +18,12 @@ package com.dotosoft.dotoquiz.tools.config;
 
 import org.apache.commons.chain.impl.ContextBase;
 
-import com.dotosoft.dotoquiz.tools.util.SyncState;
-
 public class DotoQuizContext extends ContextBase {
 
-	private SyncState syncState;
 	private Settings settings;
 
 	public DotoQuizContext() {
-		syncState = new SyncState();
 		settings = new Settings();
-	}
-
-	public SyncState getSyncState() {
-		return syncState;
-	}
-
-	public void setSyncState(SyncState syncState) {
-		this.syncState = syncState;
 	}
 
 	public Settings getSettings() {

@@ -1,13 +1,7 @@
 package com.dotosoft.dotoquiz.command.datasheet;
 
-import java.util.List;
-
 import org.apache.commons.chain.Command;
 import org.apache.commons.chain.Context;
-
-import com.dotosoft.dotoquiz.command.datasheet.impl.DatasheetClient;
-import com.dotosoft.dotoquiz.command.image.impl.ImageWebClient;
-import com.dotosoft.dotoquiz.tools.util.BeanUtils;
 
 public class ListEntrysheetCommand implements Command {
 
@@ -29,18 +23,18 @@ public class ListEntrysheetCommand implements Command {
 
 	@Override
 	public boolean execute(Context context) throws Exception {
-		DatasheetClient webClient = (DatasheetClient) BeanUtils.getProperty(context, apiKey);
-		if (webClient == null) {
-			throw new Exception("API is not exist!");
-		}
-
-		Object value = BeanUtils.getProperty(context, dataKey);
-		if(value != null) {
-			List listRow = webClient.getListRows(value);
-			context.put(toKey, listRow);
-		} else {
-			context.remove(toKey);
-		}
+//		DatasheetClient webClient = (DatasheetClient) BeanUtils.getProperty(context, apiKey);
+//		if (webClient == null) {
+//			throw new Exception("API is not exist!");
+//		}
+//
+//		Object value = BeanUtils.getProperty(context, dataKey);
+//		if(value != null) {
+//			List listRow = webClient.getListRows(value);
+//			context.put(toKey, listRow);
+//		} else {
+//			context.remove(toKey);
+//		}
 
 		return false;
 	}
