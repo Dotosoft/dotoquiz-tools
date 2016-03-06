@@ -17,6 +17,7 @@
 package com.dotosoft.dotoquiz.command.generic;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.chain.Command;
@@ -52,13 +53,19 @@ public class PrintCommand implements Command {
 		}
 		
 		List paramMessages = new ArrayList();
-		String[] splitKeys = key.split(",");
-		for(String splitKey : splitKeys) {
-			Object param = BeanUtils.getProperty(context, splitKey);
-			paramMessages.add(param);
+		if(StringUtils.hasValue(key)) {
+			String[] splitKeys = key.split(",");
+			for(String splitKey : splitKeys) {
+				Object param = BeanUtils.getProperty(context, splitKey);
+				paramMessages.add(param);
+			}
 		}
 		
-		log.info ( String.format(messageInfo, paramMessages.toArray()) );
+		if(StringUtils.hasValue(messageInfo)) {
+			log.info ( String.format(messageInfo, paramMessages.toArray()) );
+		} else {
+			log.info ( Arrays.toString(paramMessages.toArray() ));
+		}
 
 		return false;
 	}

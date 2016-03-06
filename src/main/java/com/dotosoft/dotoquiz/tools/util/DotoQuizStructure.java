@@ -73,6 +73,10 @@ public class DotoQuizStructure {
 		return result;
 	}
 	
+	public static ParameterAchievementParser convertDataToAchievement(ListEntry data, Settings setting) {
+		return convertDataToAchievement((Object) data, setting);
+	}
+	
 	public static ParameterAchievementParser convertDataToAchievement(Object data, Settings setting) {
 		String achievementId = getValueFromRowData(QuizParserConstant.PARSE_ACHIEVEMENT, setting, "iAchievementId", data);
 		if(!StringUtils.hasValue(achievementId)) return null;

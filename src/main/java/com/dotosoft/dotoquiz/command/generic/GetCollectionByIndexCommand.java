@@ -28,7 +28,14 @@ public class GetCollectionByIndexCommand implements Command {
 	public boolean execute(Context context) throws Exception {
 
 		Collection collection = (Collection) BeanUtils.getProperty(context, collectionKey);
-		Integer indexCollection = (Integer) BeanUtils.getProperty(context, indexKey);
+		
+		Object index = BeanUtils.getProperty(context, indexKey);
+		Integer indexCollection;
+		if(index instanceof Integer) {
+			indexCollection = (Integer) index;
+		} else {
+			indexCollection = Integer.parseInt(String.valueOf(index));
+		}
 
 		if (collection != null && indexCollection < collection.size()) {
 			context.put(toKey, collection.toArray()[indexCollection]);
