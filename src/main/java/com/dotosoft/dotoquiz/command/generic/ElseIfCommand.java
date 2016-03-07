@@ -5,32 +5,27 @@ import org.apache.commons.chain.impl.ChainBase;
 
 import com.dotosoft.dotoquiz.tools.util.BeanUtils;
 
-public class IfCommand extends ChainBase {
+public class ElseIfCommand extends ChainBase {
 
 	private static final String regexStr = "(?=[!=&|][=&|])|(?<=[!=&|][=&|])";
-	private static boolean ifFlag = true;
-	
+
 	private String evaluate;
-	
+
 	public void setEvaluate(String evaluate) {
 		this.evaluate = evaluate;
-	}
-	
-	public static boolean getIfCommandKey() {
-		return IfCommand.ifFlag;
 	}
 
 	@Override
 	public boolean execute(Context context) throws Exception {
-		IfCommand.ifFlag = true;
-		evaluate = evaluate.replaceAll("\\s+", "");
-		String[] parts = evaluate.split(regexStr);
-		boolean result = evaluate(context, parts);
 
-		if (result) {
-			result = super.execute(context);
-		} else {
-			IfCommand.ifFlag = false;
+		boolean result = false;
+		if (!IfCommand.getIfCommandKey()) {
+			evaluate = evaluate.replaceAll("\\s+", "");
+			String[] parts = evaluate.split(regexStr);
+			result = evaluate(context, parts);
+			if (result) {
+				result = super.execute(context);
+			}
 		}
 
 		return false;
@@ -60,5 +55,4 @@ public class IfCommand extends ChainBase {
 		}
 		return result;
 	}
-
 }

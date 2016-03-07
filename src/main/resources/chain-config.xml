@@ -84,6 +84,8 @@
 					method="toParameterAchievements" methodKey="achievement" toKey="achievementObject"/>
 				<command className="com.dotosoft.dotoquiz.command.generic.PrintCommand" key="achievementObject"/>
 				
+				<command className="com.dotosoft.dotoquiz.command.generic.IfCommand" />
+				
 			</chain>				
 		</chain>
 	</chain>
