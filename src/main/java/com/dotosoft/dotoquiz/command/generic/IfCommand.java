@@ -1,7 +1,11 @@
 package com.dotosoft.dotoquiz.command.generic;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.apache.commons.chain.Context;
 import org.apache.commons.chain.impl.ChainBase;
+import org.hibernate.internal.util.compare.EqualsHelper;
 
 import com.dotosoft.dotoquiz.tools.util.BeanUtils;
 
@@ -38,16 +42,16 @@ public class IfCommand extends ChainBase {
 
 	private boolean evaluate(Context context, String[] parts) throws Exception {
 		boolean result = false;
-		Object obj1 = BeanUtils.getProperty(context, parts[0]);
+		Object obj1 = extractValue(context, parts[0]);
 		String op = parts[1];
-		Object obj2 = BeanUtils.getProperty(context, parts[2]);
+		Object obj2 = extractValue(context, parts[2]);
 
 		switch (op) {
 		case "!=":
-			result = obj1 != obj2;
+			result = !(EqualsHelper.equals(obj1, obj2));
 			break;
 		case "==":
-			result = obj1 == obj2;
+			result = (EqualsHelper.equals(obj1, obj2));
 			break;
 		case "||":
 			result = ((Boolean) obj1 || (Boolean) obj2);
@@ -57,6 +61,23 @@ public class IfCommand extends ChainBase {
 			break;
 		default:
 			throw new Exception("Expression is not valid");
+		}
+		return result;
+	}
+	
+	Pattern pattern;
+	public IfCommand() {
+		pattern = Pattern.compile("([\"'])((?:(?=(\\\\?))\\3.)*?)\\1");
+	}
+	
+	private Object extractValue(Context context, String part) {
+		// "(["'])(?:(?=(\\?))\2.)*?\1"
+		Object result = null;
+		Matcher matcher = pattern.matcher(part);
+		if(matcher.find()) {
+			result = matcher.group(2);
+		} else {
+			result = BeanUtils.getProperty(context, part);
 		}
 		return result;
 	}

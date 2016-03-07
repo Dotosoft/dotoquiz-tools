@@ -73,7 +73,7 @@
 				toKey="rowEntryCollection"/>
 				
 			<chain name="doIterateListEntry" className="com.dotosoft.dotoquiz.command.generic.LoopCommand"
-				loopTime="1" indexKey="indexRowEntry">
+				checkCollectionKey="rowEntryCollection" indexKey="indexRowEntry">
 				
 				<command className="com.dotosoft.dotoquiz.command.generic.GetCollectionByIndexCommand" 
 					collectionKey="rowEntryCollection" indexKey="indexRowEntry" toKey="rowEntry"/>
@@ -82,9 +82,13 @@
 					argumentsKey="rowEntry,settings" staticFlag="true" toKey="achievement"/>
 				<command className="com.dotosoft.dotoquiz.command.generic.CallMethodCommand" 
 					method="toParameterAchievements" methodKey="achievement" toKey="achievementObject"/>
-				<command className="com.dotosoft.dotoquiz.command.generic.PrintCommand" key="achievementObject"/>
 				
-				<command className="com.dotosoft.dotoquiz.command.generic.IfCommand" />
+				<chain className="com.dotosoft.dotoquiz.command.generic.IfCommand" evaluate="achievement.isProcessed == 'Y'">
+					<command className="com.dotosoft.dotoquiz.command.generic.PrintCommand" message="%s sudah diproses" key="achievement.id"/>
+				</chain>
+				<chain className="com.dotosoft.dotoquiz.command.generic.ElseCommand">
+					<command className="com.dotosoft.dotoquiz.command.generic.PrintCommand" message="%s belum diproses" key="achievement.id"/>
+				</chain>
 				
 			</chain>				
 		</chain>
