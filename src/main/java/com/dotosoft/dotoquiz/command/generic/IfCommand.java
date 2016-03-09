@@ -35,9 +35,10 @@ public class IfCommand extends ChainBase {
 			result = super.execute(context);
 		} else {
 			IfCommand.ifFlag = false;
+			result = IfCommand.ifFlag;
 		}
 
-		return false;
+		return result;
 	}
 
 	private boolean evaluate(Context context, String[] parts) throws Exception {
@@ -76,6 +77,8 @@ public class IfCommand extends ChainBase {
 		Matcher matcher = pattern.matcher(part);
 		if(matcher.find()) {
 			result = matcher.group(2);
+		} else if("null".equalsIgnoreCase(part)) {
+			result = null;
 		} else {
 			result = BeanUtils.getProperty(context, part);
 		}

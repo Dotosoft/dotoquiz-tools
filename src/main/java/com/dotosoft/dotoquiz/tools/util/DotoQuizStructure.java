@@ -32,7 +32,8 @@ import com.google.gdata.data.spreadsheet.ListEntry;
 
 public class DotoQuizStructure {
 	
-	public static DataTopicsParser convertDataToTopics(Object data, Settings setting) {
+	public static DataTopicsParser convertDataToTopics(Object data, Object settingParam) {
+		Settings setting = (Settings) settingParam;
 		String topicId = getValueFromRowData(QuizParserConstant.PARSE_TOPIC, setting, "iTopicId", data);
 		if(!StringUtils.hasValue(topicId)) return null;
 		
@@ -73,11 +74,8 @@ public class DotoQuizStructure {
 		return result;
 	}
 	
-	public static ParameterAchievementParser convertDataToAchievement(ListEntry data, Settings setting) {
-		return convertDataToAchievement((Object) data, setting);
-	}
-	
-	public static ParameterAchievementParser convertDataToAchievement(Object data, Settings setting) {
+	public static ParameterAchievementParser convertDataToAchievement(Object data, Object settingParam) {
+		Settings setting = (Settings) settingParam;
 		String achievementId = getValueFromRowData(QuizParserConstant.PARSE_ACHIEVEMENT, setting, "iAchievementId", data);
 		if(!StringUtils.hasValue(achievementId)) return null;
 		

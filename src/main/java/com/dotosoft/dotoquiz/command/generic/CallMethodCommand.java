@@ -2,12 +2,14 @@ package com.dotosoft.dotoquiz.command.generic;
 
 import java.lang.reflect.Method;
 import java.util.Map;
+import java.util.Set;
 import java.util.WeakHashMap;
 
 import org.apache.commons.chain.Command;
 import org.apache.commons.chain.Context;
 
 import com.dotosoft.dotoquiz.tools.util.BeanUtils;
+import com.dotosoft.dotoquiz.tools.util.ReflectionsUtil;
 import com.dotosoft.dotoquiz.utils.StringUtils;
 
 public class CallMethodCommand implements Command {
@@ -49,24 +51,27 @@ public class CallMethodCommand implements Command {
 		}
 
 		Method methodObject = extractMethod(context);
-
-		try {
-			Object returnValue = null;
-			if (staticFlag) {
-				returnValue = methodObject.invoke(null, getArguments(context));
-			} else {
-				Object objectValue = BeanUtils.getProperty(context, methodKey);
-				returnValue = methodObject.invoke(objectValue, getArguments(context));
+		if(methodObject != null) {
+			try {
+				Object returnValue = null;
+				if (staticFlag) {
+					returnValue = methodObject.invoke(null, getArguments(context));
+				} else {
+					Object objectValue = BeanUtils.getProperty(context, methodKey);
+					returnValue = methodObject.invoke(objectValue, getArguments(context));
+				}
+				
+				if(StringUtils.hasValue(toKey)) {
+					context.put(toKey, returnValue);
+				}
+				return false;
+			} catch (Exception e) {
+				e.printStackTrace();
+				throw e;
 			}
-			
-			if(StringUtils.hasValue(toKey)) {
-				context.put(toKey, returnValue);
-			}
-			return false;
-		} catch (Exception e) {
-			e.printStackTrace();
-			throw e;
 		}
+		
+		return false;
 	}
 
 	/**
@@ -86,15 +91,19 @@ public class CallMethodCommand implements Command {
 	protected Method extractMethod(Context context) throws Exception {
 
 		Method theMethod = null;
-		synchronized (methods) {
-			String methodName = this.getMethod();
-			theMethod = (Method) methods.get(methodName);
-			if (theMethod == null) {
-				theMethod = getClassObject(context).getDeclaredMethod(methodName, getSignature(context));
-				methods.put(methodName, theMethod);
+		
+		Class objectClass = getClassObject(context);
+		if(objectClass != null) {
+			try {			
+				theMethod = ReflectionsUtil.method(objectClass, getMethod(), getSignature(context));
+			} catch (Exception ex) {
+				try {
+					theMethod = ReflectionsUtil.method(objectClass, getMethod(), getSignatureObject(context));
+				} catch (Exception exc) {
+					exc.printStackTrace();
+				}
 			}
 		}
-
 		return theMethod;
 	}
 
@@ -104,7 +113,11 @@ public class CallMethodCommand implements Command {
 		}
 
 		Object objectValue = BeanUtils.getProperty(context, methodKey);
-		return objectValue.getClass();
+		if(objectValue != null) { 
+			return objectValue.getClass();
+		}
+		
+		return null;
 	}
 
 	/**
@@ -138,6 +151,20 @@ public class CallMethodCommand implements Command {
 				String key = keys[i];
 				Object param = BeanUtils.getProperty(context, key);
 				clazz[i] = param.getClass();
+			}
+			return clazz;
+		}
+
+		return null;
+	}
+	
+	protected Class[] getSignatureObject(Context context) {
+
+		if (StringUtils.hasValue(getArgumentsKey())) {
+			String[] keys = getArgumentsKey().split(",");
+			Class[] clazz = new Class[keys.length];
+			for (int i = 0; i < keys.length; i++) {
+				clazz[i] = Object.class;
 			}
 			return clazz;
 		}

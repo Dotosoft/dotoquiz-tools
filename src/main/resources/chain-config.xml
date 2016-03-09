@@ -105,22 +105,24 @@
 			argumentsKey="credential,settings.syncDataFile" toKey="datasheetAPI" />
 		<command className="com.dotosoft.dotoquiz.command.generic.CallMethodCommand" 
 			method="getWorksheets" methodKey="datasheetAPI" toKey="datasheetCollection"/>		
-		<command className="com.dotosoft.dotoquiz.command.generic.SplitCommand" 
-			fromKey="settings.structure.tabAchievements" separator=";" toKey="tabAchievementCollections"/>
 			
 		<!-- Create Connection to DB -->
 		<command className="com.dotosoft.dotoquiz.command.generic.CallMethodCommand" 
-			method="getSessionFactory" methodKey="com.dotosoft.dotoquiz.tools.util.HibernateUtil" 
-			staticFlag="true" toKey="sessionFactory"/>
+			method="buildSessionFactory" methodKey="com.dotosoft.dotoquiz.tools.util.HibernateUtil" 
+			argumentsKey="settings" staticFlag="true" toKey="sessionFactory"/>
 		<command className="com.dotosoft.dotoquiz.command.generic.CallMethodCommand" 
 			method="openSession" methodKey="sessionFactory" toKey="session"/>
-			
+		
 		<!-- Save/Update Achievement to DB -->
+		<command className="com.dotosoft.dotoquiz.command.generic.SplitCommand" 
+			fromKey="settings.structure.tabAchievements" separator=";" toKey="tabAchievementCollections"/>
 		<chain className="com.dotosoft.dotoquiz.command.generic.LoopCommand"
 			checkCollectionKey="tabAchievementCollections" doWhile="true" indexKey="indexTabAchievement">
 			
+			<command className="com.dotosoft.dotoquiz.command.generic.PrintCommand" message="Proses Achievements %s:" key="indexTabAchievement"/>
+			
 			<command className="com.dotosoft.dotoquiz.command.generic.CallMethodCommand" 
-				method="beginTransaction" methodKey="session" toKey="trx"/>	
+				method="beginTransaction" methodKey="session" toKey="trx"/>
 			
 			<command className="com.dotosoft.dotoquiz.command.generic.GetCollectionByIndexCommand" 
 				collectionKey="tabAchievementCollections" indexKey="indexTabAchievement" toKey="tab"/>
@@ -143,12 +145,64 @@
 				
 				<command className="com.dotosoft.dotoquiz.command.generic.CallMethodCommand" 
 					method="saveOrUpdate" methodKey="session" argumentsKey="achievementObject"/>
+					
+				<command className="com.dotosoft.dotoquiz.command.generic.PrintCommand" message="Save/Update (Achievements) %s: %s" key="achievementObject.id,achievementObject.name"/>
 			</chain>
 			
 			<command className="com.dotosoft.dotoquiz.command.generic.CallMethodCommand" 
 				method="commit" methodKey="trx"/>	
 		</chain>
 		
-		<!-- Save/Update Topic to DB -->
+		<!-- Save/Update Topic to DB -->	
+		<command className="com.dotosoft.dotoquiz.command.generic.SplitCommand" 
+			fromKey="settings.structure.tabTopics" separator=";" toKey="tabTopicCollections"/>
+		<chain className="com.dotosoft.dotoquiz.command.generic.LoopCommand"
+			checkCollectionKey="tabTopicCollections" doWhile="true" indexKey="indexTopicAchievement">
+			
+			<command className="com.dotosoft.dotoquiz.command.generic.PrintCommand" message="Proses Topics %s:" key="indexTopicAchievement"/>
+			
+			<command className="com.dotosoft.dotoquiz.command.generic.CallMethodCommand" 
+				method="beginTransaction" methodKey="session" toKey="trx"/>
+			
+			<command className="com.dotosoft.dotoquiz.command.generic.GetCollectionByIndexCommand" 
+				collectionKey="tabTopicCollections" indexKey="indexTopicAchievement" toKey="tab"/>
+			<command className="com.dotosoft.dotoquiz.command.generic.GetCollectionByIndexCommand" 
+				collectionKey="datasheetCollection" indexKey="tab" toKey="datasheet"/>				
+			<command className="com.dotosoft.dotoquiz.command.generic.CallMethodCommand" 
+				method="getListRows" methodKey="datasheetAPI" argumentsKey="datasheet" 
+				toKey="rowEntryCollection"/>
+				
+			<chain name="doIterateListEntry" className="com.dotosoft.dotoquiz.command.generic.LoopCommand"
+				checkCollectionKey="rowEntryCollection" indexKey="indexRowEntry">
+				
+				<command className="com.dotosoft.dotoquiz.command.generic.GetCollectionByIndexCommand" 
+					collectionKey="rowEntryCollection" indexKey="indexRowEntry" toKey="rowEntry"/>
+				<command className="com.dotosoft.dotoquiz.command.generic.CallMethodCommand" 
+					method="convertDataToTopics" methodKey="com.dotosoft.dotoquiz.tools.util.DotoQuizStructure" 
+					argumentsKey="rowEntry,settings" staticFlag="true" toKey="topics"/>
+					
+				<chain className="com.dotosoft.dotoquiz.command.generic.IfCommand" evaluate="topics == null">
+					<command className="com.dotosoft.dotoquiz.command.generic.CallMethodCommand" 
+						method="commit" methodKey="trx"/>	
+					<command className="com.dotosoft.dotoquiz.command.generic.BreakCommand" />
+				</chain>
+					
+				<command className="com.dotosoft.dotoquiz.command.generic.CallMethodCommand" 
+					method="toDataTopics" methodKey="topics" toKey="topicsObject"/>
+				
+				<command className="com.dotosoft.dotoquiz.command.generic.CallMethodCommand" 
+					method="saveOrUpdate" methodKey="session" argumentsKey="topicsObject"/>
+					
+				<command className="com.dotosoft.dotoquiz.command.generic.PrintCommand" message="Save/Update (Topics) %s: %s" key="topicsObject.id,topicsObject.name"/>
+			</chain>
+			
+			<command className="com.dotosoft.dotoquiz.command.generic.CallMethodCommand" 
+				method="commit" methodKey="trx"/>	
+		</chain>
+		
+		
+		<!-- Close Connection -->
+		<command className="com.dotosoft.dotoquiz.command.generic.CallMethodCommand" 
+				method="close" methodKey="session"/>	
 	</chain>
 </catalog>

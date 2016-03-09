@@ -36,7 +36,8 @@ public class App {
 				Command command = CatalogLoader.getInstance().getCatalog().getCommand(ctx.getSettings().getApplicationType());
 				if(command != null) {
 					command.execute(ctx);
-					return;
+					ctx = null;
+					System.exit(0);
 				}
 			} 
 		} catch (Exception ex) {
