@@ -21,8 +21,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.commons.chain.Command;
-
+import com.dotosoft.dot4command.chain.Command;
 import com.dotosoft.dotoquiz.tools.config.DotoQuizContext;
 import com.dotosoft.dotoquiz.tools.util.CatalogLoader;
 

@@ -16,7 +16,7 @@
 
 package com.dotosoft.dotoquiz.tools.config;
 
-import org.apache.commons.chain.impl.ContextBase;
+import com.dotosoft.dot4command.impl.ContextBase;
 
 public class DotoQuizContext extends ContextBase {
 

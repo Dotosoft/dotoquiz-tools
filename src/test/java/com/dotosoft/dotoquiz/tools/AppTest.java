@@ -6,8 +6,7 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import org.apache.commons.chain.Command;
-
+import com.dotosoft.dot4command.chain.Command;
 import com.dotosoft.dotoquiz.tools.config.DotoQuizContext;
 import com.dotosoft.dotoquiz.tools.util.CatalogLoader;
 import com.google.gdata.util.ServiceException;

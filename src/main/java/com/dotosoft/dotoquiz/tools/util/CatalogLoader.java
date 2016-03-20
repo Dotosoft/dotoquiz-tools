@@ -18,9 +18,13 @@ package com.dotosoft.dotoquiz.tools.util;
 
 import static com.dotosoft.dotoquiz.common.QuizConstant.EMPTY_STRING;
 
-import org.apache.commons.chain.Catalog;
-import org.apache.commons.chain.config.ConfigParser;
-import org.apache.commons.chain.impl.CatalogFactoryBase;
+import com.dotosoft.dot4command.chain.Catalog;
+import com.dotosoft.dot4command.chain.Context;
+import com.dotosoft.dot4command.config.ConfigParser;
+import com.dotosoft.dot4command.config.xml.XmlConfigParser;
+import com.dotosoft.dot4command.impl.CatalogBase;
+import com.dotosoft.dot4command.impl.CatalogFactoryBase;
+import com.dotosoft.dot4command.impl.ContextBase;
 
 public class CatalogLoader {
 	private static final String CONFIG_FILE = "/chain-config.xml";
@@ -29,7 +33,10 @@ public class CatalogLoader {
 	private static CatalogLoader catalogLoader;
 
 	private CatalogLoader() {
-		parser = new ConfigParser();
+		CatalogFactoryBase.clear();
+	    Catalog<String, Object, Context<String, Object>> catalog = new CatalogBase<String, Object, Context<String, Object>>();
+	    Context<String, Object> context = new ContextBase();
+		parser = new XmlConfigParser();
 	}
 	
 	public static CatalogLoader getInstance() {

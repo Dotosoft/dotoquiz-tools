@@ -22,13 +22,10 @@ import java.security.GeneralSecurityException;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.commons.chain.Context;
 import org.apache.log4j.Logger;
 
 import com.dotosoft.dotoquiz.tools.common.QuizParserConstant;
-import com.dotosoft.dotoquiz.tools.config.DotoQuizContext;
 import com.dotosoft.dotoquiz.tools.config.Settings;
-import com.dotosoft.dotoquiz.tools.util.SyncState;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
 import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
@@ -42,7 +39,6 @@ import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.store.DataStoreFactory;
 import com.google.api.client.util.store.FileDataStoreFactory;
-import com.google.gdata.util.ServiceException;
 //import javafx.beans.value.ObservableValue;
 //import javafx.concurrent.Worker;
 //import javafx.concurrent.Worker.State;
