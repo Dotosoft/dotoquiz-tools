@@ -94,6 +94,10 @@
 		</chain>
 	</chain>
 	
+	<chain name="TEST" className="com.dotosoft.dotoquiz.command.generic.TemplateCommand" testMap="SALES:0,SALE_PRODUCTS:1,EXPENSES:2,EXPENSES_ITEMS:3">
+		<command className="com.dotosoft.dotoquiz.command.generic.PrintCommand" message="{{}}"/>
+	</chain>
+	
 	<chain name="DB">
 		<command className="com.dotosoft.dotoquiz.command.generic.PrintCommand" message="DO DB"/>
 		
