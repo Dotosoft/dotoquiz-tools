@@ -1,24 +1,170 @@
 <catalog>
 	
 	<!-- Define command and chain aliases -->
-	<define name="print" className="com.dotosoft.dot4command.commands.PrintCommand" />
+	<define name="callMethod" className="com.dotosoft.dot4command.commands.CallMethodCommand" />
+	<define name="createObject" className="com.dotosoft.dot4command.commands.CreateObjectCommand" />
+	<define name="setProperty" className="com.dotosoft.dot4command.commands.SetPropertyCommand" />
 	<define name="loop" className="com.dotosoft.dot4command.commands.LoopCommand" />
-	<define name="if" className="com.dotosoft.dot4command.commands.IfCommand" />
-	<define name="else" className="com.dotosoft.dot4command.commands.ElseCommand" />
-	<define name="setProperty" className="com.dotosoft.dot4command.commands.SetPropertyCommand"/>
+	<define name="getCollection" className="com.dotosoft.dot4command.commands.GetCollectionByIndexCommand"/>
+	<define name="callTemplate" className="com.dotosoft.dot4command.commands.CallTemplateCommand"/>
+	<define name="print" className="com.dotosoft.dot4command.commands.PrintCommand"/>
+	<define name="split" className="com.dotosoft.dot4command.commands.SplitCommand"/>
+	<define name="if" className="com.dotosoft.dot4command.commands.IfCommand"/>
+	<define name="else" className="com.dotosoft.dot4command.commands.ElseCommand"/>
+	<define name="break" className="com.dotosoft.dot4command.commands.BreakCommand"/>
 	<define name="callTemplate" className="com.dotosoft.dot4command.commands.CallTemplateCommand"/>
 	
-	<loop name="doPrintTemplate" doWhile="true" loopTime="10">
-		<setProperty type="boolean" value="true" toKey="isLogging"/> 
-		<if evaluate="isLogging == false">
-			<print message="${messageKey1}" showLog="true"/>
-			<print message="${messageKey2}" showLog="true"/>
-		</if>
-		<else>
-			<print message="${messageKey1}" showLog="false"/>
-			<print message="${messageKey2}" showLog="false"/>
-		</else>
-	</loop>
+	<!-- Tools Application -->
+	<chain name="CLEAR">
+		<callMethod method="authenticate" toKey="credential" argumentsKey="settings" staticFlag="true"
+			methodKey="com.dotosoft.dotoquiz.tools.thirdparty.GoogleOAuth"/>
+		<createObject argumentsKey="credential" toKey="imageAPI"
+			objectClass="com.dotosoft.dotoquiz.tools.thirdparty.PicasawebClient"/>
+		<setProperty type="boolean" value="true" toKey="showAll" />
+		<callMethod method="getAlbums" methodKey="imageAPI" argumentsKey="showAll" 
+			toKey="albumCollection" />
+		<loop checkCollectionKey="albumCollection" doWhile="true" indexKey="indexAlbum">
+			<getCollection collectionKey="albumCollection" indexKey="indexAlbum" toKey="album"/>
+			<callMethod method="deletePhoto" methodKey="imageAPI" argumentsKey="album" />
+		</loop>
+	</chain>
 	
-	<callTemplate name="TEST" commandName="doPrintTemplate" keyMap="messageKey1:test1,messageKey2:test2"/>
+	<chain name="SHOW_COLUMN_HEADER">
+		<callMethod method="authenticate" methodKey="com.dotosoft.dotoquiz.tools.thirdparty.GoogleOAuth"
+			argumentsKey="settings" staticFlag="true" toKey="credential" />
+		<createObject objectClass="com.dotosoft.dotoquiz.tools.thirdparty.GooglesheetClient" 
+			argumentsKey="credential,settings.syncDataFile" toKey="datasheetAPI" />
+		<callMethod method="getWorksheets" methodKey="datasheetAPI" toKey="datasheetCollection"/>
+		<loop checkCollectionKey="datasheetCollection" doWhile="true" indexKey="indexWorksheet">
+			<getCollection collectionKey="datasheetCollection" indexKey="indexWorksheet" toKey="datasheet"/>
+			<print message="Worksheet name: %s" key="datasheet.title.plainText" />
+			<callMethod method="getListRows" methodKey="datasheetAPI" argumentsKey="datasheet" 
+				toKey="rowEntryCollection"/>
+			<loop loopTime="1" indexKey="indexRowEntry">
+				<getCollection collectionKey="rowEntryCollection" indexKey="indexRowEntry" toKey="rowEntry"/>
+				<callMethod  method="showColumnHeader" methodKey="datasheetAPI" argumentsKey="rowEntry" />				
+			</loop>
+		</loop>
+	</chain>
+	
+	<chain name="SYNC">
+		<print message="DO SYNC"/>
+		<callMethod method="authenticate" methodKey="com.dotosoft.dotoquiz.tools.thirdparty.GoogleOAuth"
+			argumentsKey="settings" staticFlag="true" toKey="credential" />
+		<createObject objectClass="com.dotosoft.dotoquiz.tools.thirdparty.GooglesheetClient" 
+			argumentsKey="credential,settings.syncDataFile" toKey="datasheetAPI" />
+		<callMethod method="getWorksheets" methodKey="datasheetAPI" toKey="datasheetCollection"/>		
+		<split fromKey="settings.structure.tabAchievements" separator=";" toKey="tabAchievementCollections"/>	
+			
+		<loop checkCollectionKey="tabAchievementCollections" doWhile="true" indexKey="indexTabAchievement">
+			<getCollection collectionKey="tabAchievementCollections" indexKey="indexTabAchievement" toKey="tab"/>
+			<getCollection collectionKey="datasheetCollection" indexKey="tab" toKey="datasheet"/>				
+			<callMethod method="getListRows" methodKey="datasheetAPI" argumentsKey="datasheet" toKey="rowEntryCollection"/>
+			<loop checkCollectionKey="rowEntryCollection" indexKey="indexRowEntry">
+				<getCollection collectionKey="rowEntryCollection" indexKey="indexRowEntry" toKey="rowEntry"/>
+				<callMethod method="convertDataToAchievement" argumentsKey="rowEntry,settings" toKey="achievement"
+					methodKey="com.dotosoft.dotoquiz.tools.util.DotoQuizStructure" staticFlag="true" />
+				<callMethod method="toParameterAchievements" methodKey="achievement" toKey="achievementObject"/>
+				<if evaluate="achievement.isProcessed == 'Y'">
+					<print message="%s sudah diproses" key="achievement.id"/>
+				</if>
+				<else>
+					<print message="%s belum diproses" key="achievement.id"/>
+				</else>
+			</loop>				
+		</loop>
+	</chain>
+	
+	<chain name="DB">
+		<print message="DO DB"/>
+		<callMethod method="authenticate" methodKey="com.dotosoft.dotoquiz.tools.thirdparty.GoogleOAuth"
+			argumentsKey="settings" staticFlag="true" toKey="credential" />
+		<createObject objectClass="com.dotosoft.dotoquiz.tools.thirdparty.GooglesheetClient" 
+			toKey="datasheetAPI" argumentsKey="credential,settings.syncDataFile"/>
+		<callMethod method="getWorksheets" methodKey="datasheetAPI" toKey="datasheetCollection"/>		
+			
+		<!-- Create Connection to DB -->
+		<callMethod method="buildSessionFactory" methodKey="com.dotosoft.dotoquiz.tools.util.HibernateUtil" 
+			argumentsKey="settings" staticFlag="true" toKey="sessionFactory"/>
+		<callMethod method="openSession" methodKey="sessionFactory" toKey="session"/>
+		
+		<!-- Save/Update Achievement to DB -->
+		<!-- <split fromKey="settings.structure.tabAchievements" separator=";" toKey="tabAchievementCollections"/>
+		<loop checkCollectionKey="tabAchievementCollections" doWhile="true" indexKey="indexTabAchievement">
+			<print message="Proses Achievements %s:" key="indexTabAchievement"/>
+			<callMethod method="beginTransaction" methodKey="session" toKey="trx"/>
+			<getCollection collectionKey="tabAchievementCollections" indexKey="indexTabAchievement" toKey="tab"/>
+			<getCollection collectionKey="datasheetCollection" indexKey="tab" toKey="datasheet"/>				
+			<callMethod method="getListRows" methodKey="datasheetAPI" argumentsKey="datasheet" toKey="rowEntryCollection"/>
+			<loop checkCollectionKey="rowEntryCollection" indexKey="indexRowEntry">
+				<getCollection collectionKey="rowEntryCollection" indexKey="indexRowEntry" toKey="rowEntry"/>
+				<callMethod method="convertDataToAchievement" methodKey="com.dotosoft.dotoquiz.tools.util.DotoQuizStructure" 
+					argumentsKey="rowEntry,settings" staticFlag="true" toKey="achievement"/>
+				<callMethod method="toParameterAchievements" methodKey="achievement" toKey="achievementObject"/>
+				<callMethod method="saveOrUpdate" methodKey="session" argumentsKey="achievementObject"/>
+				<print message="Save/Update (Achievements) %s: %s" key="achievementObject.id,achievementObject.name"/>
+			</loop>
+			<callMethod method="commit" methodKey="trx"/>	
+		</loop> -->
+		
+		<!-- Save/Update Topic to DB -->	
+		<!-- <split fromKey="settings.structure.tabTopics" separator=";" toKey="tabTopicCollections"/>
+		<loop checkCollectionKey="tabTopicCollections" doWhile="true" indexKey="indexTopicAchievement">
+			<print message="Proses Topics %s:" key="indexTopicAchievement"/>
+			<callMethod method="beginTransaction" methodKey="session" toKey="trx"/>
+			<getCollection collectionKey="tabTopicCollections" indexKey="indexTopicAchievement" toKey="tab"/>
+			<getCollection collectionKey="datasheetCollection" indexKey="tab" toKey="datasheet"/>				
+			<callMethod method="getListRows" methodKey="datasheetAPI" argumentsKey="datasheet" toKey="rowEntryCollection"/>
+			<loop checkCollectionKey="rowEntryCollection" indexKey="indexRowEntry">
+				<getCollection collectionKey="rowEntryCollection" indexKey="indexRowEntry" toKey="rowEntry"/>
+				<callMethod method="convertDataToTopics" methodKey="com.dotosoft.dotoquiz.tools.util.DotoQuizStructure" 
+					argumentsKey="rowEntry,settings" staticFlag="true" toKey="topics"/>
+				<if evaluate="topics == null">
+					<callMethod method="commit" methodKey="trx"/>	
+					<break />
+				</if>
+				<callMethod method="toDataTopics" methodKey="topics" toKey="topicsObject"/>
+				<callMethod method="saveOrUpdate" methodKey="session" argumentsKey="topicsObject"/>
+				<print message="Save/Update (Topics) %s: %s" key="topicsObject.id,topicsObject.name"/>
+			</loop>
+			<callMethod method="commit" methodKey="trx"/>	
+		</loop> -->	
+		
+		<callTemplate commandName="doSaveTemplateToDB" 
+			keyMap="tabSettingKey:tabAchievements,
+				tabCollectionKey:tabAchievementCollections,
+				indexKey:indexTabAchievement,
+				methodStructureKey:convertDataToAchievement,
+				resultKey:achievement,
+				methodKey:toParameterAchievements,
+				resultObjectKey:achievementObject"/>
+		
+		
+		<!-- Close Connection -->
+		<callMethod method="close" methodKey="session"/>	
+	</chain>
+	
+	<chain name="doSaveTemplateToDB">
+		<split fromKey="settings.structure.${tabSettingKey}" separator=";" toKey="${tabCollectionKey}"/>
+		<loop checkCollectionKey="${tabCollectionKey}" doWhile="true" indexKey="${indexKey}">
+			<print message="Proses ${resultKey} %s:" key="${indexKey}"/>
+			<callMethod method="beginTransaction" methodKey="session" toKey="trx"/>
+			<getCollection collectionKey="${tabCollectionKey}" indexKey="${indexKey}" toKey="tab"/>
+			<getCollection collectionKey="datasheetCollection" indexKey="tab" toKey="datasheet"/>				
+			<callMethod method="getListRows" methodKey="datasheetAPI" argumentsKey="datasheet" toKey="rowEntryCollection"/>
+			<loop checkCollectionKey="rowEntryCollection" indexKey="indexRowEntry">
+				<getCollection collectionKey="rowEntryCollection" indexKey="indexRowEntry" toKey="rowEntry"/>
+				<callMethod method="${methodStructureKey}" methodKey="com.dotosoft.dotoquiz.tools.util.DotoQuizStructure" 
+					argumentsKey="rowEntry,settings" staticFlag="true" toKey="${resultKey}"/>
+				<if evaluate="topics == null">
+					<callMethod method="commit" methodKey="trx"/>	
+					<break />
+				</if>
+				<callMethod method="${methodKey}" methodKey="${resultKey}" toKey="${resultObjectKey}"/>
+				<callMethod method="saveOrUpdate" methodKey="session" argumentsKey="${resultObjectKey}"/>
+				<print message="Save/Update (${resultKey}) %s: %s" key="${resultObjectKey}.id,${resultObjectKey}.name"/>
+			</loop>
+			<callMethod method="commit" methodKey="trx"/>	
+		</loop>
+	</chain>
 </catalog>
