@@ -51,7 +51,8 @@ public class DotoQuizStructure {
 		return result;
 	}
 	
-	public static DataQuestionsParser convertDataToAnswerQuestion(Object data, Settings setting) {
+	public static DataQuestionsParser convertDataToAnswerQuestion(Object data, Object settingParam) {
+		Settings setting = (Settings) settingParam;
 		String pertanyaanId = getValueFromRowData(QuizParserConstant.PARSE_QUESTION_ANSWER, setting, "iPertanyaanId", data);
 		if(!StringUtils.hasValue(pertanyaanId)) return null;
 		

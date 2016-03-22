@@ -30,7 +30,7 @@ public class ParameterAchievementParser extends ParameterAchievements {
 	public ParameterAchievementParser(String id, String picasaId,
 			String imagePicasaURL, String name, String description,
 			String imageURL, String isDelete, Date createdDt, String createdBy,
-			String isProcessed, APPLICATION_TYPE type) {
+			String isProcessed, APPLICATION_TYPE applicationType) {
 		super(id, name, description, isDelete, imageURL, imagePicasaURL,
 				picasaId, createdDt, createdBy);
 		this.isProcessed = isProcessed;

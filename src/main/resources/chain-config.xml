@@ -10,9 +10,11 @@
 	<define name="print" className="com.dotosoft.dot4command.commands.PrintCommand"/>
 	<define name="split" className="com.dotosoft.dot4command.commands.SplitCommand"/>
 	<define name="if" className="com.dotosoft.dot4command.commands.IfCommand"/>
+	<define name="elseif" className="com.dotosoft.dot4command.commands.ElseIfCommand"/>
 	<define name="else" className="com.dotosoft.dot4command.commands.ElseCommand"/>
 	<define name="break" className="com.dotosoft.dot4command.commands.BreakCommand"/>
 	<define name="callTemplate" className="com.dotosoft.dot4command.commands.CallTemplateCommand"/>
+	<define name="removeProperty" className="com.dotosoft.dot4command.base.RemoveCommand"/>
 	
 	<!-- Tools Application -->
 	<chain name="CLEAR">
@@ -89,80 +91,53 @@
 		<callMethod method="openSession" methodKey="sessionFactory" toKey="session"/>
 		
 		<!-- Save/Update Achievement to DB -->
-		<!-- <split fromKey="settings.structure.tabAchievements" separator=";" toKey="tabAchievementCollections"/>
-		<loop checkCollectionKey="tabAchievementCollections" doWhile="true" indexKey="indexTabAchievement">
-			<print message="Proses Achievements %s:" key="indexTabAchievement"/>
-			<callMethod method="beginTransaction" methodKey="session" toKey="trx"/>
-			<getCollection collectionKey="tabAchievementCollections" indexKey="indexTabAchievement" toKey="tab"/>
-			<getCollection collectionKey="datasheetCollection" indexKey="tab" toKey="datasheet"/>				
-			<callMethod method="getListRows" methodKey="datasheetAPI" argumentsKey="datasheet" toKey="rowEntryCollection"/>
-			<loop checkCollectionKey="rowEntryCollection" indexKey="indexRowEntry">
-				<getCollection collectionKey="rowEntryCollection" indexKey="indexRowEntry" toKey="rowEntry"/>
-				<callMethod method="convertDataToAchievement" methodKey="com.dotosoft.dotoquiz.tools.util.DotoQuizStructure" 
-					argumentsKey="rowEntry,settings" staticFlag="true" toKey="achievement"/>
-				<callMethod method="toParameterAchievements" methodKey="achievement" toKey="achievementObject"/>
-				<callMethod method="saveOrUpdate" methodKey="session" argumentsKey="achievementObject"/>
-				<print message="Save/Update (Achievements) %s: %s" key="achievementObject.id,achievementObject.name"/>
-			</loop>
-			<callMethod method="commit" methodKey="trx"/>	
-		</loop> -->
+		<print message="Synchronize Achievement Data to DB"/>
+		<callTemplate commandName="doSaveTemplateToDB" ignoreExecuteResult="true" 
+			keyMap="tabSettingKey:tabAchievements,methodStructureKey:convertDataToAchievement,
+				resultKey:achievement,methodKey:toParameterAchievements" />
 		
 		<!-- Save/Update Topic to DB -->	
-		<!-- <split fromKey="settings.structure.tabTopics" separator=";" toKey="tabTopicCollections"/>
-		<loop checkCollectionKey="tabTopicCollections" doWhile="true" indexKey="indexTopicAchievement">
-			<print message="Proses Topics %s:" key="indexTopicAchievement"/>
-			<callMethod method="beginTransaction" methodKey="session" toKey="trx"/>
-			<getCollection collectionKey="tabTopicCollections" indexKey="indexTopicAchievement" toKey="tab"/>
-			<getCollection collectionKey="datasheetCollection" indexKey="tab" toKey="datasheet"/>				
-			<callMethod method="getListRows" methodKey="datasheetAPI" argumentsKey="datasheet" toKey="rowEntryCollection"/>
-			<loop checkCollectionKey="rowEntryCollection" indexKey="indexRowEntry">
-				<getCollection collectionKey="rowEntryCollection" indexKey="indexRowEntry" toKey="rowEntry"/>
-				<callMethod method="convertDataToTopics" methodKey="com.dotosoft.dotoquiz.tools.util.DotoQuizStructure" 
-					argumentsKey="rowEntry,settings" staticFlag="true" toKey="topics"/>
-				<if evaluate="topics == null">
-					<callMethod method="commit" methodKey="trx"/>	
-					<break />
-				</if>
-				<callMethod method="toDataTopics" methodKey="topics" toKey="topicsObject"/>
-				<callMethod method="saveOrUpdate" methodKey="session" argumentsKey="topicsObject"/>
-				<print message="Save/Update (Topics) %s: %s" key="topicsObject.id,topicsObject.name"/>
-			</loop>
-			<callMethod method="commit" methodKey="trx"/>	
-		</loop> -->	
+		<print message="Synchronize Topics Data to DB"/>
+		<callTemplate commandName="doSaveTemplateToDB" ignoreExecuteResult="true" 
+			keyMap="tabSettingKey:tabTopics,methodStructureKey:convertDataToTopics,
+				resultKey:topics,methodKey:toDataTopics" />
 		
-		<callTemplate commandName="doSaveTemplateToDB" 
-			keyMap="tabSettingKey:tabAchievements,
-				tabCollectionKey:tabAchievementCollections,
-				indexKey:indexTabAchievement,
-				methodStructureKey:convertDataToAchievement,
-				resultKey:achievement,
-				methodKey:toParameterAchievements,
-				resultObjectKey:achievementObject"/>
-		
+		<!-- Save/Update Answers to DB -->	
+		<print message="Synchronize Questions Data to DB"/>
+		<callTemplate commandName="doSaveTemplateToDB" ignoreExecuteResult="true"
+			keyMap="tabSettingKey:tabQuestions,methodStructureKey:convertDataToAnswerQuestion,
+				resultKey:questions,methodKey:toDataQuestion" />
 		
 		<!-- Close Connection -->
 		<callMethod method="close" methodKey="session"/>	
 	</chain>
 	
 	<chain name="doSaveTemplateToDB">
-		<split fromKey="settings.structure.${tabSettingKey}" separator=";" toKey="${tabCollectionKey}"/>
-		<loop checkCollectionKey="${tabCollectionKey}" doWhile="true" indexKey="${indexKey}">
-			<print message="Proses ${resultKey} %s:" key="${indexKey}"/>
+		<split fromKey="settings.structure.${tabSettingKey}" separator=";" toKey="tabCollections"/>
+		<loop checkCollectionKey="tabCollections" doWhile="true" indexKey="iterateIndex">
+			<print message="* Proses ${resultKey} %s:" key="iterateIndex"/>
 			<callMethod method="beginTransaction" methodKey="session" toKey="trx"/>
-			<getCollection collectionKey="${tabCollectionKey}" indexKey="${indexKey}" toKey="tab"/>
+			<getCollection collectionKey="tabCollections" indexKey="iterateIndex" toKey="tab"/>
 			<getCollection collectionKey="datasheetCollection" indexKey="tab" toKey="datasheet"/>				
 			<callMethod method="getListRows" methodKey="datasheetAPI" argumentsKey="datasheet" toKey="rowEntryCollection"/>
 			<loop checkCollectionKey="rowEntryCollection" indexKey="indexRowEntry">
 				<getCollection collectionKey="rowEntryCollection" indexKey="indexRowEntry" toKey="rowEntry"/>
 				<callMethod method="${methodStructureKey}" methodKey="com.dotosoft.dotoquiz.tools.util.DotoQuizStructure" 
 					argumentsKey="rowEntry,settings" staticFlag="true" toKey="${resultKey}"/>
-				<if evaluate="topics == null">
+				<if evaluate="${resultKey} == null">
 					<callMethod method="commit" methodKey="trx"/>	
 					<break />
 				</if>
-				<callMethod method="${methodKey}" methodKey="${resultKey}" toKey="${resultObjectKey}"/>
-				<callMethod method="saveOrUpdate" methodKey="session" argumentsKey="${resultObjectKey}"/>
-				<print message="Save/Update (${resultKey}) %s: %s" key="${resultObjectKey}.id,${resultObjectKey}.name"/>
+				<callMethod method="${methodKey}" methodKey="${resultKey}" toKey="resultData"/>
+				<callMethod method="saveOrUpdate" methodKey="session" argumentsKey="resultData"/>
+				<print message="   Save/Update (${resultKey}) %s: %s" key="resultData.id,resultData.name"/>
+				
+				<if evaluate="'${resultKey}' == 'questions'">
+					<print message="ini questions"/>
+				</if>
+				<elseif evaluate="'${resultKey}' == 'topics'">
+					<print message="ini topics: %s" key="${resultKey}.topicParentId"/>
+				</elseif>
 			</loop>
 			<callMethod method="commit" methodKey="trx"/>	
 		</loop>
