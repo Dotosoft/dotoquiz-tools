@@ -3,9 +3,11 @@
 	<!-- Define command and chain aliases -->
 	<define name="callMethod" className="com.dotosoft.dot4command.commands.CallMethodCommand" />
 	<define name="createObject" className="com.dotosoft.dot4command.commands.CreateObjectCommand" />
+	<define name="getProperty" className="com.dotosoft.dot4command.commands.GetPropertyCommand"/>
 	<define name="setProperty" className="com.dotosoft.dot4command.commands.SetPropertyCommand" />
+	<define name="removeProperty" className="com.dotosoft.dot4command.commands.RemoveCommand"/>
 	<define name="loop" className="com.dotosoft.dot4command.commands.LoopCommand" />
-	<define name="getCollection" className="com.dotosoft.dot4command.commands.GetCollectionByIndexCommand"/>
+	<!-- <define name="getCollection" className="com.dotosoft.dot4command.commands.CollectionGetCommand"/> -->
 	<define name="callTemplate" className="com.dotosoft.dot4command.commands.CallTemplateCommand"/>
 	<define name="print" className="com.dotosoft.dot4command.commands.PrintCommand"/>
 	<define name="split" className="com.dotosoft.dot4command.commands.SplitCommand"/>
@@ -14,10 +16,9 @@
 	<define name="else" className="com.dotosoft.dot4command.commands.ElseCommand"/>
 	<define name="break" className="com.dotosoft.dot4command.commands.BreakCommand"/>
 	<define name="callTemplate" className="com.dotosoft.dot4command.commands.CallTemplateCommand"/>
-	<define name="removeProperty" className="com.dotosoft.dot4command.base.RemoveCommand"/>
 	
 	<!-- Tools Application -->
-	<chain name="CLEAR">
+	<!-- <chain name="CLEAR">
 		<callMethod method="authenticate" toKey="credential" argumentsKey="settings" staticFlag="true"
 			methodKey="com.dotosoft.dotoquiz.tools.thirdparty.GoogleOAuth"/>
 		<createObject argumentsKey="credential" toKey="imageAPI"
@@ -26,6 +27,7 @@
 		<callMethod method="getAlbums" methodKey="imageAPI" argumentsKey="showAll" 
 			toKey="albumCollection" />
 		<loop checkCollectionKey="albumCollection" doWhile="true" indexKey="indexAlbum">
+			<getCollection collectionKey="albumCollection" indexKey="indexAlbum" toKey="album"/>
 			<getCollection collectionKey="albumCollection" indexKey="indexAlbum" toKey="album"/>
 			<callMethod method="deletePhoto" methodKey="imageAPI" argumentsKey="album" />
 		</loop>
@@ -75,7 +77,7 @@
 				</else>
 			</loop>				
 		</loop>
-	</chain>
+	</chain> -->
 	
 	<chain name="DB">
 		<print message="DO DB"/>
@@ -97,16 +99,16 @@
 				resultKey:achievement,methodKey:toParameterAchievements" />
 		
 		<!-- Save/Update Topic to DB -->	
-		<print message="Synchronize Topics Data to DB"/>
+		<!-- <print message="Synchronize Topics Data to DB"/>
 		<callTemplate commandName="doSaveTemplateToDB" ignoreExecuteResult="true" 
 			keyMap="tabSettingKey:tabTopics,methodStructureKey:convertDataToTopics,
-				resultKey:topics,methodKey:toDataTopics" />
+				resultKey:topics,methodKey:toDataTopics" /> -->
 		
 		<!-- Save/Update Answers to DB -->	
-		<print message="Synchronize Questions Data to DB"/>
+		<!-- <print message="Synchronize Questions Data to DB"/>
 		<callTemplate commandName="doSaveTemplateToDB" ignoreExecuteResult="true"
 			keyMap="tabSettingKey:tabQuestions,methodStructureKey:convertDataToAnswerQuestion,
-				resultKey:questions,methodKey:toDataQuestion" />
+				resultKey:questions,methodKey:toDataQuestion" /> -->
 		
 		<!-- Close Connection -->
 		<callMethod method="close" methodKey="session"/>	
@@ -117,11 +119,17 @@
 		<loop checkCollectionKey="tabCollections" doWhile="true" indexKey="iterateIndex">
 			<print message="* Proses ${resultKey} %s:" key="iterateIndex"/>
 			<callMethod method="beginTransaction" methodKey="session" toKey="trx"/>
-			<getCollection collectionKey="tabCollections" indexKey="iterateIndex" toKey="tab"/>
-			<getCollection collectionKey="datasheetCollection" indexKey="tab" toKey="datasheet"/>				
+			<!-- <getCollection collectionKey="tabCollections" indexKey="iterateIndex" toKey="tab"/>
+			<getCollection collectionKey="datasheetCollection" indexKey="tab" toKey="datasheet"/> -->
+			<getAttribute fromKey="tabCollections[iterateIndex]" toKey="tab" />
+			<print message="* tab %s:" key="tab"/>
+			<getAttribute fromKey="tabCollections[tab]" toKey="datasheet" />
+			<print message="* tab %s:" key="datasheet"/>
+							
 			<callMethod method="getListRows" methodKey="datasheetAPI" argumentsKey="datasheet" toKey="rowEntryCollection"/>
 			<loop checkCollectionKey="rowEntryCollection" indexKey="indexRowEntry">
-				<getCollection collectionKey="rowEntryCollection" indexKey="indexRowEntry" toKey="rowEntry"/>
+				<!-- <getCollection collectionKey="rowEntryCollection" indexKey="indexRowEntry" toKey="rowEntry"/> -->
+				<getAttribute fromKey="rowEntryCollection[indexRowEntry]" toKey="rowEntry" />
 				<callMethod method="${methodStructureKey}" methodKey="com.dotosoft.dotoquiz.tools.util.DotoQuizStructure" 
 					argumentsKey="rowEntry,settings" staticFlag="true" toKey="${resultKey}"/>
 				<if evaluate="${resultKey} == null">
@@ -129,15 +137,20 @@
 					<break />
 				</if>
 				<callMethod method="${methodKey}" methodKey="${resultKey}" toKey="resultData"/>
-				<callMethod method="saveOrUpdate" methodKey="session" argumentsKey="resultData"/>
-				<print message="   Save/Update (${resultKey}) %s: %s" key="resultData.id,resultData.name"/>
-				
+				<!-- Set parent topic object -->
 				<if evaluate="'${resultKey}' == 'questions'">
 					<print message="ini questions"/>
+					<!-- <if evaluate="resultData.topicParentId != null">
+						<callMethod method="setDatTopics" methodKey="resultData" argumentsKey="test" />
+					</if> -->
 				</if>
 				<elseif evaluate="'${resultKey}' == 'topics'">
-					<print message="ini topics: %s" key="${resultKey}.topicParentId"/>
+					<print message="ini topics"/>
+					<!-- <getCollection collectionKey="rowEntryCollection" indexKey="indexRowEntry" toKey="rowEntry"/>
+					<print message="ini topics: %s" key="${resultKey}.topicParentId"/> -->
 				</elseif>
+				<callMethod method="saveOrUpdate" methodKey="session" argumentsKey="resultData"/>
+				<print message="   Save/Update (${resultKey}) %s: %s" key="resultData.id,resultData.name"/>
 			</loop>
 			<callMethod method="commit" methodKey="trx"/>	
 		</loop>

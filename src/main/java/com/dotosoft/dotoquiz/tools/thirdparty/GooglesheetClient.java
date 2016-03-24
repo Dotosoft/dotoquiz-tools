@@ -116,7 +116,8 @@ public class GooglesheetClient {
 		worksheetEntry.delete();
 	}
 	
-	public List getListRows(WorksheetEntry worksheet) throws Exception {
+	public List getListRows(Object worksheetEntryObject) throws Exception {
+		WorksheetEntry worksheet = (WorksheetEntry) worksheetEntryObject; 
 		// Fetch the list feed of the worksheet.
 	    URL listFeedUrl = worksheet.getListFeedUrl();
 	    ListFeed listFeed = service.getFeed(listFeedUrl, ListFeed.class);
