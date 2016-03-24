@@ -7,7 +7,6 @@
 	<define name="setProperty" className="com.dotosoft.dot4command.commands.SetPropertyCommand" />
 	<define name="removeProperty" className="com.dotosoft.dot4command.commands.RemoveCommand"/>
 	<define name="loop" className="com.dotosoft.dot4command.commands.LoopCommand" />
-	<!-- <define name="getCollection" className="com.dotosoft.dot4command.commands.CollectionGetCommand"/> -->
 	<define name="callTemplate" className="com.dotosoft.dot4command.commands.CallTemplateCommand"/>
 	<define name="print" className="com.dotosoft.dot4command.commands.PrintCommand"/>
 	<define name="split" className="com.dotosoft.dot4command.commands.SplitCommand"/>
@@ -18,7 +17,7 @@
 	<define name="callTemplate" className="com.dotosoft.dot4command.commands.CallTemplateCommand"/>
 	
 	<!-- Tools Application -->
-	<!-- <chain name="CLEAR">
+	<chain name="CLEAR">
 		<callMethod method="authenticate" toKey="credential" argumentsKey="settings" staticFlag="true"
 			methodKey="com.dotosoft.dotoquiz.tools.thirdparty.GoogleOAuth"/>
 		<createObject argumentsKey="credential" toKey="imageAPI"
@@ -27,8 +26,7 @@
 		<callMethod method="getAlbums" methodKey="imageAPI" argumentsKey="showAll" 
 			toKey="albumCollection" />
 		<loop checkCollectionKey="albumCollection" doWhile="true" indexKey="indexAlbum">
-			<getCollection collectionKey="albumCollection" indexKey="indexAlbum" toKey="album"/>
-			<getCollection collectionKey="albumCollection" indexKey="indexAlbum" toKey="album"/>
+			<getProperty fromKey="albumCollection[indexAlbum]" toKey="album" />
 			<callMethod method="deletePhoto" methodKey="imageAPI" argumentsKey="album" />
 		</loop>
 	</chain>
@@ -40,12 +38,12 @@
 			argumentsKey="credential,settings.syncDataFile" toKey="datasheetAPI" />
 		<callMethod method="getWorksheets" methodKey="datasheetAPI" toKey="datasheetCollection"/>
 		<loop checkCollectionKey="datasheetCollection" doWhile="true" indexKey="indexWorksheet">
-			<getCollection collectionKey="datasheetCollection" indexKey="indexWorksheet" toKey="datasheet"/>
+			<getProperty fromKey="datasheetCollection[indexWorksheet]" toKey="datasheet" />
 			<print message="Worksheet name: %s" key="datasheet.title.plainText" />
 			<callMethod method="getListRows" methodKey="datasheetAPI" argumentsKey="datasheet" 
 				toKey="rowEntryCollection"/>
 			<loop loopTime="1" indexKey="indexRowEntry">
-				<getCollection collectionKey="rowEntryCollection" indexKey="indexRowEntry" toKey="rowEntry"/>
+				<getProperty fromKey="rowEntryCollection[indexRowEntry]" toKey="rowEntry" />
 				<callMethod  method="showColumnHeader" methodKey="datasheetAPI" argumentsKey="rowEntry" />				
 			</loop>
 		</loop>
@@ -61,11 +59,12 @@
 		<split fromKey="settings.structure.tabAchievements" separator=";" toKey="tabAchievementCollections"/>	
 			
 		<loop checkCollectionKey="tabAchievementCollections" doWhile="true" indexKey="indexTabAchievement">
-			<getCollection collectionKey="tabAchievementCollections" indexKey="indexTabAchievement" toKey="tab"/>
-			<getCollection collectionKey="datasheetCollection" indexKey="tab" toKey="datasheet"/>				
+			<getProperty fromKey="tabAchievementCollections[indexTabAchievement]" toKey="tab" />
+			<getProperty fromKey="datasheetCollection[tab]" toKey="datasheet" />		
+					
 			<callMethod method="getListRows" methodKey="datasheetAPI" argumentsKey="datasheet" toKey="rowEntryCollection"/>
 			<loop checkCollectionKey="rowEntryCollection" indexKey="indexRowEntry">
-				<getCollection collectionKey="rowEntryCollection" indexKey="indexRowEntry" toKey="rowEntry"/>
+				<getProperty fromKey="rowEntryCollection[indexRowEntry]" toKey="rowEntry" />
 				<callMethod method="convertDataToAchievement" argumentsKey="rowEntry,settings" toKey="achievement"
 					methodKey="com.dotosoft.dotoquiz.tools.util.DotoQuizStructure" staticFlag="true" />
 				<callMethod method="toParameterAchievements" methodKey="achievement" toKey="achievementObject"/>
@@ -77,7 +76,7 @@
 				</else>
 			</loop>				
 		</loop>
-	</chain> -->
+	</chain>
 	
 	<chain name="DB">
 		<print message="DO DB"/>
@@ -119,17 +118,13 @@
 		<loop checkCollectionKey="tabCollections" doWhile="true" indexKey="iterateIndex">
 			<print message="* Proses ${resultKey} %s:" key="iterateIndex"/>
 			<callMethod method="beginTransaction" methodKey="session" toKey="trx"/>
-			<!-- <getCollection collectionKey="tabCollections" indexKey="iterateIndex" toKey="tab"/>
-			<getCollection collectionKey="datasheetCollection" indexKey="tab" toKey="datasheet"/> -->
-			<getAttribute fromKey="tabCollections[iterateIndex]" toKey="tab" />
-			<print message="* tab %s:" key="tab"/>
-			<getAttribute fromKey="tabCollections[tab]" toKey="datasheet" />
+			<getProperty fromKey="tabCollections[iterateIndex]" toKey="tab" />
+			<getProperty fromKey="datasheetCollection[tab]" toKey="datasheet" />
 			<print message="* tab %s:" key="datasheet"/>
 							
 			<callMethod method="getListRows" methodKey="datasheetAPI" argumentsKey="datasheet" toKey="rowEntryCollection"/>
 			<loop checkCollectionKey="rowEntryCollection" indexKey="indexRowEntry">
-				<!-- <getCollection collectionKey="rowEntryCollection" indexKey="indexRowEntry" toKey="rowEntry"/> -->
-				<getAttribute fromKey="rowEntryCollection[indexRowEntry]" toKey="rowEntry" />
+				<getProperty fromKey="rowEntryCollection[indexRowEntry]" toKey="rowEntry" />
 				<callMethod method="${methodStructureKey}" methodKey="com.dotosoft.dotoquiz.tools.util.DotoQuizStructure" 
 					argumentsKey="rowEntry,settings" staticFlag="true" toKey="${resultKey}"/>
 				<if evaluate="${resultKey} == null">
@@ -146,8 +141,6 @@
 				</if>
 				<elseif evaluate="'${resultKey}' == 'topics'">
 					<print message="ini topics"/>
-					<!-- <getCollection collectionKey="rowEntryCollection" indexKey="indexRowEntry" toKey="rowEntry"/>
-					<print message="ini topics: %s" key="${resultKey}.topicParentId"/> -->
 				</elseif>
 				<callMethod method="saveOrUpdate" methodKey="session" argumentsKey="resultData"/>
 				<print message="   Save/Update (${resultKey}) %s: %s" key="resultData.id,resultData.name"/>
