@@ -80,7 +80,7 @@
 	</chain>
 	
 	<chain name="DB">
-		<print message="DO DB"/>
+		<print message="*** START TASK - DATA TO DB ***"/>
 		<callMethod method="authenticate" methodKey="com.dotosoft.dotoquiz.tools.thirdparty.GoogleOAuth"
 			argumentsKey="settings" staticFlag="true" toKey="credential" />
 		<createObject objectClass="com.dotosoft.dotoquiz.tools.thirdparty.GooglesheetClient" 
@@ -93,10 +93,10 @@
 		<callMethod method="openSession" methodKey="sessionFactory" toKey="session"/>
 		
 		<!-- Save/Update Achievement to DB -->
-		<!-- <print message="Synchronize Achievement Data to DB"/>
+		<print message="Synchronize Achievement Data to DB"/>
 		<callTemplate commandName="doSaveTemplateToDB" ignoreExecuteResult="true" 
 			keyMap="tabSettingKey:tabAchievements,methodStructureKey:convertDataToAchievement,
-				resultKey:achievement,methodKey:toParameterAchievements" /> -->
+				resultKey:achievement,methodKey:toParameterAchievements" />
 		
 		<!-- Save/Update Topic to DB -->	
 		<print message="Synchronize Topics Data to DB"/>
@@ -112,6 +112,7 @@
 		
 		<!-- Close Connection -->
 		<callMethod method="close" methodKey="session"/>	
+		<print message="*** FINISHED TASK - DATA TO DB ***"/>
 	</chain>
 	
 	<chain name="doSaveTemplateToDB">
@@ -149,15 +150,15 @@
 				<callMethod method="saveOrUpdate" methodKey="session" argumentsKey="resultData"/>
 				<print message="   Save/Update (${resultKey}) %s: %s" key="resultData.id,resultData"/>
 				
-				<!-- <if evaluate="'${resultKey}' == 'questions'">
+				<if evaluate="'${resultKey}' == 'questions'">
 					<loop checkCollectionKey="${resultKey}.topics" indexKey="indexTopicAnswer">
-						<getProperty fromKey="topicMapByTopicId[indexTopicAnswer]" toKey="topicParent" />
-						<callMethod method="toDataTopics" methodKey="datTopic" argumentsKey="resultTopic"/>
-						<callMethod method="toDataQuestion" methodKey="questionAnswer" argumentsKey="resultQuestion"/>						
+						<getProperty fromKey="${resultKey}.topics[indexTopicAnswer]" toKey="topicId" />
+						<getProperty fromKey="topicMapByTopicId[topicId]" toKey="datTopic" />
+						<callMethod method="toDataTopics" methodKey="datTopic" toKey="resultTopic"/>						
 						<callMethod method="saveOrUpdateTopicQuestionData" methodKey="com.dotosoft.dotoquiz.tools.util.HibernateUtil" 
-							staticFlag="true" argumentsKey="session,resultTopic,resultQuestion" />
+							staticFlag="true" argumentsKey="session,resultTopic,resultData" />
 					</loop>
-				</if> -->
+				</if>
 			</loop>
 			<callMethod method="commit" methodKey="trx"/>	
 		</loop>

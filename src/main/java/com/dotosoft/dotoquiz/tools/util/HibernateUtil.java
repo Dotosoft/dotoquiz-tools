@@ -91,7 +91,10 @@ public class HibernateUtil {
     	return parameterQuestionType;
     }
   
-    public static void saveOrUpdateTopicQuestionData(Session session, DataTopics topic, DataQuestions questionAnswer) {
+    public static void saveOrUpdateTopicQuestionData(Object sessionTmp, Object topicTmp, Object questionAnswerTmp) {
+    	Session session = (Session) sessionTmp;
+    	DataTopics topic = (DataTopics) topicTmp;
+    	DataQuestions questionAnswer = (DataQuestions) questionAnswerTmp;
     	Query q = session.createQuery("From DataTopicsQuestions tq where tq.datQuestions.id = :questionId and tq.datTopics.id = :topicId");
     	q.setString("questionId", questionAnswer.getId());
     	q.setString("topicId", topic.getId());
