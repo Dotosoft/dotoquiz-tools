@@ -15,6 +15,7 @@
 	<define name="else" className="com.dotosoft.dot4command.commands.ElseCommand"/>
 	<define name="break" className="com.dotosoft.dot4command.commands.BreakCommand"/>
 	<define name="callTemplate" className="com.dotosoft.dot4command.commands.CallTemplateCommand"/>
+	<define name="filter" className="com.dotosoft.dot4command.commands.FilterCollectionCommand"/>
 	
 	<!-- Tools Application -->
 	<chain name="CLEAR">
@@ -98,10 +99,10 @@
 				resultKey:achievement,methodKey:toParameterAchievements" />
 		
 		<!-- Save/Update Topic to DB -->	
-		<!-- <print message="Synchronize Topics Data to DB"/>
+		<print message="Synchronize Topics Data to DB"/>
 		<callTemplate commandName="doSaveTemplateToDB" ignoreExecuteResult="true" 
 			keyMap="tabSettingKey:tabTopics,methodStructureKey:convertDataToTopics,
-				resultKey:topics,methodKey:toDataTopics" /> -->
+				resultKey:topics,methodKey:toDataTopics" />
 		
 		<!-- Save/Update Answers to DB -->	
 		<!-- <print message="Synchronize Questions Data to DB"/>
@@ -133,14 +134,16 @@
 				</if>
 				<callMethod method="${methodKey}" methodKey="${resultKey}" toKey="resultData"/>
 				<!-- Set parent topic object -->
-				<if evaluate="'${resultKey}' == 'questions'">
-					<print message="ini questions"/>
-					<!-- <if evaluate="resultData.topicParentId != null">
-						<callMethod method="setDatTopics" methodKey="resultData" argumentsKey="test" />
-					</if> -->
-				</if>
-				<elseif evaluate="'${resultKey}' == 'topics'">
+				<if evaluate="'${resultKey}' == 'topics'">
 					<print message="ini topics"/>
+					<getProperty fromKey="topicMapByTopicId[${resultKey}.topicParentId]" toKey="topicParent" />
+					<if evaluate="topicParent != null">
+						<callMethod method="setDatTopics" methodKey="resultData" argumentsKey="test" />
+					</if>
+					<setProperty key="topicMapByTopicId" value="${resultKey}.id,${resultKey}" type="map" />
+				</if>
+				<elseif evaluate="'${resultKey}' == 'questions'">
+					<print message="ini questions"/>
 				</elseif>
 				<callMethod method="saveOrUpdate" methodKey="session" argumentsKey="resultData"/>
 				<print message="   Save/Update (${resultKey}) %s: %s" key="resultData.id,resultData.name"/>
