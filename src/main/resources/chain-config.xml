@@ -93,10 +93,10 @@
 		<callMethod method="openSession" methodKey="sessionFactory" toKey="session"/>
 		
 		<!-- Save/Update Achievement to DB -->
-		<print message="Synchronize Achievement Data to DB"/>
+		<!-- <print message="Synchronize Achievement Data to DB"/>
 		<callTemplate commandName="doSaveTemplateToDB" ignoreExecuteResult="true" 
 			keyMap="tabSettingKey:tabAchievements,methodStructureKey:convertDataToAchievement,
-				resultKey:achievement,methodKey:toParameterAchievements" />
+				resultKey:achievement,methodKey:toParameterAchievements" /> -->
 		
 		<!-- Save/Update Topic to DB -->	
 		<print message="Synchronize Topics Data to DB"/>
@@ -105,10 +105,10 @@
 				resultKey:topics,methodKey:toDataTopics" />
 		
 		<!-- Save/Update Answers to DB -->	
-		<!-- <print message="Synchronize Questions Data to DB"/>
+		<print message="Synchronize Questions Data to DB"/>
 		<callTemplate commandName="doSaveTemplateToDB" ignoreExecuteResult="true"
 			keyMap="tabSettingKey:tabQuestions,methodStructureKey:convertDataToAnswerQuestion,
-				resultKey:questions,methodKey:toDataQuestion" /> -->
+				resultKey:questions,methodKey:toDataQuestion" />
 		
 		<!-- Close Connection -->
 		<callMethod method="close" methodKey="session"/>	
@@ -121,32 +121,43 @@
 			<callMethod method="beginTransaction" methodKey="session" toKey="trx"/>
 			<getProperty fromKey="tabCollections[iterateIndex]" toKey="tab" />
 			<getProperty fromKey="datasheetCollection[tab]" toKey="datasheet" />
-			<print message="* tab %s:" key="datasheet"/>
-							
 			<callMethod method="getListRows" methodKey="datasheetAPI" argumentsKey="datasheet" toKey="rowEntryCollection"/>
 			<loop checkCollectionKey="rowEntryCollection" indexKey="indexRowEntry">
 				<getProperty fromKey="rowEntryCollection[indexRowEntry]" toKey="rowEntry" />
 				<callMethod method="${methodStructureKey}" methodKey="com.dotosoft.dotoquiz.tools.util.DotoQuizStructure" 
 					argumentsKey="rowEntry,settings" staticFlag="true" toKey="${resultKey}"/>
 				<if evaluate="${resultKey} == null">
+					<print message="    Done"/>
 					<callMethod method="commit" methodKey="trx"/>	
 					<break />
+				</if>
+				<if evaluate="'${resultKey}' == 'questions'">
+					<callMethod method="getQuestionTypeByName" argumentsKey="session,${resultKey}.questionTypeData"
+						staticFlag="true" methodKey="com.dotosoft.dotoquiz.tools.util.HibernateUtil" toKey="mtQuestionType"/>
+					<callMethod method="setMtQuestionType" methodKey="${resultKey}" argumentsKey="mtQuestionType" />
 				</if>
 				<callMethod method="${methodKey}" methodKey="${resultKey}" toKey="resultData"/>
 				<!-- Set parent topic object -->
 				<if evaluate="'${resultKey}' == 'topics'">
-					<print message="ini topics"/>
 					<getProperty fromKey="topicMapByTopicId[${resultKey}.topicParentId]" toKey="topicParent" />
 					<if evaluate="topicParent != null">
-						<callMethod method="setDatTopics" methodKey="resultData" argumentsKey="test" />
+						<callMethod method="${methodKey}" methodKey="topicParent" toKey="parentData"/>
+						<callMethod method="setDatTopics" methodKey="${resultKey}" argumentsKey="parentData" />
 					</if>
 					<setProperty key="topicMapByTopicId" value="${resultKey}.id,${resultKey}" type="map" />
 				</if>
-				<elseif evaluate="'${resultKey}' == 'questions'">
-					<print message="ini questions"/>
-				</elseif>
 				<callMethod method="saveOrUpdate" methodKey="session" argumentsKey="resultData"/>
-				<print message="   Save/Update (${resultKey}) %s: %s" key="resultData.id,resultData.name"/>
+				<print message="   Save/Update (${resultKey}) %s: %s" key="resultData.id,resultData"/>
+				
+				<!-- <if evaluate="'${resultKey}' == 'questions'">
+					<loop checkCollectionKey="${resultKey}.topics" indexKey="indexTopicAnswer">
+						<getProperty fromKey="topicMapByTopicId[indexTopicAnswer]" toKey="topicParent" />
+						<callMethod method="toDataTopics" methodKey="datTopic" argumentsKey="resultTopic"/>
+						<callMethod method="toDataQuestion" methodKey="questionAnswer" argumentsKey="resultQuestion"/>						
+						<callMethod method="saveOrUpdateTopicQuestionData" methodKey="com.dotosoft.dotoquiz.tools.util.HibernateUtil" 
+							staticFlag="true" argumentsKey="session,resultTopic,resultQuestion" />
+					</loop>
+				</if> -->
 			</loop>
 			<callMethod method="commit" methodKey="trx"/>	
 		</loop>

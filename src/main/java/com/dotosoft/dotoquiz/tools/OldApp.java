@@ -305,7 +305,7 @@ public class OldApp {
 			        		log.info("Save or update QuestionAnswers: " + questionAnswer);
 			        		for(String topicId : questionAnswer.getTopics()) {
 			        			DataTopicsParser datTopic = topicMapByTopicId.get(topicId);
-			        			HibernateUtil.SaveOrUpdateTopicQuestionData(session, datTopic.toDataTopics(), questionAnswer.toDataQuestion());
+			        			HibernateUtil.saveOrUpdateTopicQuestionData(session, datTopic.toDataTopics(), questionAnswer.toDataQuestion());
 			        		}
 			    		} else if(type == APPLICATION_TYPE.SYNC) {
 			    			questionAnswer = syncQuestionAnswersToPicasa(questionAnswer);		    	

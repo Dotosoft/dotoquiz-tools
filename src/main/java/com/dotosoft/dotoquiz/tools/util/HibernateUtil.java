@@ -81,7 +81,9 @@ public class HibernateUtil {
         getSessionFactory().close();
     }
     
-    public static ParameterQuestionType getQuestionTypeByName(Session session, String name) {
+    public static ParameterQuestionType getQuestionTypeByName(Object sessionTmp, Object nameTmp) {
+    	Session session = (Session) sessionTmp;
+    	String name = (String) nameTmp;
     	Query q = session.createQuery("From ParameterQuestionType qt where qt.name = :questionTypeId");
     	q.setString("questionTypeId", name);
     	
@@ -89,7 +91,7 @@ public class HibernateUtil {
     	return parameterQuestionType;
     }
   
-    public static void SaveOrUpdateTopicQuestionData(Session session, DataTopics topic, DataQuestions questionAnswer) {
+    public static void saveOrUpdateTopicQuestionData(Session session, DataTopics topic, DataQuestions questionAnswer) {
     	Query q = session.createQuery("From DataTopicsQuestions tq where tq.datQuestions.id = :questionId and tq.datTopics.id = :topicId");
     	q.setString("questionId", questionAnswer.getId());
     	q.setString("topicId", topic.getId());
