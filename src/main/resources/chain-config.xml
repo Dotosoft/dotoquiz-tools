@@ -19,6 +19,7 @@
 	
 	<!-- Tools Application -->
 	<chain name="CLEAR">
+		<print message="*** START TASK - CLEAR PICASA ***"/>
 		<callMethod method="authenticate" toKey="credential" argumentsKey="settings" staticFlag="true"
 			methodKey="com.dotosoft.dotoquiz.tools.thirdparty.GoogleOAuth"/>
 		<createObject argumentsKey="credential" toKey="imageAPI"
@@ -30,9 +31,11 @@
 			<getProperty fromKey="albumCollection[indexAlbum]" toKey="album" />
 			<callMethod method="deletePhoto" methodKey="imageAPI" argumentsKey="album" />
 		</loop>
+		<print message="*** FINISHED TASK - CLEAR PICASA ***"/>
 	</chain>
 	
 	<chain name="SHOW_COLUMN_HEADER">
+		<print message="*** START TASK - SHOW COLUMN HEADER DATA ***"/>
 		<callMethod method="authenticate" methodKey="com.dotosoft.dotoquiz.tools.thirdparty.GoogleOAuth"
 			argumentsKey="settings" staticFlag="true" toKey="credential" />
 		<createObject objectClass="com.dotosoft.dotoquiz.tools.thirdparty.GooglesheetClient" 
@@ -48,10 +51,11 @@
 				<callMethod  method="showColumnHeader" methodKey="datasheetAPI" argumentsKey="rowEntry" />				
 			</loop>
 		</loop>
+		<print message="*** FINISHED TASK - SHOW COLUMN HEADER DATA ***"/>
 	</chain>
 	
 	<chain name="SYNC">
-		<print message="DO SYNC"/>
+		<print message="*** START TASK - SYNC DATA TO IMAGES HOST ***"/>
 		<callMethod method="authenticate" methodKey="com.dotosoft.dotoquiz.tools.thirdparty.GoogleOAuth"
 			argumentsKey="settings" staticFlag="true" toKey="credential" />
 		<createObject objectClass="com.dotosoft.dotoquiz.tools.thirdparty.GooglesheetClient" 
@@ -77,6 +81,7 @@
 				</else>
 			</loop>				
 		</loop>
+		<print message="*** FINISHED TASK - SYNC DATA TO IMAGES HOST ***"/>
 	</chain>
 	
 	<chain name="DB">
