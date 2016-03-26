@@ -19,6 +19,7 @@ package com.dotosoft.dotoquiz.tools.util;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 
+import com.dotosoft.dot4command.utils.BeanUtils;
 import com.dotosoft.dotoquiz.common.QuizConstant;
 import com.dotosoft.dotoquiz.tools.common.QuizParserConstant;
 import com.dotosoft.dotoquiz.tools.common.QuizParserConstant.APPLICATION_TYPE;

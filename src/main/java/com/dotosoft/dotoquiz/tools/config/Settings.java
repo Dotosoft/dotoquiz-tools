@@ -45,9 +45,18 @@ public class Settings {
 
 	private String syncDataFile;
 	private String syncDataFolder;
+	private String uploadDataFolder;
 
 	private boolean replaced;
 	
+	public String getUploadDataFolder() {
+		return uploadDataFolder;
+	}
+
+	public void setUploadDataFolder(String uploadDataFolder) {
+		this.uploadDataFolder = uploadDataFolder;
+	}
+
 	public ImageConfig getImageConfig() {
 		return imageConfig;
 	}

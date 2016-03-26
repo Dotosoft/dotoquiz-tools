@@ -73,12 +73,8 @@
 				<callMethod method="convertDataToAchievement" argumentsKey="rowEntry,settings" toKey="achievement"
 					methodKey="com.dotosoft.dotoquiz.tools.util.DotoQuizStructure" staticFlag="true" />
 				<callMethod method="toParameterAchievements" methodKey="achievement" toKey="achievementObject"/>
-				<if evaluate="achievement.isProcessed == 'Y'">
-					<print message="%s sudah diproses" key="achievement.id"/>
-				</if>
-				<else>
-					<print message="%s belum diproses" key="achievement.id"/>
-				</else>
+				<!-- Do Sync Data To Image Hosting -->
+				<callTemplate commandName="doSyncDataToImageHosting" />
 			</loop>				
 		</loop>
 		<print message="*** FINISHED TASK - SYNC DATA TO IMAGES HOST ***"/>
@@ -167,5 +163,21 @@
 			</loop>
 			<callMethod method="commit" methodKey="trx"/>	
 		</loop>
+	</chain>
+	
+	<chain name="doSyncDataToImageHosting">
+		<if evaluate="achievement.isProcessed == 'Y'">
+			<print message="%s sudah diproses" key="achievement.id"/>
+			<if evaluate="achievement.imagePicasaUrl != null">
+				<callMethod method="get" methodKey="java.nio.file.Paths" staticFlag="true" 
+					argumentsKey="settings.uploadDataFolder,'achievement',achievement.imageUrl" toKey="filePath" />
+				<callMethod method="downloadFileToLocal" methodKey="com.dotosoft.dotoquiz.utils.FileUtils" staticFlag="true" 
+					argumentsKey="achievement.imagePicasaUrl,filePath,settings.replaced" />
+				<print message="download image from %s" key="achievement.imagePicasaUrl"/>				
+			</if>
+		</if>
+		<else>
+			<print message="%s belum diproses" key="achievement.id"/>
+		</else>
 	</chain>
 </catalog>
