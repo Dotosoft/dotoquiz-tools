@@ -146,7 +146,7 @@
 						<callMethod method="${methodKey}" methodKey="topicParent" toKey="parentData"/>
 						<callMethod method="setDatTopics" methodKey="${resultKey}" argumentsKey="parentData" />
 					</if>
-					<setProperty key="topicMapByTopicId" value="${resultKey}.id,${resultKey}" type="map" />
+					<setProperty key="topicMapByTopicId" value="${resultKey}.id:${resultKey}" type="map" />
 				</if>
 				<callMethod method="saveOrUpdate" methodKey="session" argumentsKey="resultData"/>
 				<print message="   Save/Update (${resultKey}) %s: %s" key="resultData.id,resultData"/>
