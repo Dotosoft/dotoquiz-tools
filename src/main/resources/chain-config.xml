@@ -169,11 +169,12 @@
 		<if evaluate="achievement.isProcessed == 'Y'">
 			<print message="%s sudah diproses" key="achievement.id"/>
 			<if evaluate="achievement.imagePicasaUrl != null">
+				<setProperty key="strPath" value="'achievement',achievement.imageUrl" type="string[]"/>
 				<callMethod method="get" methodKey="java.nio.file.Paths" staticFlag="true" 
-					argumentsKey="settings.uploadDataFolder,'achievement',achievement.imageUrl" toKey="filePath" />
+					argumentsKey="settings.uploadDataFolder,strPath" toKey="filePath" />
 				<callMethod method="downloadFileToLocal" methodKey="com.dotosoft.dotoquiz.utils.FileUtils" staticFlag="true" 
 					argumentsKey="achievement.imagePicasaUrl,filePath,settings.replaced" />
-				<print message="download image from %s" key="achievement.imagePicasaUrl"/>				
+				<print message="*** download image from %s" key="achievement.imagePicasaUrl"/>				
 			</if>
 		</if>
 		<else>
