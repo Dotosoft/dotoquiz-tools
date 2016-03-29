@@ -24,7 +24,7 @@
 			methodKey="com.dotosoft.dotoquiz.tools.thirdparty.GoogleOAuth"/>
 		<createObject argumentsKey="credential" toKey="imageAPI"
 			objectClass="com.dotosoft.dotoquiz.tools.thirdparty.PicasawebClient"/>
-		<setProperty type="boolean" value="true" toKey="showAll" />
+		<setProperty type="java.lang.Boolean" value="true" key="showAll" />
 		<callMethod method="getAlbums" methodKey="imageAPI" argumentsKey="showAll" 
 			toKey="albumCollection" />
 		<loop checkCollectionKey="albumCollection" doWhile="true" indexKey="indexAlbum">
@@ -146,7 +146,7 @@
 						<callMethod method="${methodKey}" methodKey="topicParent" toKey="parentData"/>
 						<callMethod method="setDatTopics" methodKey="${resultKey}" argumentsKey="parentData" />
 					</if>
-					<setProperty key="topicMapByTopicId" value="${resultKey}.id:${resultKey}" type="map" />
+					<setProperty key="topicMapByTopicId" value="${resultKey}.id:${resultKey}" type="java.util.HashMap" />
 				</if>
 				<callMethod method="saveOrUpdate" methodKey="session" argumentsKey="resultData"/>
 				<print message="   Save/Update (${resultKey}) %s: %s" key="resultData.id,resultData"/>
@@ -169,7 +169,7 @@
 		<if evaluate="achievement.isProcessed == 'Y'">
 			<print message="%s sudah diproses" key="achievement.id"/>
 			<if evaluate="achievement.imagePicasaUrl != null">
-				<setProperty key="strPath" value="'achievement',achievement.imageUrl" type="string[]"/>
+				<setProperty key="strPath" value="'achievement',achievement.imageUrl" type="java.lang.String []"/>
 				<callMethod method="get" methodKey="java.nio.file.Paths" staticFlag="true" 
 					argumentsKey="settings.uploadDataFolder,strPath" toKey="filePath" />
 				<callMethod method="downloadFileToLocal" methodKey="com.dotosoft.dotoquiz.utils.FileUtils" staticFlag="true" 
