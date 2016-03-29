@@ -34,8 +34,9 @@
 		<print message="*** FINISHED TASK - CLEAR PICASA ***"/>
 	</chain>
 	
-	<chain name="SHOW_COLUMN_HEADER">
+	<chain name="SHOW_COLUMN_HEADER" showLog="false">
 		<print message="*** START TASK - SHOW COLUMN HEADER DATA ***"/>
+		<setProperty type="java.lang.Boolean" value="false" key="showLog" />
 		<callMethod method="authenticate" methodKey="com.dotosoft.dotoquiz.tools.thirdparty.GoogleOAuth"
 			argumentsKey="settings" staticFlag="true" toKey="credential" />
 		<createObject objectClass="com.dotosoft.dotoquiz.tools.thirdparty.GooglesheetClient" 
@@ -48,7 +49,7 @@
 				toKey="rowEntryCollection"/>
 			<loop loopTime="1" indexKey="indexRowEntry">
 				<getProperty fromKey="rowEntryCollection[indexRowEntry]" toKey="rowEntry" />
-				<callMethod  method="showColumnHeader" methodKey="datasheetAPI" argumentsKey="rowEntry" />				
+				<callMethod  method="showColumnHeader" methodKey="datasheetAPI" argumentsKey="rowEntry,showLog" />				
 			</loop>
 		</loop>
 		<print message="*** FINISHED TASK - SHOW COLUMN HEADER DATA ***"/>

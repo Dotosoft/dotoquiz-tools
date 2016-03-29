@@ -159,10 +159,15 @@ public class GooglesheetClient {
 	    rowEntry.delete();
 	}
 
-	public void showColumnHeader(ListEntry listEntry) {
+	public void showColumnHeader(ListEntry listEntry, Boolean useLog) {
 		int index = 0;
 		for (String tag : listEntry.getCustomElements().getTags()) {
-			log.info("\tColumn" + (index++) + ": " + tag);
+			if(useLog) {
+				log.info("** Column" + (index++) + ": " + tag);
+			} else {
+				System.out.println("** Column" + (index++) + ": " + tag);
+			}
 		}
+		System.out.print("\n");
 	}
 }
