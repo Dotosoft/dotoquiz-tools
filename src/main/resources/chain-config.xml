@@ -14,6 +14,7 @@
 	<define name="elseif" className="com.dotosoft.dot4command.commands.ElseIfCommand"/>
 	<define name="else" className="com.dotosoft.dot4command.commands.ElseCommand"/>
 	<define name="break" className="com.dotosoft.dot4command.commands.BreakCommand"/>
+	<define name="continue" className="com.dotosoft.dot4command.commands.ContinueCommand"/>
 	<define name="callTemplate" className="com.dotosoft.dot4command.commands.CallTemplateCommand"/>
 	<define name="filter" className="com.dotosoft.dot4command.commands.FilterCollectionCommand"/>
 	
@@ -62,22 +63,28 @@
 		<createObject objectClass="com.dotosoft.dotoquiz.tools.thirdparty.GooglesheetClient" 
 			argumentsKey="credential,settings.syncDataFile" toKey="datasheetAPI" />
 		<callMethod method="getWorksheets" methodKey="datasheetAPI" toKey="datasheetCollection"/>		
-		<split fromKey="settings.structure.tabAchievements" separator=";" toKey="tabAchievementCollections"/>	
-			
-		<loop checkCollectionKey="tabAchievementCollections" doWhile="true" indexKey="indexTabAchievement">
-			<getProperty fromKey="tabAchievementCollections[indexTabAchievement]" toKey="tab" />
-			<getProperty fromKey="datasheetCollection[tab]" toKey="datasheet" />		
-					
-			<callMethod method="getListRows" methodKey="datasheetAPI" argumentsKey="datasheet" toKey="rowEntryCollection"/>
-			<loop checkCollectionKey="rowEntryCollection" indexKey="indexRowEntry">
-				<getProperty fromKey="rowEntryCollection[indexRowEntry]" toKey="rowEntry" />
-				<callMethod method="convertDataToAchievement" argumentsKey="rowEntry,settings" toKey="achievement"
-					methodKey="com.dotosoft.dotoquiz.tools.util.DotoQuizStructure" staticFlag="true" />
-				<callMethod method="toParameterAchievements" methodKey="achievement" toKey="achievementObject"/>
-				<!-- Do Sync Data To Image Hosting -->
-				<callTemplate commandName="doSyncDataToImageHosting" />
-			</loop>				
-		</loop>
+		
+		<!-- Sync Achievement To Image Hosting -->
+		<!-- <print message="============================================="/>
+		<print message="Synchronize Achievement Data to ImageHosting"/>
+		<callTemplate commandName="doSyncDataToImageHosting" ignoreExecuteResult="true" 
+			keyMap="tabSettingKey:tabAchievements,methodStructureKey:convertDataToAchievement,
+				resultKey:achievement,methodKey:toParameterAchievements,fieldImageUrl:imageUrl" /> -->
+		
+		<!-- Sync Topic to Image Hosting -->
+		<!-- <print message="============================================="/>	
+		<print message="Synchronize Topics Data to ImageHosting"/>
+		<callTemplate commandName="doSyncDataToImageHosting" ignoreExecuteResult="true" 
+			keyMap="tabSettingKey:tabTopics,methodStructureKey:convertDataToTopics,
+				resultKey:topics,methodKey:toDataTopics,fieldImageUrl:imageUrl" /> -->
+		
+		<!-- Sync Answers to Image Hosting -->	
+		<print message="============================================="/>
+		<print message="Synchronize Questions Data to ImageHosting"/>
+		<callTemplate commandName="doSyncDataToImageHosting" ignoreExecuteResult="true"
+			keyMap="tabSettingKey:tabQuestions,methodStructureKey:convertDataToAnswerQuestion,
+				resultKey:questions,methodKey:toDataQuestion,fieldImageUrl:additionalData" />
+				
 		<print message="*** FINISHED TASK - SYNC DATA TO IMAGES HOST ***"/>
 	</chain>
 	
@@ -120,7 +127,7 @@
 	<chain name="doSaveTemplateToDB">
 		<split fromKey="settings.structure.${tabSettingKey}" separator=";" toKey="tabCollections"/>
 		<loop checkCollectionKey="tabCollections" doWhile="true" indexKey="iterateIndex">
-			<print message="* Proses ${resultKey} %s:" key="iterateIndex"/>
+			<print message="* Proses ${resultKey} tab %s:" key="iterateIndex"/>
 			<callMethod method="beginTransaction" methodKey="session" toKey="trx"/>
 			<getProperty fromKey="tabCollections[iterateIndex]" toKey="tab" />
 			<getProperty fromKey="datasheetCollection[tab]" toKey="datasheet" />
@@ -167,19 +174,42 @@
 	</chain>
 	
 	<chain name="doSyncDataToImageHosting">
-		<if evaluate="achievement.isProcessed == 'Y'">
-			<print message="%s sudah diproses" key="achievement.id"/>
-			<if evaluate="achievement.imagePicasaUrl != null">
-				<setProperty key="strPath" value="'achievement',achievement.imageUrl" type="java.lang.String []"/>
-				<callMethod method="get" methodKey="java.nio.file.Paths" staticFlag="true" 
-					argumentsKey="settings.uploadDataFolder,strPath" toKey="filePath" />
-				<callMethod method="downloadFileToLocal" methodKey="com.dotosoft.dotoquiz.utils.FileUtils" staticFlag="true" 
-					argumentsKey="achievement.imagePicasaUrl,filePath,settings.replaced" />
-				<print message="*** download image from %s" key="achievement.imagePicasaUrl"/>				
-			</if>
-		</if>
-		<else>
-			<print message="%s belum diproses" key="achievement.id"/>
-		</else>
+		<split fromKey="settings.structure.${tabSettingKey}" separator=";" toKey="tabCollections"/>	
+		<loop checkCollectionKey="tabCollections" doWhile="true" indexKey="iterateIndex">
+			<print message="* Proses ${resultKey} tab %s:" key="iterateIndex"/>
+			<getProperty fromKey="tabCollections[iterateIndex]" toKey="tab" />
+			<getProperty fromKey="datasheetCollection[tab]" toKey="datasheet" />		
+					
+			<callMethod method="getListRows" methodKey="datasheetAPI" argumentsKey="datasheet" toKey="rowEntryCollection"/>
+			<loop checkCollectionKey="rowEntryCollection" indexKey="indexRowEntry">
+				<getProperty fromKey="rowEntryCollection[indexRowEntry]" toKey="rowEntry" />
+				<callMethod method="${methodStructureKey}" argumentsKey="rowEntry,settings" toKey="${resultKey}"
+					methodKey="com.dotosoft.dotoquiz.tools.util.DotoQuizStructure" staticFlag="true" />
+				<if evaluate="${resultKey} == null">
+					<print message="    Done"/>
+					<break />
+				</if>
+				<callMethod method="${methodKey}" methodKey="${resultKey}" toKey="dataObject"/>
+				<if evaluate="${resultKey}.isProcessed == 'Y'">
+					<print message="${resultKey} - %s sudah diproses" key="${resultKey}.id"/>
+					<if evaluate="'${resultKey}' == 'questions'">
+						<if evaluate="${resultKey}.questionTypeData != 'image'">
+							<continue/>
+						</if>
+					</if>
+					<if evaluate="${resultKey}.imagePicasaUrl != null">
+						<setProperty key="strPath" value="'${resultKey}',${resultKey}.${fieldImageUrl}" type="java.lang.String []"/>
+						<callMethod method="get" methodKey="java.nio.file.Paths" staticFlag="true" 
+							argumentsKey="settings.uploadDataFolder,strPath" toKey="filePath" />
+						<callMethod method="downloadFileToLocal" methodKey="com.dotosoft.dotoquiz.utils.FileUtils" staticFlag="true" 
+							argumentsKey="${resultKey}.imagePicasaUrl,filePath,settings.replaced" />
+						<print message="*** download image from %s" key="${resultKey}.imagePicasaUrl"/>				
+					</if>
+				</if>
+				<else>
+					<print message="${resultKey} - %s belum diproses" key="${resultKey}.id"/>
+				</else>
+			</loop>				
+		</loop>
 	</chain>
 </catalog>
