@@ -65,20 +65,20 @@
 		<callMethod method="getWorksheets" methodKey="datasheetAPI" toKey="datasheetCollection"/>		
 		
 		<!-- Sync Achievement To Image Hosting -->
-		<!-- <print message="============================================="/>
+		<print message="============================================="/>
 		<print message="Synchronize Achievement Data to ImageHosting"/>
 		<callTemplate commandName="doSyncDataToImageHosting" ignoreExecuteResult="true" 
 			keyMap="tabSettingKey:tabAchievements,methodStructureKey:convertDataToAchievement,
-				resultKey:achievement,methodKey:toParameterAchievements,fieldImageUrl:imageUrl" /> -->
+				resultKey:achievement,methodKey:toParameterAchievements,fieldImageUrl:imageUrl" />
 		
 		<!-- Sync Topic to Image Hosting -->
-		<!-- <print message="============================================="/>	
+		<print message="============================================="/>	
 		<print message="Synchronize Topics Data to ImageHosting"/>
 		<callTemplate commandName="doSyncDataToImageHosting" ignoreExecuteResult="true" 
 			keyMap="tabSettingKey:tabTopics,methodStructureKey:convertDataToTopics,
-				resultKey:topics,methodKey:toDataTopics,fieldImageUrl:imageUrl" /> -->
+				resultKey:topics,methodKey:toDataTopics,fieldImageUrl:imageUrl" />
 		
-		<!-- Sync Answers to Image Hosting -->	
+		<!-- Sync Answers to Image Hosting -->
 		<print message="============================================="/>
 		<print message="Synchronize Questions Data to ImageHosting"/>
 		<callTemplate commandName="doSyncDataToImageHosting" ignoreExecuteResult="true"
