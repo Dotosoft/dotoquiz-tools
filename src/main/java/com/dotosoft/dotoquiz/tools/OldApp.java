@@ -225,7 +225,7 @@ public class OldApp {
 			    			achievement = syncAchievementToPicasa(achievement);
 			    			
 			    			if(!QuizConstant.YES.equals(achievement.getIsProcessed())) {
-			    				updateSyncPicasa(QuizParserConstant.PARSE_ACHIEVEMENT, row, achievement.getPicasaId(), achievement.getImagePicasaUrl(), QuizConstant.YES);
+			    				PicasawebClient.updateSyncPicasa(settings, QuizParserConstant.PARSE_ACHIEVEMENT, row, achievement.getPicasaId(), achievement.getImagePicasaUrl(), QuizConstant.YES);
 			    			}
 			    		}
 			        }
@@ -266,7 +266,7 @@ public class OldApp {
 			    			topic = syncTopicToPicasa(topic);
 			    			
 			    			if(!QuizConstant.YES.equals(topic.getIsProcessed())) {
-			    				updateSyncPicasa(QuizParserConstant.PARSE_TOPIC, row, topic.getPicasaId(), topic.getImagePicasaUrl(), QuizConstant.YES);
+			    				PicasawebClient.updateSyncPicasa(settings, QuizParserConstant.PARSE_TOPIC, row, topic.getPicasaId(), topic.getImagePicasaUrl(), QuizConstant.YES);
 			    			}
 			    		}
 			        	
@@ -310,7 +310,7 @@ public class OldApp {
 			    		} else if(type == APPLICATION_TYPE.SYNC) {
 			    			questionAnswer = syncQuestionAnswersToPicasa(questionAnswer);		    	
 			    			if(!QuizConstant.YES.equals(questionAnswer.getIsProcessed())) {
-			    				updateSyncPicasa(QuizParserConstant.PARSE_QUESTION_ANSWER, row, questionAnswer.getPicasaId(), questionAnswer.getImagePicasaUrl(), QuizConstant.YES);
+			    				PicasawebClient.updateSyncPicasa(settings, QuizParserConstant.PARSE_QUESTION_ANSWER, row, questionAnswer.getPicasaId(), questionAnswer.getImagePicasaUrl(), QuizConstant.YES);
 			    			}
 			    		}
 			        }
@@ -374,26 +374,6 @@ public class OldApp {
 		}
 		
 		return null;
-	}
-	
-	private void updateSyncPicasa(String parseType, Object data, String picasaId, String imagePicasaURL, String isProcessed) throws IOException, ServiceException {
-		String paramPIcasaId = DotoQuizStructure.getStructureKey(parseType, settings, "iAlbumIdPicasa");
-		String paramImageURLPicasa = DotoQuizStructure.getStructureKey(parseType, settings, "iImageURLPicasa");
-		String paramIsProcessed = DotoQuizStructure.getStructureKey(parseType, settings, "iIsProcessed");
-		
-		if(DATA_TYPE.EXCEL.toString().equals(settings.getDataType())) {
-			Row rowData = (Row) data;
-			
-			if(StringUtils.hasValue(picasaId)) rowData.getCell(Integer.parseInt(paramPIcasaId)).setCellValue(picasaId);
-			if(StringUtils.hasValue(imagePicasaURL)) rowData.getCell(Integer.parseInt(paramImageURLPicasa)).setCellValue(imagePicasaURL);
-			rowData.getCell(Integer.parseInt(paramIsProcessed)).setCellValue(isProcessed);
-		} else if(DATA_TYPE.GOOGLESHEET.toString().equals(settings.getDataType())) {
-			ListEntry listEntry = (ListEntry) data;
-			if(StringUtils.hasValue(picasaId)) listEntry.getCustomElements().setValueLocal(paramPIcasaId, picasaId);
-			if(StringUtils.hasValue(imagePicasaURL)) listEntry.getCustomElements().setValueLocal(paramImageURLPicasa, imagePicasaURL);
-			listEntry.getCustomElements().setValueLocal(paramIsProcessed, isProcessed);
-			listEntry.update();
-		}
 	}
 	
 	private void refreshDataFromPicasa() {
