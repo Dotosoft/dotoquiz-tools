@@ -54,6 +54,7 @@ import com.dotosoft.dotoquiz.tools.util.SyncState;
 import com.dotosoft.dotoquiz.utils.FileUtils;
 import com.dotosoft.dotoquiz.utils.MD5Checksum;
 import com.dotosoft.dotoquiz.utils.StringUtils;
+import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.util.Lists;
 import com.google.gdata.data.MediaContent;
 import com.google.gdata.data.PlainTextConstruct;
@@ -69,7 +70,7 @@ public class OldApp {
 	private static final Logger log = LogManager.getLogger(OldApp.class.getName());
 	
 	private Settings settings;
-	private GoogleOAuth auth;
+	private Credential auth;
 	private SyncState syncState;
 	private PicasawebClient webClient;
 	
@@ -78,11 +79,11 @@ public class OldApp {
 	private Map<String, GphotoEntry> albumMapByTitle;
 	private Map<String, DataTopicsParser> topicMapByTopicId;
 	
-	public static void main(String[] args) {
+	public static void main(String[] args) throws Exception {
 		new OldApp(args).process();
 	}
 	
-	public OldApp(String args[]) {
+	public OldApp(String args[]) throws Exception {
 		
 		photoMapByAlbumId = new HashMap<String, Map<String, GphotoEntry>>();
 		albumMapByTopicId = new HashMap<String, GphotoEntry>();
@@ -95,7 +96,7 @@ public class OldApp {
 		if( settings.loadSettings(args) ) {
 			log.info("Starting and setup Doto Parser...");
 			
-//			auth = new GoogleOAuth();
+			auth = GoogleOAuth.authenticate(settings);
 			
 			if(APPLICATION_TYPE.DB.toString().equals(settings.getApplicationType())) {
 				log.info("Building hibernate...");
@@ -105,7 +106,7 @@ public class OldApp {
 			log.info("Initialising Web client and authenticating...");
 	        if( webClient == null ) {
 	            try {
-//	                webClient = auth.authenticatePicasa(false, syncState );
+	            	webClient = new PicasawebClient(auth);
 	            }
 	            catch( Exception _ex ) {
 	            	// settings.showError();
@@ -183,6 +184,7 @@ public class OldApp {
 			    file = new FileInputStream(settings.getSyncDataFile());
 			    workbook = new XSSFWorkbook(file);			 
 			} else if(DATA_TYPE.GOOGLESHEET.toString().equals(settings.getDataType())) {
+				googlesheetClient = new GooglesheetClient(auth, settings.getSyncDataFile());
 //				googlesheetClient = auth.authenticateGooglesheet(settings.getSyncDataFile(), settings, false, syncState );
 			}
 			

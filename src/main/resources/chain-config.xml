@@ -61,17 +61,8 @@
 		<callMethod method="authenticate" methodKey="com.dotosoft.dotoquiz.tools.thirdparty.GoogleOAuth"
 			argumentsKey="settings" staticFlag="true" toKey="credential" />
 		
-		<!-- Get All Album from Picasa -->
-		<createObject argumentsKey="credential" toKey="imageAPI"
-			objectClass="com.dotosoft.dotoquiz.tools.thirdparty.PicasawebClient"/>
-		<setProperty type="java.lang.Boolean" value="true" key="showAll" />
-		<callMethod method="getAlbums" methodKey="imageAPI" argumentsKey="showAll" 
-			toKey="albumCollection" />
-			
-		<!-- Get All Worksheet from GoogleSheet -->
-		<createObject objectClass="com.dotosoft.dotoquiz.tools.thirdparty.GooglesheetClient" 
-			argumentsKey="credential,settings.syncDataFile" toKey="datasheetAPI" />
-		<callMethod method="getWorksheets" methodKey="datasheetAPI" toKey="datasheetCollection"/>		
+		<callTemplate commandName="doGetAllAlbumAndPhotoFromPicasa" />
+		<callTemplate commandName="doGetAllWorksheetFromGoogleSheet" />
 		
 		<!-- Sync Achievement To Image Hosting -->
 		<print message="============================================="/>
@@ -101,9 +92,8 @@
 		<print message="*** START TASK - DATA TO DB ***"/>
 		<callMethod method="authenticate" methodKey="com.dotosoft.dotoquiz.tools.thirdparty.GoogleOAuth"
 			argumentsKey="settings" staticFlag="true" toKey="credential" />
-		<createObject objectClass="com.dotosoft.dotoquiz.tools.thirdparty.GooglesheetClient" 
-			toKey="datasheetAPI" argumentsKey="credential,settings.syncDataFile"/>
-		<callMethod method="getWorksheets" methodKey="datasheetAPI" toKey="datasheetCollection"/>		
+			
+		<callTemplate commandName="doGetAllWorksheetFromGoogleSheet" />
 			
 		<!-- Create Connection to DB -->
 		<callMethod method="buildSessionFactory" methodKey="com.dotosoft.dotoquiz.tools.util.HibernateUtil" 
@@ -182,6 +172,32 @@
 		</loop>
 	</chain>
 	
+	<chain name="doGetAllWorksheetFromGoogleSheet">
+		<!-- Get All Worksheet from GoogleSheet -->
+		<createObject objectClass="com.dotosoft.dotoquiz.tools.thirdparty.GooglesheetClient" 
+			argumentsKey="credential,settings.syncDataFile" toKey="datasheetAPI" />
+		<callMethod method="getWorksheets" methodKey="datasheetAPI" toKey="datasheetCollection"/>		
+	</chain>
+	
+	<chain name="doGetAllAlbumAndPhotoFromPicasa">
+		<createObject argumentsKey="credential" toKey="imageAPI" objectClass="com.dotosoft.dotoquiz.tools.thirdparty.PicasawebClient"/>
+		<setProperty type="java.lang.Boolean" value="true" key="showAll" />
+		
+		<!-- Get All Album from Picasa -->
+		<callMethod method="getAlbums" methodKey="imageAPI" argumentsKey="showAll" toKey="albumCollection" />
+		
+		<!-- Get All Photo from Picasa -->	
+		<loop checkCollectionKey="albumCollection" indexKey="indexAlbum">
+			<callMethod method="getPhotos" methodKey="imageAPI" argumentsKey="albumCollection[indexAlbum]" toKey="photoEntries" />
+			<loop checkCollectionKey="photoEntries" indexKey="indexPhoto">
+				<setProperty key="photoMapByPhotoId" value="photoEntries[indexPhoto].title.plainText:photoEntries[indexPhoto]" type="java.util.HashMap" />
+				<setProperty key="photoMapByAlbumId" value="albumCollection[indexAlbum].id:photoMapByPhotoId" type="java.util.HashMap" />
+				<removeProperty fromKey="photoMapByPhotoId" />				
+			</loop>
+			<setProperty key="albumMapByTopicId" value="albumCollection[indexAlbum].id:albumCollection[indexAlbum]" type="java.util.HashMap" />
+		</loop>
+	</chain>
+	
 	<chain name="doSyncDataToImageHosting">
 		<split fromKey="settings.structure.${tabSettingKey}" separator=";" toKey="tabCollections"/>	
 		<loop checkCollectionKey="tabCollections" doWhile="true" indexKey="iterateIndex">
@@ -220,11 +236,20 @@
 				</if>
 				<else>
 					<print message="${resultKey} - %s belum diproses" key="${resultKey}.id"/>
-					<getProperty fromKey="albumCollection[${resultKey}.id]" toKey="myAlbum" />
+					
+					<setProperty key="strPath" value="'achievement',${resultKey}.${fieldImageUrl}" type="java.lang.String []"/>
+					<callMethod method="get" methodKey="java.nio.file.Paths" staticFlag="true" 
+						argumentsKey="settings.syncDataFolder,strPath" toKey="filePath" />
+					
+					<!-- <getProperty fromKey="albumCollection[${resultKey}.id]" toKey="myAlbum" />
 					<setProperty key="strPath" value="myAlbum.title.plainText,${resultKey}.${fieldImageUrl}" type="java.lang.String []"/>
 					<print message="strPath:: %s" key="strPath"/>
 					<callMethod method="get" methodKey="java.nio.file.Paths" staticFlag="true" 
-						argumentsKey="settings.syncDataFolder,strPath" toKey="filePath" />
+						argumentsKey="settings.syncDataFolder,strPath" toKey="filePath" /> -->
+						
+					<!-- <getProperty fromKey="albumMapByTopicId['achievement']" toKey="achievementTopic" />
+					<print message="strPath:: %s" key="achievementTopic.id"/> -->
+					
 					
 					<!-- GphotoEntry achievementTopic = albumMapByTopicId.get(QuizParserConstant.ACHIEVEMENT_NAME);
 					// Check image file is valid or not
@@ -245,6 +270,9 @@
 					
 					achievement.setImagePicasaUrl( ((MediaContent)photoEntry.getContent()).getUri() );
 					achievement.setPicasaId( photoEntry.getGphotoId() ); -->
+					
+					<callMethod method="uploadImageToAlbum" methodKey="imageAPI" argumentsKey="filePath,null,myAlbum" 
+						toKey="albumCollection" />
 					
 				</else>
 			</loop>				

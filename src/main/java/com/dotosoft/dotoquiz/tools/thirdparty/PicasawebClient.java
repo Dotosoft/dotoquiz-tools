@@ -45,6 +45,7 @@ import com.dotosoft.dotoquiz.tools.config.Settings;
 import com.dotosoft.dotoquiz.tools.thirdparty.metadata.ImageInformation;
 import com.dotosoft.dotoquiz.tools.util.DotoQuizStructure;
 import com.dotosoft.dotoquiz.tools.util.TimeUtils;
+import com.dotosoft.dotoquiz.utils.MD5Checksum;
 import com.dotosoft.dotoquiz.utils.StringUtils;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
@@ -271,22 +272,21 @@ public class PicasawebClient {
     }
 
     public void deletePhoto(GphotoEntry photoEntry) throws Exception {
-    	// photoEntry.delete();
     	log.info( "Delete photo " + photoEntry.getTitle().getPlainText() );
+    	photoEntry.delete();
     }
     
-    public GphotoEntry uploadImageToAlbum(String imageFilePath, GphotoEntry remotePhoto, GphotoEntry albumEntry ) throws Exception {
-//    	java.nio.file.Path topicImagePath = FileUtils.getPath(settings.getSyncDataFolder(), topic.getId(), topic.getImageUrl());
-//    	// java.nio.file.Path topicImagePath = FileUtils.getPath(settings.getSyncDataFolder(), topic.getId(), topic.getImageUrl());
-//		if(topicImagePath.getParent().toFile().exists()) {
-//			if(!topicImagePath.toFile().exists()) {
-//				log.error("File is not found at '" + topicImagePath.toString() + "'. Please put the file and start this app again.");
-//				System.exit(1);
-//			}
-//			GphotoEntry photoEntry = (GphotoEntry) webClient.uploadImageToAlbum(topicImagePath.toFile(), photoEntry, albumEntry, MD5Checksum.getMD5Checksum(topicImagePath.toString()));
-//		}
-//    	return uploadImageToAlbum(imageFilePath, remotePhoto, albumEntry);
-    	return null;
+    public GphotoEntry uploadImageToAlbum(Path imageFilePath, GphotoEntry remotePhoto, GphotoEntry albumEntry ) throws Exception {
+    	// java.nio.file.Path topicImagePath = FileUtils.getPath(settings.getSyncDataFolder(), topic.getId(), topic.getImageUrl());
+    	// java.nio.file.Path topicImagePath = FileUtils.getPath(settings.getSyncDataFolder(), topic.getId(), topic.getImageUrl());
+		if(imageFilePath.getParent().toFile().exists()) {
+			if(!imageFilePath.toFile().exists()) {
+				log.error("File is not found at '" + imageFilePath.toString() + "'. Please put the file and start this app again.");
+				System.exit(1);
+			}
+			GphotoEntry photoEntry = (GphotoEntry) uploadImageToAlbum(imageFilePath.toFile(), remotePhoto, albumEntry, MD5Checksum.getMD5Checksum(imageFilePath.toString()));
+		}
+    	return uploadImageToAlbum(imageFilePath, remotePhoto, albumEntry);
     }
 
     public GphotoEntry uploadImageToAlbum(File imageFile, GphotoEntry remotePhoto, GphotoEntry albumEntry, String localMd5CheckSum ) throws Exception {
