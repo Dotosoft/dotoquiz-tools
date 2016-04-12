@@ -227,7 +227,7 @@ public class OldApp {
 			    			achievement = syncAchievementToPicasa(achievement);
 			    			
 			    			if(!QuizConstant.YES.equals(achievement.getIsProcessed())) {
-			    				PicasawebClient.updateSyncPicasa(settings, QuizParserConstant.PARSE_ACHIEVEMENT, row, achievement.getPicasaId(), achievement.getImagePicasaUrl(), QuizConstant.YES);
+			    				GooglesheetClient.updateSyncPicasa(settings, QuizParserConstant.PARSE_ACHIEVEMENT, row, achievement.getPicasaId(), achievement.getImagePicasaUrl(), QuizConstant.YES);
 			    			}
 			    		}
 			        }
@@ -268,7 +268,7 @@ public class OldApp {
 			    			topic = syncTopicToPicasa(topic);
 			    			
 			    			if(!QuizConstant.YES.equals(topic.getIsProcessed())) {
-			    				PicasawebClient.updateSyncPicasa(settings, QuizParserConstant.PARSE_TOPIC, row, topic.getPicasaId(), topic.getImagePicasaUrl(), QuizConstant.YES);
+			    				GooglesheetClient.updateSyncPicasa(settings, QuizParserConstant.PARSE_TOPIC, row, topic.getPicasaId(), topic.getImagePicasaUrl(), QuizConstant.YES);
 			    			}
 			    		}
 			        	
@@ -312,7 +312,7 @@ public class OldApp {
 			    		} else if(type == APPLICATION_TYPE.SYNC) {
 			    			questionAnswer = syncQuestionAnswersToPicasa(questionAnswer);		    	
 			    			if(!QuizConstant.YES.equals(questionAnswer.getIsProcessed())) {
-			    				PicasawebClient.updateSyncPicasa(settings, QuizParserConstant.PARSE_QUESTION_ANSWER, row, questionAnswer.getPicasaId(), questionAnswer.getImagePicasaUrl(), QuizConstant.YES);
+			    				GooglesheetClient.updateSyncPicasa(settings, QuizParserConstant.PARSE_QUESTION_ANSWER, row, questionAnswer.getPicasaId(), questionAnswer.getImagePicasaUrl(), QuizConstant.YES);
 			    			}
 			    		}
 			        }

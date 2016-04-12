@@ -28,10 +28,31 @@
 		<setProperty type="java.lang.Boolean" value="true" key="showAll" />
 		<callMethod method="getAlbums" methodKey="imageAPI" argumentsKey="showAll" 
 			toKey="albumCollection" />
-		<loop checkCollectionKey="albumCollection" doWhile="true" indexKey="indexAlbum">
+		<loop checkCollectionKey="albumCollection" indexKey="indexAlbum">
 			<getProperty fromKey="albumCollection[indexAlbum]" toKey="album" />
-			<callMethod method="deletePhoto" methodKey="imageAPI" argumentsKey="album" />
+			<callMethod method="deletePhoto" methodKey="imageAPI" argumentsKey="album" stopWhenNull="false" />
 		</loop>
+		
+		<callTemplate commandName="doGetAllWorksheetFromGoogleSheet" />
+		
+		<!-- Clear Achievement Data -->
+		<print message="Clear Achievement Data"/>
+		<callTemplate commandName="doClearData" ignoreExecuteResult="true" 
+			keyMap="tabSettingKey:tabAchievements,methodStructureKey:convertDataToAchievement,
+				resultKey:achievement,parseType:'ACHIEVEMENT'" />
+		
+		<!-- Clear Topics Data -->	
+		<print message="Clear Topics Data"/>
+		<callTemplate commandName="doClearData" ignoreExecuteResult="true" 
+			keyMap="tabSettingKey:tabTopics,methodStructureKey:convertDataToTopics,
+				resultKey:topics,parseType:'TOPIC'" />
+		
+		<!-- Clear Questions Data -->	
+		<print message="Clear Questions Data"/>
+		<callTemplate commandName="doClearData" ignoreExecuteResult="true"
+			keyMap="tabSettingKey:tabQuestions,methodStructureKey:convertDataToAnswerQuestion,
+				resultKey:questions,parseType:'QUESTION_ANSWER'" />
+		
 		<print message="*** FINISHED TASK - CLEAR PICASA ***"/>
 	</chain>
 	
@@ -121,6 +142,27 @@
 		<!-- Close Connection -->
 		<callMethod method="close" methodKey="session"/>	
 		<print message="*** FINISHED TASK - DATA TO DB ***"/>
+	</chain>
+	
+	<chain name="doClearData">
+		<split fromKey="settings.structure.${tabSettingKey}" separator=";" toKey="tabCollections"/>
+		<loop checkCollectionKey="tabCollections" doWhile="true" indexKey="iterateIndex">
+			<print message="* Proses ${resultKey} tab %s:" key="iterateIndex"/>
+			<getProperty fromKey="tabCollections[iterateIndex]" toKey="tab" />
+			<getProperty fromKey="datasheetCollection[tab]" toKey="datasheet" />
+			<callMethod method="getListRows" methodKey="datasheetAPI" argumentsKey="datasheet" toKey="rowEntryCollection"/>
+			<loop checkCollectionKey="rowEntryCollection" indexKey="indexRowEntry">
+				<getProperty fromKey="rowEntryCollection[indexRowEntry]" toKey="rowEntry" />
+				<callMethod method="${methodStructureKey}" methodKey="com.dotosoft.dotoquiz.tools.util.DotoQuizStructure" 
+					argumentsKey="rowEntry,settings" staticFlag="true" toKey="${resultKey}"/>
+				<if evaluate="${resultKey} == null">
+					<print message="    Done"/>
+					<break />
+				</if>
+				<callMethod method="updateClearPicasa" methodKey="com.dotosoft.dotoquiz.tools.thirdparty.GooglesheetClient" 
+					argumentsKey="settings,${parseType},rowEntry" staticFlag="true" toKey="${resultKey}"/>
+			</loop>
+		</loop>
 	</chain>
 	
 	<chain name="doSaveTemplateToDB">

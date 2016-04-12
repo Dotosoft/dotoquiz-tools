@@ -26,8 +26,14 @@ import java.util.List;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.apache.poi.ss.usermodel.Row;
 
+import com.dotosoft.dotoquiz.common.QuizConstant;
 import com.dotosoft.dotoquiz.tools.common.QuizParserConstant;
+import com.dotosoft.dotoquiz.tools.common.QuizParserConstant.DATA_TYPE;
+import com.dotosoft.dotoquiz.tools.config.Settings;
+import com.dotosoft.dotoquiz.tools.util.DotoQuizStructure;
+import com.dotosoft.dotoquiz.utils.StringUtils;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.google.gdata.client.spreadsheet.SpreadsheetService;
@@ -170,4 +176,48 @@ public class GooglesheetClient {
 		}
 		System.out.print("\n");
 	}
+	
+	public static void updateSyncPicasa(Settings settings, String parseType, Object data, String picasaId, String imagePicasaURL, String isProcessed) throws IOException, ServiceException {
+		String paramPIcasaId = DotoQuizStructure.getStructureKey(parseType, settings, "iAlbumIdPicasa");
+		String paramImageURLPicasa = DotoQuizStructure.getStructureKey(parseType, settings, "iImageURLPicasa");
+		String paramIsProcessed = DotoQuizStructure.getStructureKey(parseType, settings, "iIsProcessed");
+		
+		if(DATA_TYPE.EXCEL.toString().equals(settings.getDataType())) {
+			Row rowData = (Row) data;
+			
+			if(StringUtils.hasValue(picasaId)) rowData.getCell(Integer.parseInt(paramPIcasaId)).setCellValue(picasaId);
+			if(StringUtils.hasValue(imagePicasaURL)) rowData.getCell(Integer.parseInt(paramImageURLPicasa)).setCellValue(imagePicasaURL);
+			rowData.getCell(Integer.parseInt(paramIsProcessed)).setCellValue(isProcessed);
+		} else if(DATA_TYPE.GOOGLESHEET.toString().equals(settings.getDataType())) {
+			ListEntry listEntry = (ListEntry) data;
+			if(StringUtils.hasValue(picasaId)) listEntry.getCustomElements().setValueLocal(paramPIcasaId, picasaId);
+			if(StringUtils.hasValue(imagePicasaURL)) listEntry.getCustomElements().setValueLocal(paramImageURLPicasa, imagePicasaURL);
+			listEntry.getCustomElements().setValueLocal(paramIsProcessed, isProcessed);
+			listEntry.update();
+		}
+	}
+    
+    public static void updateClearPicasa(Settings settings, String parseType, Object data) throws IOException, ServiceException {
+    	String paramPIcasaId = DotoQuizStructure.getStructureKey(parseType, settings, "iAlbumIdPicasa");
+		String paramImageURLPicasa = DotoQuizStructure.getStructureKey(parseType, settings, "iImageURLPicasa");
+		String paramIsProcessed = DotoQuizStructure.getStructureKey(parseType, settings, "iIsProcessed");
+		
+		String picasaId = "";
+		if(DATA_TYPE.EXCEL.toString().equals(settings.getDataType())) {
+			Row rowData = (Row) data;
+			picasaId = rowData.getCell(Integer.parseInt(paramPIcasaId)).getStringCellValue();
+			rowData.getCell(Integer.parseInt(paramPIcasaId)).setCellValue(QuizConstant.EMPTY_STRING);
+			rowData.getCell(Integer.parseInt(paramImageURLPicasa)).setCellValue(QuizConstant.EMPTY_STRING);
+			rowData.getCell(Integer.parseInt(paramIsProcessed)).setCellValue(QuizConstant.EMPTY_STRING);
+		} else if(DATA_TYPE.GOOGLESHEET.toString().equals(settings.getDataType())) {
+			ListEntry listEntry = (ListEntry) data;
+			picasaId = listEntry.getCustomElements().getValue(paramPIcasaId);
+			listEntry.getCustomElements().setValueLocal(paramPIcasaId, QuizConstant.EMPTY_STRING);
+			listEntry.getCustomElements().setValueLocal(paramImageURLPicasa, QuizConstant.EMPTY_STRING);
+			listEntry.getCustomElements().setValueLocal(paramIsProcessed, QuizConstant.EMPTY_STRING);
+			listEntry.update();
+		}
+		
+		log.info("Clear Data " + parseType + ": " + picasaId);
+    }
 }

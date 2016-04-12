@@ -37,16 +37,11 @@ import org.apache.commons.beanutils.BeanPropertyValueEqualsPredicate;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
-import org.apache.poi.ss.usermodel.Row;
 
 import com.dotosoft.dotoquiz.tools.common.QuizParserConstant;
-import com.dotosoft.dotoquiz.tools.common.QuizParserConstant.DATA_TYPE;
-import com.dotosoft.dotoquiz.tools.config.Settings;
 import com.dotosoft.dotoquiz.tools.thirdparty.metadata.ImageInformation;
-import com.dotosoft.dotoquiz.tools.util.DotoQuizStructure;
 import com.dotosoft.dotoquiz.tools.util.TimeUtils;
 import com.dotosoft.dotoquiz.utils.MD5Checksum;
-import com.dotosoft.dotoquiz.utils.StringUtils;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.google.gdata.client.Query;
@@ -66,7 +61,6 @@ import com.google.gdata.data.photos.GphotoFeed;
 import com.google.gdata.data.photos.PhotoEntry;
 import com.google.gdata.data.photos.TagEntry;
 import com.google.gdata.data.photos.UserFeed;
-import com.google.gdata.data.spreadsheet.ListEntry;
 import com.google.gdata.util.AuthenticationException;
 import com.google.gdata.util.ParseException;
 import com.google.gdata.util.ServiceException;
@@ -810,24 +804,4 @@ public class PicasawebClient {
 
         return title;
     }
-    
-    public static void updateSyncPicasa(Settings settings, String parseType, Object data, String picasaId, String imagePicasaURL, String isProcessed) throws IOException, ServiceException {
-		String paramPIcasaId = DotoQuizStructure.getStructureKey(parseType, settings, "iAlbumIdPicasa");
-		String paramImageURLPicasa = DotoQuizStructure.getStructureKey(parseType, settings, "iImageURLPicasa");
-		String paramIsProcessed = DotoQuizStructure.getStructureKey(parseType, settings, "iIsProcessed");
-		
-		if(DATA_TYPE.EXCEL.toString().equals(settings.getDataType())) {
-			Row rowData = (Row) data;
-			
-			if(StringUtils.hasValue(picasaId)) rowData.getCell(Integer.parseInt(paramPIcasaId)).setCellValue(picasaId);
-			if(StringUtils.hasValue(imagePicasaURL)) rowData.getCell(Integer.parseInt(paramImageURLPicasa)).setCellValue(imagePicasaURL);
-			rowData.getCell(Integer.parseInt(paramIsProcessed)).setCellValue(isProcessed);
-		} else if(DATA_TYPE.GOOGLESHEET.toString().equals(settings.getDataType())) {
-			ListEntry listEntry = (ListEntry) data;
-			if(StringUtils.hasValue(picasaId)) listEntry.getCustomElements().setValueLocal(paramPIcasaId, picasaId);
-			if(StringUtils.hasValue(imagePicasaURL)) listEntry.getCustomElements().setValueLocal(paramImageURLPicasa, imagePicasaURL);
-			listEntry.getCustomElements().setValueLocal(paramIsProcessed, isProcessed);
-			listEntry.update();
-		}
-	}
 }
