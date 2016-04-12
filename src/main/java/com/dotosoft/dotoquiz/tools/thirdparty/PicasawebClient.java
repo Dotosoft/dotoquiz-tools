@@ -38,6 +38,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 
+import com.dotosoft.dot4command.utils.StringUtils;
 import com.dotosoft.dotoquiz.tools.common.QuizParserConstant;
 import com.dotosoft.dotoquiz.tools.thirdparty.metadata.ImageInformation;
 import com.dotosoft.dotoquiz.tools.util.TimeUtils;
@@ -270,17 +271,12 @@ public class PicasawebClient {
     	photoEntry.delete();
     }
     
-    public GphotoEntry uploadImageToAlbum(Path imageFilePath, GphotoEntry remotePhoto, GphotoEntry albumEntry ) throws Exception {
-    	// java.nio.file.Path topicImagePath = FileUtils.getPath(settings.getSyncDataFolder(), topic.getId(), topic.getImageUrl());
-    	// java.nio.file.Path topicImagePath = FileUtils.getPath(settings.getSyncDataFolder(), topic.getId(), topic.getImageUrl());
-		if(imageFilePath.getParent().toFile().exists()) {
-			if(!imageFilePath.toFile().exists()) {
-				log.error("File is not found at '" + imageFilePath.toString() + "'. Please put the file and start this app again.");
-				System.exit(1);
-			}
-			GphotoEntry photoEntry = (GphotoEntry) uploadImageToAlbum(imageFilePath.toFile(), remotePhoto, albumEntry, MD5Checksum.getMD5Checksum(imageFilePath.toString()));
+    public GphotoEntry uploadImageToAlbum(Path imageFilePath, Object remotePhoto, Object albumEntry ) throws Exception {
+		if(imageFilePath.getParent().toFile().exists() && !imageFilePath.toFile().exists()) {
+			log.error("File is not found at '" + imageFilePath.toString() + "'. Please put the file and start this app again.");
+			System.exit(1);
 		}
-    	return uploadImageToAlbum(imageFilePath, remotePhoto, albumEntry);
+		return (GphotoEntry) uploadImageToAlbum(imageFilePath.toFile(), (GphotoEntry) remotePhoto, (GphotoEntry) albumEntry, MD5Checksum.getMD5Checksum(imageFilePath.toString()));
     }
 
     public GphotoEntry uploadImageToAlbum(File imageFile, GphotoEntry remotePhoto, GphotoEntry albumEntry, String localMd5CheckSum ) throws Exception {
@@ -289,7 +285,7 @@ public class PicasawebClient {
         String albumName = albumEntry.getTitle().getPlainText();
         PhotoEntry  myPhoto = new PhotoEntry();
         
-        if( remotePhoto == null )
+        if( remotePhoto == null || !StringUtils.hasValue(remotePhoto.getId()) )
         {
             newPhoto = true;
             log.info( "Uploading new image to album " + albumName + ": " + imageFile);

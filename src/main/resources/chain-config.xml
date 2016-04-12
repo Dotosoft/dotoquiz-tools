@@ -90,21 +90,21 @@
 		<print message="Synchronize Achievement Data to ImageHosting"/>
 		<callTemplate commandName="doSyncDataToImageHosting" ignoreExecuteResult="true" 
 			keyMap="tabSettingKey:tabAchievements,methodStructureKey:convertDataToAchievement,
-				resultKey:achievement,methodKey:toParameterAchievements,fieldImageUrl:imageUrl" />
+				resultKey:achievement,methodKey:toParameterAchievements,fieldImageUrl:imageUrl,parseType:'ACHIEVEMENT'" />
 		
 		<!-- Sync Topic to Image Hosting -->
 		<!-- <print message="============================================="/>	
 		<print message="Synchronize Topics Data to ImageHosting"/>
 		<callTemplate commandName="doSyncDataToImageHosting" ignoreExecuteResult="true" 
 			keyMap="tabSettingKey:tabTopics,methodStructureKey:convertDataToTopics,
-				resultKey:topics,methodKey:toDataTopics,fieldImageUrl:imageUrl" /> -->
+				resultKey:topics,methodKey:toDataTopics,fieldImageUrl:imageUrl,parseType:'TOPIC'" /> -->
 		
 		<!-- Sync Answers to Image Hosting -->
 		<!-- <print message="============================================="/>
 		<print message="Synchronize Questions Data to ImageHosting"/>
 		<callTemplate commandName="doSyncDataToImageHosting" ignoreExecuteResult="true"
 			keyMap="tabSettingKey:tabQuestions,methodStructureKey:convertDataToAnswerQuestion,
-				resultKey:questions,methodKey:toDataQuestion,fieldImageUrl:additionalData" /> -->
+				resultKey:questions,methodKey:toDataQuestion,fieldImageUrl:additionalData,parseType:'QUESTION_ANSWER'" /> -->
 				
 		<print message="*** FINISHED TASK - SYNC DATA TO IMAGES HOST ***"/>
 	</chain>
@@ -230,13 +230,16 @@
 		
 		<!-- Get All Photo from Picasa -->	
 		<loop checkCollectionKey="albumCollection" indexKey="indexAlbum">
+			<setProperty key="albumEntry" value="albumCollection[indexAlbum]" />
+			<setProperty key="albumMapByTopicId" value="albumEntry.title.plainText:albumEntry" type="java.util.HashMap" />
+			<print message="wow: %s" key="albumMapByTopicId"/>
+			
 			<callMethod method="getPhotos" methodKey="imageAPI" argumentsKey="albumCollection[indexAlbum]" toKey="photoEntries" />
 			<loop checkCollectionKey="photoEntries" indexKey="indexPhoto">
 				<setProperty key="photoMapByPhotoId" value="photoEntries[indexPhoto].title.plainText:photoEntries[indexPhoto]" type="java.util.HashMap" />
 				<setProperty key="photoMapByAlbumId" value="albumCollection[indexAlbum].id:photoMapByPhotoId" type="java.util.HashMap" />
 				<removeProperty fromKey="photoMapByPhotoId" />				
 			</loop>
-			<setProperty key="albumMapByTopicId" value="albumCollection[indexAlbum].id:albumCollection[indexAlbum]" type="java.util.HashMap" />
 		</loop>
 	</chain>
 	
@@ -279,43 +282,32 @@
 				<else>
 					<print message="${resultKey} - %s belum diproses" key="${resultKey}.id"/>
 					
-					<setProperty key="strPath" value="'achievement',${resultKey}.${fieldImageUrl}" type="java.lang.String []"/>
+					<if evaluate="'${resultKey}' == 'achievement'">
+						<getProperty fromKey="albumMapByTopicId['achievement']" toKey="albumGPhotoEntry" />
+						<setProperty key="strPath" value="'achievement',${resultKey}.${fieldImageUrl}" type="java.lang.String []"/>
+					</if>
+					<else>
+						<getProperty fromKey="albumMapByTopicId[${resultKey}.id]" toKey="albumGPhotoEntry" />
+						<setProperty key="strPath" value="${resultKey}.id,${resultKey}.${fieldImageUrl}" type="java.lang.String []"/>
+					</else>
+					
 					<callMethod method="get" methodKey="java.nio.file.Paths" staticFlag="true" 
 						argumentsKey="settings.syncDataFolder,strPath" toKey="filePath" />
-					
-					<!-- <getProperty fromKey="albumCollection[${resultKey}.id]" toKey="myAlbum" />
-					<setProperty key="strPath" value="myAlbum.title.plainText,${resultKey}.${fieldImageUrl}" type="java.lang.String []"/>
-					<print message="strPath:: %s" key="strPath"/>
-					<callMethod method="get" methodKey="java.nio.file.Paths" staticFlag="true" 
-						argumentsKey="settings.syncDataFolder,strPath" toKey="filePath" /> -->
 						
-					<!-- <getProperty fromKey="albumMapByTopicId['achievement']" toKey="achievementTopic" />
-					<print message="strPath:: %s" key="achievementTopic.id"/> -->
+					<getProperty fromKey="photoMapByAlbumId[${resultKey}.id]" toKey="photoEntryCollections" />
+					<getProperty fromKey="photoEntryCollections[${resultKey}.${fieldImageUrl}]" toKey="photoGPhotoEntry" />
+					<if evaluate="photoGPhotoEntry == null">
+						<setProperty key="photoGPhotoEntry" type="com.google.gdata.data.photos.GphotoEntry" />
+					</if>
 					
+					<callMethod method="uploadImageToAlbum" methodKey="imageAPI" argumentsKey="filePath,photoGPhotoEntry,albumGPhotoEntry" toKey="photoGPhotoEntry" />
 					
-					<!-- GphotoEntry achievementTopic = albumMapByTopicId.get(QuizParserConstant.ACHIEVEMENT_NAME);
-					// Check image file is valid or not
-					java.nio.file.Path achievementImagePath = FileUtils.getPath(settings.getSyncDataFolder(), achievementTopic.getTitle().getPlainText(), achievement.getImageUrl());
-					if(!achievementImagePath.toFile().exists()) {
-						log.error("File is not found at '" + achievementImagePath.toString() + "'. Please put the file and start this app again.");
-						System.exit(1);
-					}
+					<setProperty key="mediaContent" value="photoGPhotoEntry.content" type="com.google.gdata.data.MediaContent"/>
+					<callMethod method="setImagePicasaUrl" methodKey="${resultKey}" argumentsKey="mediaContent.uri" />
+					<callMethod method="setPicasaId" methodKey="${resultKey}" argumentsKey="photoGPhotoEntry.gphotoId" />
 					
-					// Check image at picasa
-					Map<String, GphotoEntry> photoEntryCollections = photoMapByAlbumId.get(achievementTopic.getId());
-					GphotoEntry photoEntry = photoEntryCollections != null ? photoEntryCollections.get(achievement.getImageUrl()) : null;
-					if(photoEntryCollections == null) photoEntryCollections = new HashMap<String, GphotoEntry>();
-					
-					photoEntry = (GphotoEntry) webClient.uploadImageToAlbum(achievementImagePath.toFile(), photoEntry, achievementTopic, MD5Checksum.getMD5Checksum(achievementImagePath.toString()));
-					photoEntryCollections.put(((MediaContent)photoEntry.getContent()).getUri(), photoEntry);
-					photoMapByAlbumId.put(achievementTopic.getId(), photoEntryCollections);
-					
-					achievement.setImagePicasaUrl( ((MediaContent)photoEntry.getContent()).getUri() );
-					achievement.setPicasaId( photoEntry.getGphotoId() ); -->
-					
-					<callMethod method="uploadImageToAlbum" methodKey="imageAPI" argumentsKey="filePath,null,myAlbum" 
-						toKey="albumCollection" />
-					
+					<callMethod method="updateSyncPicasa" methodKey="com.dotosoft.dotoquiz.tools.thirdparty.GooglesheetClient" staticFlag="true" 
+						argumentsKey="settings,${parseType},rowEntry,${resultKey}.picasaId,${resultKey}.imagePicasaUrl,'Y'" />
 				</else>
 			</loop>				
 		</loop>

@@ -7,6 +7,7 @@ release.properties
 dependency-reduced-pom.xml
 buildNumber.properties
 Data/
+Upload/
 client_secrets.json
 .DS_Store
 *.log
