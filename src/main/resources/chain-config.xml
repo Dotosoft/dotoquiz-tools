@@ -1,40 +1,36 @@
 <catalog>
 	
 	<!-- Define command and chain aliases -->
-	<define name="callMethod" className="com.dotosoft.dot4command.commands.CallMethodCommand" />
-	<define name="createObject" className="com.dotosoft.dot4command.commands.CreateObjectCommand" />
-	<define name="copyProperty" className="com.dotosoft.dot4command.commands.CopyPropertyCommand"/>
-	<define name="setProperty" className="com.dotosoft.dot4command.commands.SetPropertyCommand" />
-	<define name="removeProperty" className="com.dotosoft.dot4command.commands.RemoveCommand"/>
-	<define name="loop" className="com.dotosoft.dot4command.commands.LoopCommand" />
-	<define name="callTemplate" className="com.dotosoft.dot4command.commands.CallTemplateCommand"/>
-	<define name="print" className="com.dotosoft.dot4command.commands.PrintCommand"/>
-	<define name="split" className="com.dotosoft.dot4command.commands.SplitCommand"/>
-	<define name="if" className="com.dotosoft.dot4command.commands.IfCommand"/>
-	<define name="elseif" className="com.dotosoft.dot4command.commands.ElseIfCommand"/>
-	<define name="else" className="com.dotosoft.dot4command.commands.ElseCommand"/>
 	<define name="break" className="com.dotosoft.dot4command.commands.BreakCommand"/>
-	<define name="continue" className="com.dotosoft.dot4command.commands.ContinueCommand"/>
+	<define name="callMethod" className="com.dotosoft.dot4command.commands.CallMethodCommand" />
 	<define name="callTemplate" className="com.dotosoft.dot4command.commands.CallTemplateCommand"/>
+	<define name="continue" className="com.dotosoft.dot4command.commands.ContinueCommand"/>
+	<define name="copyProperty" className="com.dotosoft.dot4command.commands.CopyPropertyCommand"/>
+	<define name="createObject" className="com.dotosoft.dot4command.commands.CreateObjectCommand" />
+	<define name="else" className="com.dotosoft.dot4command.commands.ElseCommand"/>
+	<define name="elseif" className="com.dotosoft.dot4command.commands.ElseIfCommand"/>
 	<define name="filter" className="com.dotosoft.dot4command.commands.FilterCollectionCommand"/>
+	<define name="if" className="com.dotosoft.dot4command.commands.IfCommand"/>
+	<define name="loop" className="com.dotosoft.dot4command.commands.LoopCommand" />
+	<define name="print" className="com.dotosoft.dot4command.commands.PrintCommand"/>
+	<define name="removeProperty" className="com.dotosoft.dot4command.commands.RemoveCommand"/>
 	<define name="setObjectProperty" className="com.dotosoft.dot4command.commands.SetObjectPropertyCommand"/>
+	<define name="setProperty" className="com.dotosoft.dot4command.commands.SetPropertyCommand" />
+	<define name="split" className="com.dotosoft.dot4command.commands.SplitCommand"/>
 	
-	<!-- Tools Application -->
+	<!-- START - COMMAND MODULE AREA -->
 	<chain name="CLEAR">
 		<print message="*** START TASK - CLEAR PICASA ***"/>
-		<callMethod method="authenticate" toKey="credential" argumentsKey="settings" staticFlag="true"
-			methodKey="com.dotosoft.dotoquiz.tools.thirdparty.GoogleOAuth"/>
-		<createObject argumentsKey="credential" toKey="imageAPI"
-			objectClass="com.dotosoft.dotoquiz.tools.thirdparty.PicasawebClient"/>
-		<setProperty type="java.lang.Boolean" value="true" key="showAll" />
-		<callMethod method="getAlbums" methodKey="imageAPI" argumentsKey="showAll" 
-			toKey="albumCollection" />
+		
+		<callTemplate commandName="doAuthGoogleAPI" />
+		<callTemplate commandName="doGetAllAlbumAndPhotoFromPicasa" ignoreExecuteResult="true" keyMap="queryPhotoFlag:'N'"/>
+		<callTemplate commandName="doGetAllWorksheetFromGoogleSheet" />
+		
+		<!-- Delete all albums in picasa -->
 		<loop checkCollectionKey="albumCollection" indexKey="indexAlbum">
 			<copyProperty fromKey="albumCollection[indexAlbum]" toKey="album" />
 			<callMethod method="deletePhoto" methodKey="imageAPI" argumentsKey="album" stopWhenNull="false" />
 		</loop>
-		
-		<callTemplate commandName="doGetAllWorksheetFromGoogleSheet" />
 		
 		<!-- Clear Achievement Data -->
 		<print message="Clear Achievement Data"/>
@@ -59,12 +55,12 @@
 	
 	<chain name="SHOW_COLUMN_HEADER" showLog="false">
 		<print message="*** START TASK - SHOW COLUMN HEADER DATA ***"/>
-		<setProperty type="java.lang.Boolean" value="false" key="showLog" />
-		<callMethod method="authenticate" methodKey="com.dotosoft.dotoquiz.tools.thirdparty.GoogleOAuth"
-			argumentsKey="settings" staticFlag="true" toKey="credential" />
-		<createObject objectClass="com.dotosoft.dotoquiz.tools.thirdparty.GooglesheetClient" 
-			argumentsKey="credential,settings.syncDataFile" toKey="datasheetAPI" />
-		<callMethod method="getWorksheets" methodKey="datasheetAPI" toKey="datasheetCollection"/>
+		
+		<callTemplate commandName="doAuthGoogleAPI" />
+		<callTemplate commandName="doGetAllWorksheetFromGoogleSheet" />
+
+		<!-- Show All Column Header in GoogleSheet -->
+		<setProperty type="java.lang.Boolean" value="false" key="showLog" />		
 		<loop checkCollectionKey="datasheetCollection" doWhile="true" indexKey="indexWorksheet">
 			<copyProperty fromKey="datasheetCollection[indexWorksheet]" toKey="datasheet" />
 			<print message="Worksheet name: %s" key="datasheet.title.plainText" />
@@ -80,10 +76,9 @@
 	
 	<chain name="SYNC">
 		<print message="*** START TASK - SYNC DATA TO IMAGES HOST ***"/>
-		<callMethod method="authenticate" methodKey="com.dotosoft.dotoquiz.tools.thirdparty.GoogleOAuth"
-			argumentsKey="settings" staticFlag="true" toKey="credential" />
 		
-		<callTemplate commandName="doGetAllAlbumAndPhotoFromPicasa" />
+		<callTemplate commandName="doAuthGoogleAPI" />
+		<callTemplate commandName="doGetAllAlbumAndPhotoFromPicasa" ignoreExecuteResult="true" keyMap="queryPhotoFlag:'Y'"/>
 		<callTemplate commandName="doGetAllWorksheetFromGoogleSheet" />
 		
 		<!-- Sync Achievement To Image Hosting -->
@@ -112,9 +107,8 @@
 	
 	<chain name="DB">
 		<print message="*** START TASK - DATA TO DB ***"/>
-		<callMethod method="authenticate" methodKey="com.dotosoft.dotoquiz.tools.thirdparty.GoogleOAuth"
-			argumentsKey="settings" staticFlag="true" toKey="credential" />
-			
+		
+		<callTemplate commandName="doAuthGoogleAPI" />
 		<callTemplate commandName="doGetAllWorksheetFromGoogleSheet" />
 			
 		<!-- Create Connection to DB -->
@@ -144,7 +138,10 @@
 		<callMethod method="close" methodKey="session"/>	
 		<print message="*** FINISHED TASK - DATA TO DB ***"/>
 	</chain>
+	<!-- END - COMMAND MODULE AREA -->
 	
+	
+	<!-- START - FUNCTION AREA -->
 	<chain name="doClearData">
 		<split fromKey="settings.structure.${tabSettingKey}" separator=";" toKey="tabCollections"/>
 		<loop checkCollectionKey="tabCollections" doWhile="true" indexKey="iterateIndex">
@@ -215,31 +212,39 @@
 		</loop>
 	</chain>
 	
+	<chain name="doAuthGoogleAPI">
+		<callMethod method="authenticate" toKey="credential" argumentsKey="settings" staticFlag="true"
+			methodKey="com.dotosoft.dotoquiz.tools.thirdparty.GoogleOAuth"/>
+	</chain>
+	
+	<!-- Function for getting all worksheet from GoogleSheet -->
 	<chain name="doGetAllWorksheetFromGoogleSheet">
-		<!-- Get All Worksheet from GoogleSheet -->
 		<createObject objectClass="com.dotosoft.dotoquiz.tools.thirdparty.GooglesheetClient" 
 			argumentsKey="credential,settings.syncDataFile" toKey="datasheetAPI" />
 		<callMethod method="getWorksheets" methodKey="datasheetAPI" toKey="datasheetCollection"/>		
 	</chain>
 	
 	<chain name="doGetAllAlbumAndPhotoFromPicasa">
+		<!-- Create Object WebPicasaClient from OAuth Google API -->
 		<createObject argumentsKey="credential" toKey="imageAPI" objectClass="com.dotosoft.dotoquiz.tools.thirdparty.PicasawebClient"/>
 		<setProperty type="java.lang.Boolean" value="true" key="showAll" />
 		
 		<!-- Get All Album from Picasa -->
 		<callMethod method="getAlbums" methodKey="imageAPI" argumentsKey="showAll" toKey="albumCollection" />
 		
-		<!-- Get All Photo from Picasa -->	
-		<loop checkCollectionKey="albumCollection" indexKey="indexAlbum">
-			<setProperty key="albumEntry" value="albumCollection[indexAlbum]" />
-			<setProperty key="albumMapByTopicId" value="albumEntry.title.plainText:albumEntry" type="java.util.HashMap" />
-			<callMethod method="getPhotos" methodKey="imageAPI" argumentsKey="albumCollection[indexAlbum]" toKey="photoEntries" />
-			<loop checkCollectionKey="photoEntries" indexKey="indexPhoto">
-				<setProperty key="photoMapByPhotoId" value="photoEntries[indexPhoto].title.plainText:photoEntries[indexPhoto]" type="java.util.HashMap" />
-				<setProperty key="photoMapByAlbumId" value="albumCollection[indexAlbum].id:photoMapByPhotoId" type="java.util.HashMap" />
-				<removeProperty fromKey="photoMapByPhotoId" />				
+		<if evaluate="'${queryPhotoFlag}' == 'Y'">
+			<!-- Get All Photo from Picasa -->	
+			<loop checkCollectionKey="albumCollection" indexKey="indexAlbum">
+				<setProperty key="albumEntry" value="albumCollection[indexAlbum]" />
+				<setProperty key="albumMapByTopicId" value="albumEntry.title.plainText:albumEntry" type="java.util.HashMap" />
+				<callMethod method="getPhotos" methodKey="imageAPI" argumentsKey="albumCollection[indexAlbum]" toKey="photoEntries" />
+				<loop checkCollectionKey="photoEntries" indexKey="indexPhoto">
+					<setProperty key="photoMapByPhotoId" value="photoEntries[indexPhoto].title.plainText:photoEntries[indexPhoto]" type="java.util.HashMap" />
+					<setProperty key="photoMapByAlbumId" value="albumCollection[indexAlbum].id:photoMapByPhotoId" type="java.util.HashMap" />
+					<removeProperty fromKey="photoMapByPhotoId" />				
+				</loop>
 			</loop>
-		</loop>
+		</if>
 	</chain>
 	
 	<chain name="doSyncDataToImageHosting">
@@ -288,9 +293,10 @@
 						<setProperty key="strPath" value="'achievement',${resultKey}.${fieldImageUrl}" type="java.lang.String []"/>
 					</if>
 					<elseif evaluate="'${resultKey}' == 'questions'">
-						<copyProperty fromKey="albumMapByTopicId[${resultKey}.id]" toKey="albumGPhotoEntry" />
-						<setProperty key="strPath" value="${resultKey}.topics['0'],${resultKey}.${fieldImageUrl}" type="java.lang.String []"/>
-						<print message="*** strPath : %s" key="strPath"/>
+						<setProperty key="albumQuestionId" value="${resultKey}.topics['0']" />
+						<print message=":: albumQuestionId: %s" key="albumQuestionId" />
+						<copyProperty fromKey="albumMapByTopicId[albumQuestionId]" toKey="albumGPhotoEntry" />
+						<setProperty key="strPath" value="albumQuestionId,${resultKey}.${fieldImageUrl}" type="java.lang.String []"/>
 					</elseif>
 					<else>
 						<copyProperty fromKey="albumMapByTopicId[${resultKey}.id]" toKey="albumGPhotoEntry" />
@@ -302,7 +308,12 @@
 						<!-- Insert Album to Picasa -->
 						<createObject toKey="myAlbum" objectClass="com.google.gdata.data.photos.AlbumEntry"/>
 						
-						<setProperty key="titleAlbum" value="${resultKey}.id" type="com.google.gdata.data.PlainTextConstruct"/>
+						<if evaluate="'${resultKey}' == 'achievement'">
+							<setProperty key="titleAlbum" value="'achievement'" type="com.google.gdata.data.PlainTextConstruct"/>
+						</if>
+						<else>
+							<setProperty key="titleAlbum" value="${resultKey}.id" type="com.google.gdata.data.PlainTextConstruct"/>
+						</else>
 						<setProperty key="descriptionAlbum" value="${resultKey}.description" type="com.google.gdata.data.PlainTextConstruct"/>
 
 						<setObjectProperty key="myAlbum" property="access" value="'public'" />
@@ -328,10 +339,16 @@
 					
 					<callMethod method="updateSyncPicasa" methodKey="com.dotosoft.dotoquiz.tools.thirdparty.GooglesheetClient" staticFlag="true" 
 						argumentsKey="settings,${parseType},rowEntry,${resultKey}.picasaId,${resultKey}.imagePicasaUrl,'Y'" />
-						
-					<setProperty key="albumMapByTopicId" value="${resultKey}.id:albumGPhotoEntry"/>
+					
+					<if evaluate="'${resultKey}' == 'achievement'">
+						<setProperty key="albumMapByTopicId" value="'achievement':albumGPhotoEntry"/>
+					</if>
+					<else>
+						<setProperty key="albumMapByTopicId" value="${resultKey}.id:albumGPhotoEntry"/>
+					</else>
 				</else>
 			</loop>				
 		</loop>
 	</chain>
+	<!-- END - FUNCTION AREA -->
 </catalog>
