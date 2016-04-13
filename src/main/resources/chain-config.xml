@@ -3,7 +3,7 @@
 	<!-- Define command and chain aliases -->
 	<define name="callMethod" className="com.dotosoft.dot4command.commands.CallMethodCommand" />
 	<define name="createObject" className="com.dotosoft.dot4command.commands.CreateObjectCommand" />
-	<define name="getProperty" className="com.dotosoft.dot4command.commands.GetPropertyCommand"/>
+	<define name="copyProperty" className="com.dotosoft.dot4command.commands.CopyPropertyCommand"/>
 	<define name="setProperty" className="com.dotosoft.dot4command.commands.SetPropertyCommand" />
 	<define name="removeProperty" className="com.dotosoft.dot4command.commands.RemoveCommand"/>
 	<define name="loop" className="com.dotosoft.dot4command.commands.LoopCommand" />
@@ -17,6 +17,7 @@
 	<define name="continue" className="com.dotosoft.dot4command.commands.ContinueCommand"/>
 	<define name="callTemplate" className="com.dotosoft.dot4command.commands.CallTemplateCommand"/>
 	<define name="filter" className="com.dotosoft.dot4command.commands.FilterCollectionCommand"/>
+	<define name="setObjectProperty" className="com.dotosoft.dot4command.commands.SetObjectPropertyCommand"/>
 	
 	<!-- Tools Application -->
 	<chain name="CLEAR">
@@ -29,7 +30,7 @@
 		<callMethod method="getAlbums" methodKey="imageAPI" argumentsKey="showAll" 
 			toKey="albumCollection" />
 		<loop checkCollectionKey="albumCollection" indexKey="indexAlbum">
-			<getProperty fromKey="albumCollection[indexAlbum]" toKey="album" />
+			<copyProperty fromKey="albumCollection[indexAlbum]" toKey="album" />
 			<callMethod method="deletePhoto" methodKey="imageAPI" argumentsKey="album" stopWhenNull="false" />
 		</loop>
 		
@@ -65,12 +66,12 @@
 			argumentsKey="credential,settings.syncDataFile" toKey="datasheetAPI" />
 		<callMethod method="getWorksheets" methodKey="datasheetAPI" toKey="datasheetCollection"/>
 		<loop checkCollectionKey="datasheetCollection" doWhile="true" indexKey="indexWorksheet">
-			<getProperty fromKey="datasheetCollection[indexWorksheet]" toKey="datasheet" />
+			<copyProperty fromKey="datasheetCollection[indexWorksheet]" toKey="datasheet" />
 			<print message="Worksheet name: %s" key="datasheet.title.plainText" />
 			<callMethod method="getListRows" methodKey="datasheetAPI" argumentsKey="datasheet" 
 				toKey="rowEntryCollection"/>
 			<loop loopTime="1" indexKey="indexRowEntry">
-				<getProperty fromKey="rowEntryCollection[indexRowEntry]" toKey="rowEntry" />
+				<copyProperty fromKey="rowEntryCollection[indexRowEntry]" toKey="rowEntry" />
 				<callMethod  method="showColumnHeader" methodKey="datasheetAPI" argumentsKey="rowEntry,showLog" />				
 			</loop>
 		</loop>
@@ -93,18 +94,18 @@
 				resultKey:achievement,methodKey:toParameterAchievements,fieldImageUrl:imageUrl,parseType:'ACHIEVEMENT'" />
 		
 		<!-- Sync Topic to Image Hosting -->
-		<!-- <print message="============================================="/>	
+		<print message="============================================="/>	
 		<print message="Synchronize Topics Data to ImageHosting"/>
 		<callTemplate commandName="doSyncDataToImageHosting" ignoreExecuteResult="true" 
 			keyMap="tabSettingKey:tabTopics,methodStructureKey:convertDataToTopics,
-				resultKey:topics,methodKey:toDataTopics,fieldImageUrl:imageUrl,parseType:'TOPIC'" /> -->
+				resultKey:topics,methodKey:toDataTopics,fieldImageUrl:imageUrl,parseType:'TOPIC'" />
 		
 		<!-- Sync Answers to Image Hosting -->
-		<!-- <print message="============================================="/>
+		<print message="============================================="/>
 		<print message="Synchronize Questions Data to ImageHosting"/>
 		<callTemplate commandName="doSyncDataToImageHosting" ignoreExecuteResult="true"
 			keyMap="tabSettingKey:tabQuestions,methodStructureKey:convertDataToAnswerQuestion,
-				resultKey:questions,methodKey:toDataQuestion,fieldImageUrl:additionalData,parseType:'QUESTION_ANSWER'" /> -->
+				resultKey:questions,methodKey:toDataQuestion,fieldImageUrl:additionalData,parseType:'QUESTION_ANSWER'" />
 				
 		<print message="*** FINISHED TASK - SYNC DATA TO IMAGES HOST ***"/>
 	</chain>
@@ -148,11 +149,11 @@
 		<split fromKey="settings.structure.${tabSettingKey}" separator=";" toKey="tabCollections"/>
 		<loop checkCollectionKey="tabCollections" doWhile="true" indexKey="iterateIndex">
 			<print message="* Proses ${resultKey} tab %s:" key="iterateIndex"/>
-			<getProperty fromKey="tabCollections[iterateIndex]" toKey="tab" />
-			<getProperty fromKey="datasheetCollection[tab]" toKey="datasheet" />
+			<copyProperty fromKey="tabCollections[iterateIndex]" toKey="tab" />
+			<copyProperty fromKey="datasheetCollection[tab]" toKey="datasheet" />
 			<callMethod method="getListRows" methodKey="datasheetAPI" argumentsKey="datasheet" toKey="rowEntryCollection"/>
 			<loop checkCollectionKey="rowEntryCollection" indexKey="indexRowEntry">
-				<getProperty fromKey="rowEntryCollection[indexRowEntry]" toKey="rowEntry" />
+				<copyProperty fromKey="rowEntryCollection[indexRowEntry]" toKey="rowEntry" />
 				<callMethod method="${methodStructureKey}" methodKey="com.dotosoft.dotoquiz.tools.util.DotoQuizStructure" 
 					argumentsKey="rowEntry,settings" staticFlag="true" toKey="${resultKey}"/>
 				<if evaluate="${resultKey} == null">
@@ -170,11 +171,11 @@
 		<loop checkCollectionKey="tabCollections" doWhile="true" indexKey="iterateIndex">
 			<print message="* Proses ${resultKey} tab %s:" key="iterateIndex"/>
 			<callMethod method="beginTransaction" methodKey="session" toKey="trx"/>
-			<getProperty fromKey="tabCollections[iterateIndex]" toKey="tab" />
-			<getProperty fromKey="datasheetCollection[tab]" toKey="datasheet" />
+			<copyProperty fromKey="tabCollections[iterateIndex]" toKey="tab" />
+			<copyProperty fromKey="datasheetCollection[tab]" toKey="datasheet" />
 			<callMethod method="getListRows" methodKey="datasheetAPI" argumentsKey="datasheet" toKey="rowEntryCollection"/>
 			<loop checkCollectionKey="rowEntryCollection" indexKey="indexRowEntry">
-				<getProperty fromKey="rowEntryCollection[indexRowEntry]" toKey="rowEntry" />
+				<copyProperty fromKey="rowEntryCollection[indexRowEntry]" toKey="rowEntry" />
 				<callMethod method="${methodStructureKey}" methodKey="com.dotosoft.dotoquiz.tools.util.DotoQuizStructure" 
 					argumentsKey="rowEntry,settings" staticFlag="true" toKey="${resultKey}"/>
 				<if evaluate="${resultKey} == null">
@@ -185,15 +186,15 @@
 				<if evaluate="'${resultKey}' == 'questions'">
 					<callMethod method="getQuestionTypeByName" argumentsKey="session,${resultKey}.questionTypeData"
 						staticFlag="true" methodKey="com.dotosoft.dotoquiz.tools.util.HibernateUtil" toKey="mtQuestionType"/>
-					<callMethod method="setMtQuestionType" methodKey="${resultKey}" argumentsKey="mtQuestionType" />
+					<setObjectProperty key="${resultKey}" property="mtQuestionType" value="mtQuestionType" />
 				</if>
 				<callMethod method="${methodKey}" methodKey="${resultKey}" toKey="resultData"/>
 				<!-- Set parent topic object -->
 				<if evaluate="'${resultKey}' == 'topics'">
-					<getProperty fromKey="topicMapByTopicId[${resultKey}.topicParentId]" toKey="topicParent" />
+					<copyProperty fromKey="topicMapByTopicId[${resultKey}.topicParentId]" toKey="topicParent" />
 					<if evaluate="topicParent != null">
 						<callMethod method="${methodKey}" methodKey="topicParent" toKey="parentData"/>
-						<callMethod method="setDatTopics" methodKey="${resultKey}" argumentsKey="parentData" />
+						<setObjectProperty key="${resultKey}" property="datTopics" value="parentData" />
 					</if>
 					<setProperty key="topicMapByTopicId" value="${resultKey}.id:${resultKey}" type="java.util.HashMap" />
 				</if>
@@ -202,8 +203,8 @@
 				
 				<if evaluate="'${resultKey}' == 'questions'">
 					<loop checkCollectionKey="${resultKey}.topics" indexKey="indexTopicAnswer">
-						<getProperty fromKey="${resultKey}.topics[indexTopicAnswer]" toKey="topicId" />
-						<getProperty fromKey="topicMapByTopicId[topicId]" toKey="datTopic" />
+						<copyProperty fromKey="${resultKey}.topics[indexTopicAnswer]" toKey="topicId" />
+						<copyProperty fromKey="topicMapByTopicId[topicId]" toKey="datTopic" />
 						<callMethod method="toDataTopics" methodKey="datTopic" toKey="resultTopic"/>						
 						<callMethod method="saveOrUpdateTopicQuestionData" methodKey="com.dotosoft.dotoquiz.tools.util.HibernateUtil" 
 							staticFlag="true" argumentsKey="session,resultTopic,resultData" />
@@ -232,8 +233,6 @@
 		<loop checkCollectionKey="albumCollection" indexKey="indexAlbum">
 			<setProperty key="albumEntry" value="albumCollection[indexAlbum]" />
 			<setProperty key="albumMapByTopicId" value="albumEntry.title.plainText:albumEntry" type="java.util.HashMap" />
-			<print message="wow: %s" key="albumMapByTopicId"/>
-			
 			<callMethod method="getPhotos" methodKey="imageAPI" argumentsKey="albumCollection[indexAlbum]" toKey="photoEntries" />
 			<loop checkCollectionKey="photoEntries" indexKey="indexPhoto">
 				<setProperty key="photoMapByPhotoId" value="photoEntries[indexPhoto].title.plainText:photoEntries[indexPhoto]" type="java.util.HashMap" />
@@ -247,12 +246,12 @@
 		<split fromKey="settings.structure.${tabSettingKey}" separator=";" toKey="tabCollections"/>	
 		<loop checkCollectionKey="tabCollections" doWhile="true" indexKey="iterateIndex">
 			<print message="* Proses ${resultKey} tab %s:" key="iterateIndex"/>
-			<getProperty fromKey="tabCollections[iterateIndex]" toKey="tab" />
-			<getProperty fromKey="datasheetCollection[tab]" toKey="datasheet" />		
+			<copyProperty fromKey="tabCollections[iterateIndex]" toKey="tab" />
+			<copyProperty fromKey="datasheetCollection[tab]" toKey="datasheet" />		
 					
 			<callMethod method="getListRows" methodKey="datasheetAPI" argumentsKey="datasheet" toKey="rowEntryCollection"/>
 			<loop checkCollectionKey="rowEntryCollection" indexKey="indexRowEntry">
-				<getProperty fromKey="rowEntryCollection[indexRowEntry]" toKey="rowEntry" />
+				<copyProperty fromKey="rowEntryCollection[indexRowEntry]" toKey="rowEntry" />
 				<callMethod method="${methodStructureKey}" argumentsKey="rowEntry,settings" toKey="${resultKey}"
 					methodKey="com.dotosoft.dotoquiz.tools.util.DotoQuizStructure" staticFlag="true" />
 				<if evaluate="${resultKey} == null">
@@ -263,6 +262,8 @@
 				<!-- skip if this data is questions and question type is image -->
 				<if evaluate="'${resultKey}' == 'questions'">
 					<if evaluate="${resultKey}.questionTypeData != 'image'">
+						<callMethod method="updateSyncPicasa" methodKey="com.dotosoft.dotoquiz.tools.thirdparty.GooglesheetClient" staticFlag="true" 
+							argumentsKey="settings,${parseType},rowEntry,'','','Y'" />
 						<continue/>
 					</if>
 				</if>
@@ -283,19 +284,38 @@
 					<print message="${resultKey} - %s belum diproses" key="${resultKey}.id"/>
 					
 					<if evaluate="'${resultKey}' == 'achievement'">
-						<getProperty fromKey="albumMapByTopicId['achievement']" toKey="albumGPhotoEntry" />
+						<copyProperty fromKey="albumMapByTopicId['achievement']" toKey="albumGPhotoEntry" />
 						<setProperty key="strPath" value="'achievement',${resultKey}.${fieldImageUrl}" type="java.lang.String []"/>
 					</if>
+					<elseif evaluate="'${resultKey}' == 'questions'">
+						<copyProperty fromKey="albumMapByTopicId[${resultKey}.id]" toKey="albumGPhotoEntry" />
+						<setProperty key="strPath" value="${resultKey}.topics['0'],${resultKey}.${fieldImageUrl}" type="java.lang.String []"/>
+						<print message="*** strPath : %s" key="strPath"/>
+					</elseif>
 					<else>
-						<getProperty fromKey="albumMapByTopicId[${resultKey}.id]" toKey="albumGPhotoEntry" />
+						<copyProperty fromKey="albumMapByTopicId[${resultKey}.id]" toKey="albumGPhotoEntry" />
 						<setProperty key="strPath" value="${resultKey}.id,${resultKey}.${fieldImageUrl}" type="java.lang.String []"/>
 					</else>
+					
+					<!-- Insert album to picasa if there is no album by id -->
+					<if evaluate="albumGPhotoEntry == null">
+						<!-- Insert Album to Picasa -->
+						<createObject toKey="myAlbum" objectClass="com.google.gdata.data.photos.AlbumEntry"/>
+						
+						<setProperty key="titleAlbum" value="${resultKey}.id" type="com.google.gdata.data.PlainTextConstruct"/>
+						<setProperty key="descriptionAlbum" value="${resultKey}.description" type="com.google.gdata.data.PlainTextConstruct"/>
+
+						<setObjectProperty key="myAlbum" property="access" value="'public'" />
+						<setObjectProperty key="myAlbum" property="title" value="titleAlbum" />
+						<setObjectProperty key="myAlbum" property="description" value="descriptionAlbum" />
+						<callMethod method="insertAlbum" methodKey="imageAPI" argumentsKey="myAlbum" toKey="albumGPhotoEntry" />
+					</if>
 					
 					<callMethod method="get" methodKey="java.nio.file.Paths" staticFlag="true" 
 						argumentsKey="settings.syncDataFolder,strPath" toKey="filePath" />
 						
-					<getProperty fromKey="photoMapByAlbumId[${resultKey}.id]" toKey="photoEntryCollections" />
-					<getProperty fromKey="photoEntryCollections[${resultKey}.${fieldImageUrl}]" toKey="photoGPhotoEntry" />
+					<copyProperty fromKey="photoMapByAlbumId[${resultKey}.id]" toKey="photoEntryCollections" />
+					<copyProperty fromKey="photoEntryCollections[${resultKey}.${fieldImageUrl}]" toKey="photoGPhotoEntry" />
 					<if evaluate="photoGPhotoEntry == null">
 						<setProperty key="photoGPhotoEntry" type="com.google.gdata.data.photos.GphotoEntry" />
 					</if>
@@ -303,11 +323,13 @@
 					<callMethod method="uploadImageToAlbum" methodKey="imageAPI" argumentsKey="filePath,photoGPhotoEntry,albumGPhotoEntry" toKey="photoGPhotoEntry" />
 					
 					<setProperty key="mediaContent" value="photoGPhotoEntry.content" type="com.google.gdata.data.MediaContent"/>
-					<callMethod method="setImagePicasaUrl" methodKey="${resultKey}" argumentsKey="mediaContent.uri" />
-					<callMethod method="setPicasaId" methodKey="${resultKey}" argumentsKey="photoGPhotoEntry.gphotoId" />
+					<setObjectProperty key="${resultKey}" property="imagePicasaUrl" value="mediaContent.uri" />
+					<setObjectProperty key="${resultKey}" property="picasaId" value="photoGPhotoEntry.gphotoId" />
 					
 					<callMethod method="updateSyncPicasa" methodKey="com.dotosoft.dotoquiz.tools.thirdparty.GooglesheetClient" staticFlag="true" 
 						argumentsKey="settings,${parseType},rowEntry,${resultKey}.picasaId,${resultKey}.imagePicasaUrl,'Y'" />
+						
+					<setProperty key="albumMapByTopicId" value="${resultKey}.id:albumGPhotoEntry"/>
 				</else>
 			</loop>				
 		</loop>

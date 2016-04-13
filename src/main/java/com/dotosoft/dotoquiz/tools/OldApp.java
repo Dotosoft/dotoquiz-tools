@@ -185,7 +185,6 @@ public class OldApp {
 			    workbook = new XSSFWorkbook(file);			 
 			} else if(DATA_TYPE.GOOGLESHEET.toString().equals(settings.getDataType())) {
 				googlesheetClient = new GooglesheetClient(auth, settings.getSyncDataFile());
-//				googlesheetClient = auth.authenticateGooglesheet(settings.getSyncDataFile(), settings, false, syncState );
 			}
 			
 			int index = 0;
